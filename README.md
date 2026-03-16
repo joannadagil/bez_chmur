@@ -2,11 +2,19 @@
 
 Frontend
 React + TypeScript
-    
-REST API
-        
+
+|
+
+| REST API
+
+v
+
 Backend
 Django + Django REST Framework
+
+|
+
+v
 
 Database
 PostgreSQL
