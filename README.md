@@ -23,11 +23,20 @@ v
 Database
 PostgreSQL
 
-sandbox płatności: Stripe Checkout w test mode
+payment sandbox: Stripe Checkout in test mode
 
-## Zespół
+## Team
 
 Marta Czarnecka, 
 Joanna Dagil, 
 Weronika Kłujszo, 
 Semion Lisichik
+
+## Views
+
+1. Registration/Login page
+2. MAIN PAGE
+  1. events catalogue with filters for specific venues
+
+
+
