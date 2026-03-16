@@ -233,5 +233,119 @@ Response:
 ```
 
 
+### Events
+
+#### Get list of events
+
+```
+GET /api/events
+```
+
+Optional query parameters:
+
+```
+/api/events?venue=main_hall
+/api/events?date=2026-05-20
+```
+
+Response:
+
+```json
+[
+  {
+    "id": 1,
+    "title": "Hamlet",
+    "venue": "Main Theatre",
+    "date": "2026-05-20T19:00:00"
+  }
+]
+```
+
+#### Get event details
+
+```
+GET /api/events/{event_id}
+```
+
+Response:
+
+```json
+{
+  "id": 1,
+  "title": "Hamlet",
+  "venue": "Main Theatre",
+  "date": "2026-05-20T19:00:00",
+  "price": 40
+}
+```
+
+### Seats 
+
+#### Get seating layout for event
+
+```
+GET /api/events/{event_id}/seats
+```
+
+Response:
+
+```json
+[
+  {
+    "seat_id": 15,
+    "row": 3,
+    "number": 5,
+    "status": "available"
+  },
+  {
+    "seat_id": 16,
+    "row": 3,
+    "number": 6,
+    "status": "booked"
+  }
+]
+```
+
+Seat status values:
+
+- available
+
+- held
+
+- booked
+- 
+
+### Reservations
+
+#### Reserve seats
+
+```
+POST /api/reservations
+```
+
+Request body:
+
+```json
+{
+  "event_id": 1,
+  "seat_ids": [15, 16]
+}
+```
+
+Response:
+
+```json
+{
+  "reservation_id": 42,
+  "status": "held",
+  "expires_at": "2026-05-20T18:05:00"
+}
+```
+
+Seats are temporarily locked until payment is completed.
+
+### Payments
+
+### User
 
 
