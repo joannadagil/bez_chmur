@@ -168,4 +168,70 @@ Marta Czarnecka, Joanna Dagil, Weronika Kłujszo, Semion Lisichik
 
 
 
+# API Endpoints
+
+The backend exposes a REST API built with **Django REST Framework**.
+
+Base URL example:
+
+```
+/api/
+```
+
+
+---
+
+### Authentication
+
+#### Register a new user
+
+```
+POST /api/auth/register
+```
+
+Request body:
+
+```json
+{
+  "username": "user123",
+  "email": "user@example.com",
+  "password": "password123"
+}
+```
+
+Response:
+
+```json
+{
+  "id": 1,
+  "username": "user123",
+  "email": "user@example.com"
+}
+```
+
+#### Login
+
+```
+POST /api/auth/login
+```
+
+Request body:
+
+```json
+{
+  "username": "user123",
+  "password": "password123"
+}
+```
+
+Response:
+
+```json
+{
+  "token": "authentication_token"
+}
+```
+
+
+
 
