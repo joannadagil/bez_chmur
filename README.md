@@ -76,29 +76,6 @@ Users are redirected to Stripe's sandbox checkout to simulate payment and then r
 ## 6. Booking Confirmation
 After successful payment, users receive confirmation and their seats are marked as booked.
 
----
-
-# Project Structure
-
-
-bez_chmur
-│
-├── backend
-│ ├── cinema
-│ ├── bookings
-│ ├── users
-│ └── manage.py
-│
-├── frontend
-│ ├── src
-│ │ ├── components
-│ │ ├── pages
-│ │ ├── api
-│ │ └── App.tsx
-│
-└── README.md
-
-
 
 ---
 
@@ -110,74 +87,29 @@ bez_chmur
 git clone https://github.com/your-username/bez_chmur.git
 cd bez_chmur
 ```
-## 2. Backend setup
 
-Create a virtual environment:
-
-```bash
-python -m venv venv
-```
-
-Activate it:
+## 2. Run containers
 
 ```bash
-# Windows
-venv\Scripts\activate
-# Linux
-source venv/bin/activate
+docker compose up
 ```
 
-Install dependencies:
+### Running migrations after changes to database
 
 ```bash
-pip install -r requirements.txt
+docker compose exec backend python manage.py makemigrations
+docker compose exec backend python manage.py migrate
+
+# view the tables
+docker compose exec db psql -U myuser -d myproject_db
+
+\dt
+\d api_event
 ```
-
-Run migrations:
-
-```bash
-python manage.py migrate
-```
-
-Start backend server:
-
-```bash
-python manage.py runserver
-```
-
-## 3. Frontend setup
-
-(in frontend folder) 
-
-Install dependencies:
-
-```bash
-npm install
-```
-
-```bash
-npm run dev
-```
-
-
-# Team 
-
-Marta Czarnecka, Joanna Dagil, Weronika Kłujszo, Semion Lisichik
-
-
-
-
 
 # API Endpoints
 
 The backend exposes a REST API built with **Django REST Framework**.
-
-Base URL example:
-
-```
-/api/
-```
-
 
 ---
 
@@ -347,5 +279,10 @@ Seats are temporarily locked until payment is completed.
 ### Payments
 
 ### User
+
+
+# Team 
+
+Marta Czarnecka, Joanna Dagil, Weronika Kłujszo, Semion Lisichik
 
 
