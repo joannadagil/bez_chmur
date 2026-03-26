@@ -125,3 +125,6 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = 'static/'
+
+# Databases are warning me so I'm adding this
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
