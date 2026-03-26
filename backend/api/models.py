@@ -12,6 +12,8 @@ class Message(models.Model):
 
 class Venue(models.Model):
     name = models.CharField(max_length=255)
+    rows = models.IntegerField()
+    seats_per_row = models.IntegerField()
 
     def __str__(self):
         return self.name
@@ -19,7 +21,7 @@ class Venue(models.Model):
 
 class Event(models.Model):
     name = models.CharField(max_length=255)
-    description = models.TextField()
+    description = models.TextField(blank=True)
 
     def __str__(self):
         return self.name
@@ -33,18 +35,36 @@ class EventInstance(models.Model):
     def __str__(self):
         return f"{self.event.name} at {self.time}"
 
-
-class Seat(models.Model):
-    eventinstance = models.ForeignKey(EventInstance, on_delete=models.CASCADE)
-    row_number = models.IntegerField()
-    seat_number = models.IntegerField()
+class SeatCategory(models.Model):
+    name = models.CharField(max_length=255)
     price = models.DecimalField(max_digits=10, decimal_places=2)
 
+    def __str__(self):
+        return self.name
+
+class Seat(models.Model):
+    venue = models.ForeignKey(Venue, on_delete=models.CASCADE)
+    row = models.IntegerField()
+    number = models.IntegerField()
+    exist = models.BooleanField(default=True)
+
     class Meta:
-        unique_together = ("eventinstance", "row_number", "seat_number")
+        unique_together = ("venue", "row", "number")
 
     def __str__(self):
-        return f"Row {self.row_number} Seat {self.seat_number}"
+        return f"Row {self.row} Seat {self.number}"
+
+# This model links seats to event instances and seat categories
+class EventSeat(models.Model):
+    seat = models.ForeignKey(Seat, on_delete=models.CASCADE)
+    seat_category = models.ForeignKey(SeatCategory, on_delete=models.CASCADE)
+    event_instance = models.ForeignKey(EventInstance, on_delete=models.CASCADE)
+
+    class Meta:
+        unique_together = ("seat", "event_instance")
+
+    def __str__(self):
+        return f"{self.event_instance} - {self.seat}"
 
 
 class Order(models.Model):
@@ -58,7 +78,7 @@ class Order(models.Model):
 
     eventinstance = models.ForeignKey(EventInstance, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES)
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
 
     def __str__(self):
         return f"Order {self.id}"
@@ -66,13 +86,13 @@ class Order(models.Model):
 
 class OrderSeat(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
-    seat = models.ForeignKey(Seat, on_delete=models.CASCADE)
+    event_seat = models.ForeignKey(EventSeat, on_delete=models.CASCADE)
 
     class Meta:
-        unique_together = ("seat", "order")
+        unique_together = ("event_seat", "order")
 
     def __str__(self):
-        return f"Order {self.order.id} - Seat {self.seat.id}"
+        return f"Order {self.order.id} - Seat {self.event_seat.id}"
 
 
 class Payment(models.Model):
@@ -85,8 +105,8 @@ class Payment(models.Model):
     ]
 
     order = models.OneToOneField(Order, on_delete=models.CASCADE)
-    stripe_session_id = models.CharField(max_length=255)
-    status = models.CharField(max_length=20, choices=STATUS_CHOICES)
+    stripe_session_id = models.CharField(max_length=255, blank=True, null=True) #idk if it may need to be optional
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
 
     def __str__(self):
         return f"Payment for Order {self.order.id}"
