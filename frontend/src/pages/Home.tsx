@@ -1,4 +1,3 @@
-// src/pages/Home.tsx
 import React, { useState } from 'react';
 import Header from '../components/layout/Header';
 import { EventCard } from '../components/events/EventCard';
