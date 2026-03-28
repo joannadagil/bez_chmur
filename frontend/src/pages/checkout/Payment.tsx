@@ -1,4 +1,3 @@
-// src/pages/checkout/PaymentPage.tsx
 import React, { useState, useEffect } from 'react';
 import { CreditCard, Lock, ShieldCheck, Clock, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -45,16 +44,16 @@ export const Payment: React.FC = () => {
     setCvc(value);
   };
 
-  const handlePayment = (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsProcessing(true);
-    
-    setTimeout(() => {
-      setIsProcessing(false);
-      console.log("Payment successful!");
-      navigate('/checkout/success'); 
-    }, 2000);
-  };
+const handlePayment = (e: React.FormEvent) => {
+  e.preventDefault();
+  setIsProcessing(true);
+  
+  setTimeout(() => {
+    setIsProcessing(false);
+
+    navigate('/checkout/success'); 
+  }, 2000);
+};
 
   return (
     <div className="min-h-screen bg-[#f0f2f5] font-sans text-[#1a0b1a] animate-in fade-in duration-700">
