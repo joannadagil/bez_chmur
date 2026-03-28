@@ -1,8 +1,10 @@
+// App.tsx
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import EventDetails from './pages/EventDetails';
 import SeatSelection from './pages/SeatSelection';
 import MyTickets from './pages/MyTickets';
+import { Payment } from './pages/checkout/Payment';
 
 function App() {
   return (
@@ -11,9 +13,9 @@ function App() {
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/event/:id" element={<EventDetails />} />
+          <Route path="/checkout/payment" element={<Payment />} />
           <Route path="/checkout/:id" element={<SeatSelection />} />
           <Route path="/my-tickets" element={<MyTickets />} />
-          
         </Routes>
       </div>
     </Router>
