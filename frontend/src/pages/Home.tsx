@@ -4,6 +4,7 @@ import Header from '../components/layout/Header';
 import { EventCard } from '../components/events/EventCard';
 import { mockEvents } from '../data/mockEvents';
 
+
 const Home = () => {
   const [activeFilter, setActiveFilter] = useState('ALL EVENTS');
   const [searchQuery, setSearchQuery] = useState('');
