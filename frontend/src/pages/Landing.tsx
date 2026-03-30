@@ -18,7 +18,7 @@ const Landing = () => {
               <img
                 src={logo}
                 alt="getAroom Logo"
-                className="w-250 h-30 object-contain cursor-pointer"
+                className="w-250 h-40 object-contain cursor-pointer mb-10"
                 onClick={() => navigate(isLoggedIn ? '/home' : '/')}
               />
             </div>
