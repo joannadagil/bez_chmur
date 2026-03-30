@@ -58,9 +58,9 @@ const RoleSelection = () => {
               onClick={() => navigate(localStorage.getItem('isLoggedIn') === 'true' ? '/home' : '/')}
             />
           </div>
-          <h1 className="text-4xl font-black text-[#d3265b] uppercase tracking-tighter italic mb-2" style={{ fontFamily: 'Placard Next, sans-serif' }}>
+          {/*<h1 className="text-4xl font-black text-[#d3265b] uppercase tracking-tighter italic mb-2" style={{ fontFamily: 'Placard Next, sans-serif' }}>
             find or create your next event
-          </h1>
+          </h1>*/}
           <p className="text-white/80 font-medium text-lg">
             Almost done! Now, tell us if you're going to be attending events or organising them:
           </p>
