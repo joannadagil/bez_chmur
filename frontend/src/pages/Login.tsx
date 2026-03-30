@@ -117,11 +117,11 @@ const Login = () => {
             <img
               src={logo}
               alt="getAroom Logo"
-              className="w-24 h-24 object-contain cursor-pointer"
+              className="w-220 h-20 object-contain cursor-pointer"
               onClick={() => navigate(localStorage.getItem('isLoggedIn') === 'true' ? '/home' : '/login')}
             />
           </div>
-          <h1 className="text-4xl font-black text-[#d3265b] uppercase tracking-tighter italic mb-2" style={{ fontFamily: 'Placard Next, sans-serif' }}>
+          <h1 className="text-4xl font-black text-[#ffffff] uppercase tracking-tighter italic mb-2" style={{ fontFamily: 'Placard Next, sans-serif' }}>
             find or create your next event
           </h1>
         </div>
