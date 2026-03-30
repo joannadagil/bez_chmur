@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { User, Moon, Search, Settings, LogOut, Ticket } from 'lucide-react';
-import logo from '../../assets/logo.png';
+import logo from '../../assets/logo_white.png';
 
 interface HeaderProps {
   activeFilter: string;
@@ -85,9 +85,14 @@ const Header: React.FC<HeaderProps> = ({ activeFilter, onFilterChange, onSearchC
           <Moon className="w-6 h-6 cursor-pointer hover:opacity-70 transition" />
         </div>
         
-        <div className="space-y-6">
-          <div className="flex items-center gap-3">
-             <img src={logo} alt="getAroom Logo" className="w-8 h-8 object-contain" />
+        <div className="space-y-6 -mt-10">
+          <div className="flex items-center gap-3 -ml-6">
+             <img 
+               src={logo} 
+               alt="getAroom Logo" 
+               className="w-30 h-15 object-contain cursor-pointer ml-6" 
+               onClick={() => navigate('/home')}
+             />
           </div>
           <h2 className="text-3xl font-black leading-tight tracking-tighter italic uppercase">Search for <br/> an event:</h2>
           <div className="relative">
