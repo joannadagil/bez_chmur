@@ -117,8 +117,8 @@ const Login = () => {
             <img
               src={logo}
               alt="getAroom Logo"
-              className="w-220 h-20 object-contain cursor-pointer"
-              onClick={() => navigate(localStorage.getItem('isLoggedIn') === 'true' ? '/home' : '/login')}
+              className="w-250 h-30 object-contain cursor-pointer"
+              onClick={() => navigate(localStorage.getItem('isLoggedIn') === 'true' ? '/home' : '/')}
             />
           </div>
           <h1 className="text-4xl font-black text-[#ffffff] uppercase tracking-tighter italic mb-2" style={{ fontFamily: 'Placard Next, sans-serif' }}>

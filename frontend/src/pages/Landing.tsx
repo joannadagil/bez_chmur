@@ -14,16 +14,16 @@ const Landing = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16">
           <div className="text-center">
             {/* Logo */}
-            <div className="flex justify-center mb-8">
+            <div className="flex justify-center">
               <img
                 src={logo}
                 alt="getAroom Logo"
-                className="w-28 h-28 object-contain cursor-pointer"
-                onClick={() => navigate(isLoggedIn ? '/home' : '/login')}
+                className="w-250 h-30 object-contain cursor-pointer"
+                onClick={() => navigate(isLoggedIn ? '/home' : '/')}
               />
             </div>
 
-            <h1 className="text-6xl lg:text-7xl font-black text-[#d3265b] uppercase tracking-tighter italic leading-none mb-6" style={{ fontFamily: 'Placard Next, sans-serif' }}>
+            <h1 className="text-lg lg:text-xl font-black text-[#d3265b] uppercase tracking-tight leading-none mb-15 ml-65" style={{ fontFamily: 'Placard Condensed, sans-serif' }}>
               find or create your next event
             </h1>
 

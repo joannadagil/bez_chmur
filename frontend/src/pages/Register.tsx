@@ -94,7 +94,12 @@ const Register = () => {
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-6">
-            <img src={logo} alt="getAroom Logo" className="h-16" />
+            <img 
+              src={logo} 
+              alt="getAroom Logo" 
+              className="w-250 h-30 object-contain cursor-pointer" 
+              onClick={() => navigate('/')}
+            />
           </div>
           <h1 className="text-4xl font-black text-white uppercase tracking-tighter italic mb-2" style={{ fontFamily: 'Placard Next, sans-serif' }}>
             find or create your next event
