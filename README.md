@@ -93,6 +93,8 @@ cd bez_chmur
 ```bash
 docker compose up
 ```
+http://localhost:8000/admin/
+http://localhost:8000/api/
 
 ### Running migrations after changes to database
 
