@@ -24,7 +24,7 @@ const Landing = () => {
             </div>
 
             <h1 className="text-6xl lg:text-7xl font-black text-[#d3265b] uppercase tracking-tighter italic leading-none mb-6" style={{ fontFamily: 'Placard Next, sans-serif' }}>
-              find/create your next event
+              find or create your next event
             </h1>
 
             {/* CTA Buttons */}
