@@ -101,9 +101,9 @@ const Register = () => {
               onClick={() => navigate('/')}
             />
           </div>
-          <h1 className="text-4xl font-black text-white uppercase tracking-tighter italic mb-2" style={{ fontFamily: 'Placard Next, sans-serif' }}>
+          {/*<h1 className="text-4xl font-black text-white uppercase tracking-tighter italic mb-2" style={{ fontFamily: 'Placard Next, sans-serif' }}>
             find or create your next event
-          </h1>
+          </h1>*/}
         </div>
 
         {/* Register Form */}
