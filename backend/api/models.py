@@ -18,10 +18,17 @@ class Venue(models.Model):
     def __str__(self):
         return self.name
 
+class EventCategory(models.Model):
+    name = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.name
 
 class Event(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField(blank=True)
+    category = models.ForeignKey(EventCategory, on_delete=models.CASCADE, null=True, blank=True)
+
 
     def __str__(self):
         return self.name
