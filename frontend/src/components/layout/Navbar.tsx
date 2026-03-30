@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
 import { User, LogOut, Settings, ChevronLeft, Moon } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
+import logo from '../../assets/logo.png';
 
 const Navbar = () => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
   const isHome = location.pathname === "/";
+  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
 
   return (
     <nav className="bg-[#3a0e23] text-white px-8 py-3 flex justify-between items-center shadow-lg sticky top-0 z-[100]">
@@ -20,13 +22,11 @@ const Navbar = () => {
           </button>
         )}
         
-        <Link to="/" className="flex items-center gap-2 no-underline group">
-          <div className="w-8 h-8 rounded-full bg-[#d3265b] text-white flex items-center justify-center font-black text-xs group-hover:scale-110 transition-transform">
-            G
-          </div>
-          <span className="text-[11px] font-black tracking-[0.3em] text-white uppercase">
-            GETAROOM
-          </span>
+        <Link
+          to={isLoggedIn ? '/home' : '/login'}
+          className="flex items-center gap-2 no-underline group"
+        >
+          <img src={logo} alt="getAroom Logo" className="w-8 h-8 object-contain group-hover:scale-110 transition-transform" />
         </Link>
       </div>
 
@@ -54,7 +54,14 @@ const Navbar = () => {
                 <Settings size={14} /> My Profile
               </Link>
               <div className="h-px bg-gray-100 my-1" />
-              <button className="flex w-full items-center gap-3 p-3 hover:bg-red-50 text-red-600 rounded-xl text-[11px] font-black uppercase tracking-wider">
+              <button
+                className="flex w-full items-center gap-3 p-3 hover:bg-red-50 text-red-600 rounded-xl text-[11px] font-black uppercase tracking-wider"
+                onClick={() => {
+                  localStorage.removeItem('isLoggedIn');
+                  setIsProfileOpen(false);
+                  navigate('/login');
+                }}
+              >
                 <LogOut size={14} /> Log out
               </button>
             </div>

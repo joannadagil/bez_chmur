@@ -1,7 +1,8 @@
 // src/components/layout/Header.tsx
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { User, Moon, Search, Settings, LogOut, Ticket } from 'lucide-react';
+import logo from '../../assets/logo.png';
 
 interface HeaderProps {
   activeFilter: string;
@@ -11,6 +12,7 @@ interface HeaderProps {
 
 const Header: React.FC<HeaderProps> = ({ activeFilter, onFilterChange, onSearchChange }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const navigate = useNavigate();
 
   const filters = ['ALL EVENTS', 'CINEMA', 'THEATRE', 'LECTURE HALL'];
 
@@ -67,7 +69,13 @@ const Header: React.FC<HeaderProps> = ({ activeFilter, onFilterChange, onSearchC
                       <Settings size={14} /> Settings
                     </button>
                     <div className="h-px bg-gray-100 my-1" />
-                    <button className="flex w-full items-center gap-2 p-2 hover:bg-red-50 text-red-600 rounded-lg text-xs font-black uppercase tracking-wider">
+                    <button
+                      className="flex w-full items-center gap-2 p-2 hover:bg-red-50 text-red-600 rounded-lg text-xs font-black uppercase tracking-wider"
+                      onClick={() => {
+                        setIsProfileOpen(false);
+                        navigate('/login');
+                      }}
+                    >
                       <LogOut size={14} /> Logout
                     </button>
                   </div>
@@ -79,8 +87,7 @@ const Header: React.FC<HeaderProps> = ({ activeFilter, onFilterChange, onSearchC
         
         <div className="space-y-6">
           <div className="flex items-center gap-3">
-             <div className="w-8 h-8 rounded-full bg-white text-[#d3265b] flex items-center justify-center font-black text-xs">G</div>
-             <span className="text-xs font-black tracking-[0.3em]">GETAROOM</span>
+             <img src={logo} alt="getAroom Logo" className="w-8 h-8 object-contain" />
           </div>
           <h2 className="text-3xl font-black leading-tight tracking-tighter italic uppercase">Search for <br/> an event:</h2>
           <div className="relative">
