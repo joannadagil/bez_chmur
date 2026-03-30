@@ -23,7 +23,7 @@ const Landing = () => {
               />
             </div>
 
-            <h1 className="text-lg lg:text-xl font-black text-[#d3265b] uppercase tracking-tight leading-none mb-15 ml-65" style={{ fontFamily: 'Placard Condensed, sans-serif' }}>
+            {/* <h1 className="text-lg lg:text-xl font-black text-[#d3265b] uppercase tracking-tight leading-none mb-15 ml-65" style={{ fontFamily: 'Placard Condensed, sans-serif' }}>
               find or create your next event
             </h1>
 

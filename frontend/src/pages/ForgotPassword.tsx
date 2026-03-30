@@ -41,11 +41,11 @@ const ForgotPassword = () => {
           {/* Logo */}
           <div className="text-center mb-8">
             <div className="flex justify-center mb-6">
-              <img src={logo} alt="getAroom Logo" className="h-16" />
+              <img src={logo} alt="getAroom Logo" className="w-250 h-30" />
             </div>
-            <h1 className="text-4xl font-black text-[#d3265b] uppercase tracking-tighter italic mb-2" style={{ fontFamily: 'Placard Next, sans-serif' }}>
+            {/* <h1 className="text-4xl font-black text-[#d3265b] uppercase tracking-tighter italic mb-2" style={{ fontFamily: 'Placard Next, sans-serif' }}>
               find or or create your next event
-            </h1>
+            </h1> */}
           </div>
 
           {/* Success Message */}
