@@ -121,9 +121,9 @@ const Login = () => {
               onClick={() => navigate(localStorage.getItem('isLoggedIn') === 'true' ? '/home' : '/')}
             />
           </div>
-          <h1 className="text-4xl font-black text-[#ffffff] uppercase tracking-tighter italic mb-2" style={{ fontFamily: 'Placard Next, sans-serif' }}>
+          {/*<h1 className="text-4xl font-black text-[#ffffff] uppercase tracking-tighter italic mb-2" style={{ fontFamily: 'Placard Next, sans-serif' }}>
             find or create your next event
-          </h1>
+          </h1>*/}
         </div>
 
         {/* Login Form */}
