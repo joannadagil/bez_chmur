@@ -1,4 +1,5 @@
 // App.tsx
+import { BookingProvider } from './context/BookingContext';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Landing from './pages/Landing';
 import Login from './pages/Login';
@@ -13,6 +14,7 @@ import HostDashboard from './pages/HostDashboard';
 import { Payment } from './pages/checkout/Payment';
 import SuccessPage from './pages/checkout/SuccessPage';
 
+
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
   return isLoggedIn ? <>{children}</> : <Navigate to="/login" replace />;
@@ -20,6 +22,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
 
 function App() {
   return (
+    <BookingProvider>
     <Router>
       <div className="min-h-screen bg-[#faf9f0] flex flex-col font-sans">
         <Routes>
@@ -41,6 +44,7 @@ function App() {
         </Routes>
       </div>
     </Router>
+    </BookingProvider>
   );
 }
 
