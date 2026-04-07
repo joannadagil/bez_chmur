@@ -3,15 +3,27 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar';
 import { Loader2 } from 'lucide-react';
+import { useBooking } from '../context/BookingContext';
 
 const SeatSelection = () => {
   const navigate = useNavigate();
+  const { booking, updateBooking } = useBooking();
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
 
   const rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
   const seatsPerRow = 14;
   
+  const getSeatPrice = (row: string) => {
+    if (['A', 'B'].includes(row)) return 6;
+    if (['C', 'D', 'E'].includes(row)) return 8;
+    if (['F', 'G'].includes(row)) return 10;
+    return 12;
+  };
+  // OBLICZANIE SUMY NA ŻYWO
+  const currentTotalPrice = selectedSeats.reduce((sum, seatId) => {
+    return sum + getSeatPrice(seatId.charAt(0));
+  }, 0);
   const toggleSeat = (seatId: string) => {
     setSelectedSeats(prev => 
       prev.includes(seatId) 
@@ -30,6 +42,10 @@ const SeatSelection = () => {
   const handleProceedToPayment = () => {
     if (selectedSeats.length === 0) return;
     setIsRedirecting(true);
+  updateBooking({ 
+    seats: selectedSeats, 
+    totalPrice: currentTotalPrice
+  });
     setTimeout(() => {
       navigate('/checkout/payment');
     }, 1200);
@@ -51,11 +67,11 @@ const SeatSelection = () => {
       <main className="max-w-[1200px] mx-auto px-8 py-12">
         <div className="mb-12">
           <h1 className="text-4xl font-black text-[#1a0b1a] tracking-tighter uppercase">
-            Dune: Part Two — <span className="text-gray-500 not-italic text-2xl">Hall A</span>
+            {booking.eventTitle} — <span className="text-gray-500 not-italic text-2xl">Hall A</span>
           </h1>
           <p className="text-gray-400 font-black text-[11px] uppercase tracking-[0.2em] mt-2 flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-[#ff3366] animate-pulse"></span>
-            Multikino Złote Tarasy · Sun 23 Mar, 14:30
+           {booking.selectedVenue} · {booking.date}, {booking.time}
           </p>
         </div>
 
@@ -134,7 +150,7 @@ const SeatSelection = () => {
               <div className="flex justify-between items-center mb-8">
                 <span className="text-gray-400 uppercase tracking-[0.2em] text-[10px] font-black">Total Price:</span>
                 <span className="text-2xl font-black text-[#3a0e23] tracking-tighter italic">
-                  ${selectedSeats.length * 12} 
+                  ${currentTotalPrice} 
                 </span>
               </div>
 

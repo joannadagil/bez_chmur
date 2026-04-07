@@ -1,19 +1,31 @@
 // src/pages/EventDetails.tsx
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom'; 
 import Navbar from '../components/layout/Navbar';
 import { Loader2, CheckCircle2 } from 'lucide-react';
+import { useBooking } from '../context/BookingContext';
+
 
 const EventDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  
+  const { updateBooking } = useBooking();
   const cinemaSectionRef = useRef<HTMLDivElement>(null);
+
+  const [eventTitle, setEventTitle] = useState('Dune: Part Two');
+  
+  useEffect(() => {
+    if (id !== 'dune-2' && id !== '1') { 
+        // fetchMovieFromBackend(id)
+        // navigate('/404'); 
+    }
+  }, [id, navigate]);
 
   const [selectedDate, setSelectedDate] = useState('Sun 23 Mar');
   const [selectedTime, setSelectedTime] = useState('14:30');
-  const [selectedCinema, setSelectedCinema] = useState('Multikino Złote Tarasy');
+  const [selectedVenue, setSelectedVenue] = useState('Multikino Złote Tarasy');
   const [isRedirecting, setIsRedirecting] = useState(false);
+  
 
   const handleDateSelect = (date: string) => {
     setSelectedDate(date);
@@ -22,6 +34,13 @@ const EventDetails = () => {
 
   const handleSeatSelection = () => {
     setIsRedirecting(true);
+    updateBooking({
+      eventId: id,
+      eventTitle: eventTitle, 
+      date: selectedDate,
+      time: selectedTime,
+      selectedVenue: selectedVenue 
+    });
     setTimeout(() => {
       navigate(`/checkout/${id}`);
     }, 1500);
@@ -55,7 +74,7 @@ const EventDetails = () => {
 
           <div className="space-y-4 pt-4">
             <h1 className="text-5xl font-black text-white tracking-tighter drop-shadow-lg leading-tight uppercase ">
-              Dune: Part Two
+              {eventTitle}
             </h1>
             <div className="flex gap-2.5">
               {['Cinema', '2h 38min', 'Sci-Fi'].map(tag => (
@@ -109,9 +128,9 @@ With breathtaking visuals, massive battles, and deep philosophical themes, Dune:
                     {['14:30', '17:00', '20:15'].map(time => (
                       <button 
                         key={time}
-                        onClick={() => { setSelectedTime(time); setSelectedCinema(cinema); }}
+                        onClick={() => { setSelectedTime(time); setSelectedVenue(cinema); }}
                         className={`px-6 py-3 rounded-xl font-black text-xs transition-all duration-200 active:scale-90 ${
-                          selectedTime === time && selectedCinema === cinema
+                          selectedTime === time && selectedVenue === cinema
                           ? 'bg-[#d64060] text-white shadow-md scale-105'
                           : 'bg-[#fcfbff] text-gray-500 border border-gray-100 hover:bg-gray-100'
                         }`}
@@ -132,9 +151,9 @@ With breathtaking visuals, massive battles, and deep philosophical themes, Dune:
             
             <div className="space-y-4 text-xs font-bold border-b border-gray-300/50 pb-7 mb-7">
               {[
-                { label: 'Film', value: 'Dune: Part Two' },
+                { label: 'Film', value: eventTitle },
                 { label: 'Date', value: selectedDate },
-                { label: 'Cinema', value: selectedCinema },
+                { label: 'Cinema', value: selectedVenue },
                 { label: 'Time', value: selectedTime }
               ].map((item) => (
                 <div key={item.label} className="flex justify-between items-center text-[#3a0e23] transition-all hover:translate-x-1">

@@ -3,15 +3,21 @@ import { Check, CalendarDays, MapPin, Armchair, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Confetti from 'react-confetti';
 import Navbar from '../../components/layout/Navbar';
+import { useBooking } from '../../context/BookingContext';
 
 const SuccessPage: React.FC = () => {
   const navigate = useNavigate();
+  const { booking, resetBooking } = useBooking();
   const [showConfetti, setShowConfetti] = useState(true);
   const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
     height: window.innerHeight,
   });
-
+useEffect(() => {
+  if (!booking.eventTitle) {
+    navigate('/');
+  }
+}, [booking, navigate]);
   useEffect(() => {
     const handleResize = () => {
       setWindowSize({ width: window.innerWidth, height: window.innerHeight });
@@ -26,16 +32,16 @@ const SuccessPage: React.FC = () => {
     };
   }, []);
 
-  const bookingData = {
-    movieTitle: 'Dune: Part Three',
-    cinema: 'Multikino Złote Tarasy',
-    email: 'john.doe@mail.com',
-    details: [
-      { icon: MapPin, label: 'Hall', value: 'Hall A' },
-      { icon: CalendarDays, label: 'Date', value: 'Sun 23 Mar' },
-      { icon: Armchair, label: 'Seats', value: 'D8, D9, D10' },
-      { icon: Clock, label: 'Time', value: '14:30' },
-    ]
+const detailsList = [
+    { icon: MapPin, label: 'Hall', value: 'Hall A' },
+    { icon: CalendarDays, label: 'Date', value: booking.date || 'N/A' },
+    { icon: Armchair, label: 'Seats', value: booking.seats.join(', ') || 'None' },
+    { icon: Clock, label: 'Time', value: booking.time || 'N/A' },
+  ];
+
+  const handleGoHome = () => {
+    resetBooking();
+    navigate('/');
   };
 
   return (
@@ -64,22 +70,22 @@ const SuccessPage: React.FC = () => {
           Booking confirmed!
         </h1>
         <p className="text-gray-500 font-medium text-sm mb-12 tracking-tight">
-          Your tickets have been sent to <span className="text-[#3a0e23] font-bold">{bookingData.email}</span>
+          Success! Your tickets for <span className="text-[#3a0e23] font-bold">{booking.eventTitle}</span> are ready.
         </p>
 
         <div className="w-full bg-[#f3f4f6] rounded-3xl p-8 border border-gray-100 shadow-sm mb-12">
           
           <div className="mb-8">
             <h2 className="text-2xl font-extrabold text-[#1a0b1a] tracking-tight">
-              {bookingData.movieTitle}
+{booking.eventTitle || "Title"}
             </h2>
             <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mt-1">
-              {bookingData.cinema}
+{booking.selectedVenue || "Venue"}
             </p>
           </div>
 
           <div className="grid grid-cols-2 gap-y-6 gap-x-12">
-            {bookingData.details.map((detail, index) => (
+            {detailsList.map((detail, index) => (
               <div key={index} className="flex items-center gap-4">
                 <div className="text-gray-400">
                   <detail.icon size={18} />
@@ -99,7 +105,7 @@ const SuccessPage: React.FC = () => {
 
         <div className="flex flex-col sm:flex-row gap-4 w-full justify-center">
           <button 
-            onClick={() => navigate('/')}
+            onClick={handleGoHome}
             className="flex-1 max-w-xs text-center text-[#3a0e23] bg-[#e5e7eb] hover:bg-gray-300 font-black py-4 rounded-xl transition-all shadow active:scale-95 text-[11px] uppercase tracking-[0.2em]"
           >
             Back to events

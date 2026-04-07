@@ -2,9 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { CreditCard, Lock, ShieldCheck, Clock, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../../components/layout/Navbar';
+import { useBooking } from '../../context/BookingContext';
 
 export const Payment: React.FC = () => {
   const navigate = useNavigate();
+  const { booking } = useBooking();
   const [timeLeft, setTimeLeft] = useState(600);
   const [isProcessing, setIsProcessing] = useState(false);
   
@@ -17,7 +19,11 @@ export const Payment: React.FC = () => {
     const timer = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
     return () => clearInterval(timer);
   }, [timeLeft]);
-
+useEffect(() => {
+  if (booking.seats.length === 0) {
+    navigate('/');
+  }
+}, [booking, navigate]);
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -75,35 +81,40 @@ const handlePayment = (e: React.FormEvent) => {
             
             <div className="space-y-7">
               <div>
-                <h3 className="text-xl font-black text-[#1a0b1a] tracking-tight uppercase leading-tight">Dune: Part Two</h3>
+                <h3 className="text-xl font-black text-[#1a0b1a] tracking-tight uppercase leading-tight">{booking.eventTitle}</h3>
                 <p className="text-[10px] text-gray-400 font-black uppercase tracking-widest mt-1.5 flex items-center gap-2">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>
-                  Multikino Złote Tarasy · Hall A
+                  {booking.selectedVenue} · Hall A
                 </p>
               </div>
 
-              <div className="flex flex-wrap gap-2.5">
-                {['D8', 'D9', 'D10'].map(seat => (
-                  <span key={seat} className="bg-[#f0f2f5] border border-gray-100 text-[#3a0e23] text-[10px] font-black px-4 py-2 rounded-xl shadow-sm">
-                    {seat}
-                  </span>
-                ))}
+<div className="flex flex-wrap gap-2.5">
+                {booking.seats.length > 0 ? (
+                  booking.seats.sort().map(seat => (
+                    <span key={seat} className="bg-[#f0f2f5] border border-gray-100 text-[#3a0e23] text-[10px] font-black px-4 py-2 rounded-xl shadow-sm">
+                      Seat {seat}
+                    </span>
+                  ))
+                ) : (
+                  <span className="text-red-500 text-[10px] font-black uppercase">No seats selected</span>
+                )}
               </div>
 
-              <div className="space-y-4 pt-5 border-t border-gray-50">
+<div className="space-y-4 pt-5 border-t border-gray-50">
                 <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-gray-400">
-                  <span>3 × Premium Ticket</span>
-                  <span className="text-[#1a0b1a] font-bold">$36.00</span>
+                  <span>Tickets ({booking.seats.length}x)</span>
+                  <span className="text-[#1a0b1a] font-bold">${booking.totalPrice}.00</span>
                 </div>
                 <div className="flex justify-between text-[10px] font-black uppercase tracking-widest text-gray-400">
-                  <span>Booking Fee</span>
+                  <span>Service Fee</span>
                   <span className="text-emerald-500 italic font-black">FREE</span>
                 </div>
               </div>
-
-              <div className="flex justify-between items-center pt-5 border-t border-gray-100">
-                <span className="text-[11px] font-black uppercase tracking-[0.15em] text-gray-400">Total Amount</span>
-                <span className="text-2xl font-black text-[#3a0e23] italic tracking-tighter">$36.00</span>
+<div className="flex justify-between items-center pt-5 border-t border-gray-100">
+                <span className="text-[11px] font-black uppercase tracking-[0.15em] text-gray-400">Total to Pay</span>
+                <span className="text-2xl font-black text-[#3a0e23] italic tracking-tighter">
+                  ${booking.totalPrice}.00
+                </span>
               </div>
             </div>
           </div>
