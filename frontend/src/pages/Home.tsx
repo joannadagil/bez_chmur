@@ -1,24 +1,61 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '../components/layout/Header';
 import { EventCard } from '../components/events/EventCard';
-import { mockEvents } from '../data/mockEvents';
+import axios from 'axios';
 
-
+interface EventFromDB {
+  id: number;
+  title: string;
+  venue_name: string;
+  type: string;
+  price: number | string;
+  seatsLeft: number;
+  image_url: string;
+}
 const Home = () => {
-  const [activeFilter, setActiveFilter] = useState('ALL EVENTS');
+const [activeFilter, setActiveFilter] = useState('ALL EVENTS');
   const [searchQuery, setSearchQuery] = useState('');
+const [events, setEvents] = useState<EventFromDB[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  const filteredEvents = mockEvents.filter(event => {
+  // Pobieranie danych z Django
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const response = await axios.get('http://localhost:8000/api/event-instances/');
+        setEvents(response.data);
+      } catch (error) {
+        console.error("Błąd pobierania danych z API:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchEvents();
+  }, []);
+const uniqueEvents = events.reduce((acc: EventFromDB[], current) => {
+  const x = acc.find(item => item.title === current.title);
+  if (!x) {
+    return acc.concat([current]);
+  } else {
+    return acc;
+  }
+}, []);
+  const filteredEvents = uniqueEvents.filter((event: any) => {
     const categoryMatch = activeFilter === 'ALL EVENTS' || 
-      (activeFilter === 'CINEMA' && event.type === 'Cinema') ||
-      (activeFilter === 'THEATRE' && event.type === 'Theatre') ||
-      (activeFilter === 'LECTURE HALL' && event.type === 'Lecture');
+      event.type.toUpperCase() === activeFilter; // Porównujemy typ z bazy z filtrem
 
     const searchMatch = event.title.toLowerCase().includes(searchQuery.toLowerCase());
 
     return categoryMatch && searchMatch;
   });
 
+  if (loading) {
+    return (
+      <div className="bg-[#f5f5dc] min-h-screen flex items-center justify-center">
+        <div className="text-[#d3265b] font-black animate-bounce">LOADING CINEMA...</div>
+      </div>
+    );
+  }
   return (
     <div className="bg-[#f5f5dc] min-h-screen font-sans selection:bg-[#ffbcc7] selection:text-[#3a0e23]">
       <Header 

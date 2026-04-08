@@ -2,9 +2,18 @@
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import type { Event } from '../../data/mockEvents';
 
-interface EventCardProps { event: Event; }
+interface EventFromDB {
+  id: number;
+  title: string;
+  venue_name: string;
+  type: string;
+  price: number | string;
+  seatsLeft: number;
+  image_url: string;
+}
+
+interface EventCardProps { event: EventFromDB; }
 
 export const EventCard: React.FC<EventCardProps> = ({ event }) => {
   const typeColors: Record<string, string> = {
@@ -18,7 +27,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event }) => {
       <div className="bg-[#3a0e23] rounded-[28px] overflow-hidden shadow-lg transition-all duration-300 group-hover:shadow-2xl text-white">
         <div className="relative h-44 overflow-hidden">
           <img
-            src={event.imageUrl}
+            src={event.image_url}
             alt={event.title}
 
 className="w-full h-full object-cover opacity-80 transition-all duration-500 group-hover:scale-110 group-hover:opacity-100"
@@ -38,7 +47,7 @@ className="w-full h-full object-cover opacity-80 transition-all duration-500 gro
               {event.title}
             </h3>
             <p className="text-[10px] text-white/40 font-medium uppercase tracking-wider truncate">
-              {event.venue}
+              {event.venue_name}
             </p>
           </div>
           <div className="pt-2 flex justify-between items-center border-t border-white/5">
