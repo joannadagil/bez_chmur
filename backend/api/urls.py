@@ -1,6 +1,15 @@
 from django.urls import path
-from .views import MessageListCreate
+from .views import (
+    EventListView, 
+    VenueListCreateView, 
+    EventListCreateView, 
+    EventCategoryListCreateView
+)
 
 urlpatterns = [
-    path('messages/', MessageListCreate.as_view(), name='message-list'),
+    path('event-instances/', EventListView.as_view()), 
+    
+    path('venues/', VenueListCreateView.as_view()),
+    path('events/', EventListCreateView.as_view()),
+    path('categories/', EventCategoryListCreateView.as_view()),
 ]

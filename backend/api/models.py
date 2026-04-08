@@ -1,15 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User #django's built in user model
 
-## idk co to, było tu
-class Message(models.Model):
-    text = models.CharField(max_length=255)
-    created_at = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return self.text
-
-
 class Venue(models.Model):
     name = models.CharField(max_length=255)
     rows = models.IntegerField()
@@ -17,15 +8,30 @@ class Venue(models.Model):
 
     def __str__(self):
         return self.name
+    
+    def save(self, *args, **kwargs):
+        is_new = self.pk is None
+        super().save(*args, **kwargs)
+        
+        if is_new:
+            for r in range(1, self.rows + 1):
+                for s in range(1, self.seats_per_row + 1):
+                    Seat.objects.create(venue=self, row=r, number=s)
 
-
-class Event(models.Model):
+class EventCategory(models.Model):
     name = models.CharField(max_length=255)
-    description = models.TextField(blank=True)
 
     def __str__(self):
         return self.name
 
+class Event(models.Model):
+    name = models.CharField(max_length=255)
+    description = models.TextField(blank=True)
+    category = models.ForeignKey(EventCategory, on_delete=models.CASCADE, null=True, blank=True)
+    image_url = models.URLField(max_length=500, null=True, blank=True)
+
+    def __str__(self):
+        return self.name
 
 class EventInstance(models.Model):
     venue = models.ForeignKey(Venue, on_delete=models.CASCADE)
@@ -66,7 +72,6 @@ class EventSeat(models.Model):
     def __str__(self):
         return f"{self.event_instance} - {self.seat}"
 
-
 class Order(models.Model):
 
     STATUS_CHOICES = [
@@ -83,7 +88,6 @@ class Order(models.Model):
     def __str__(self):
         return f"Order {self.id}"
 
-
 class OrderSeat(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     event_seat = models.ForeignKey(EventSeat, on_delete=models.CASCADE)
@@ -93,7 +97,6 @@ class OrderSeat(models.Model):
 
     def __str__(self):
         return f"Order {self.order.id} - Seat {self.event_seat.id}"
-
 
 class Payment(models.Model):
 
@@ -105,7 +108,7 @@ class Payment(models.Model):
     ]
 
     order = models.OneToOneField(Order, on_delete=models.CASCADE)
-    stripe_session_id = models.CharField(max_length=255, blank=True, null=True) #idk if it may need to be optional
+    stripe_session_id = models.CharField(max_length=255, blank=True, null=True)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
 
     def __str__(self):

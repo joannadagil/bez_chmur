@@ -84,7 +84,7 @@ After successful payment, users receive confirmation and their seats are marked 
 ## 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/bez_chmur.git
+git clone https://github.com/joannadagil/bez_chmur.git
 cd bez_chmur
 ```
 
@@ -93,6 +93,8 @@ cd bez_chmur
 ```bash
 docker compose up
 ```
+http://localhost:8000/admin/
+http://localhost:8000/api/
 
 ### Running migrations after changes to database
 
