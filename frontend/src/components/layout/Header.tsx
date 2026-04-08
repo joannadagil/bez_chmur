@@ -1,7 +1,6 @@
-// src/components/layout/Header.tsx
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, Moon, Search, Settings, LogOut, Ticket } from 'lucide-react';
+import { User, Moon, Search, Settings, LogOut, Ticket, ChevronDown } from 'lucide-react';
 import logo from '../../assets/logo_white.png';
 
 interface HeaderProps {
@@ -17,8 +16,7 @@ const Header: React.FC<HeaderProps> = ({ activeFilter, onFilterChange, onSearchC
   const filters = ['ALL EVENTS', 'CINEMA', 'THEATRE', 'LECTURE HALL'];
 
   return (
-    <header className="flex flex-col md:flex-row h-auto md:h-[320px] overflow-hidden shadow-xl w-full">
-      {/* LEWA STRONA: Banner i Filtry */}
+    <header className="flex flex-col md:flex-row h-auto md:h-[320px] overflow-hidden shadow-2xl w-full">
       <div className="flex-grow bg-gradient-to-br from-[#f27690] to-[#ffbb9c] p-10 flex flex-col justify-between relative">
         <div className="space-y-4">
           <h1 className="text-5xl lg:text-6xl font-black text-[#d3265b] tracking-tighter italic drop-shadow-sm leading-none uppercase">
@@ -45,64 +43,78 @@ const Header: React.FC<HeaderProps> = ({ activeFilter, onFilterChange, onSearchC
           ))}
         </div>
       </div>
+      <div className="w-full md:w-[420px] bg-gradient-to-b from-[#d3265b] to-[#a11d45] p-10 text-white flex flex-col relative shadow-inner overflow-hidden">
+        
 
-      <div className="w-full md:w-[400px] bg-[#d3265b] p-10 text-white flex flex-col justify-between relative shadow-inner">
-        <div className="flex justify-end gap-6 items-center">
+        <div className="absolute top-[20%] right-[-10%] w-[200px] h-[200px] bg-white/5 rounded-full blur-[50px] pointer-events-none"></div>
+        <div className="absolute inset-0 opacity-[0.02] mix-blend-overlay pointer-events-none" style={{ backgroundImage: `url("https://www.transparenttextures.com/patterns/stardust.png")` }}></div>
+
+        <div className="relative z-10 flex justify-between items-center mb-10">
+          <img 
+            src={logo} 
+            alt="getAroom Logo" 
+            className="w-28 h-auto object-contain cursor-pointer hover:scale-105 transition-transform" 
+            onClick={() => navigate('/home')}
+          />
           
-          <div className="relative flex items-center gap-3">
-             <span className="text-[10px] font-black uppercase tracking-widest opacity-80">John</span>
-             <div className="relative">
-                <User 
-                  className="w-8 h-8 cursor-pointer hover:opacity-70 transition bg-white/10 rounded-full p-1.5" 
-                  onClick={() => setIsProfileOpen(!isProfileOpen)}
-                />
-                {isProfileOpen && (
-                  <div className="absolute right-0 top-12 w-48 bg-white text-[#3a0e23] rounded-xl shadow-2xl p-2 z-50 border border-gray-100">
-                    <Link 
-                      to="/my-tickets" 
-                      className="flex w-full items-center gap-2 p-2 hover:bg-gray-100 rounded-lg text-xs font-black uppercase tracking-wider no-underline text-[#3a0e23]"
-                      onClick={() => setIsProfileOpen(false)}
-                    >
-                      <Ticket size={14} /> My Tickets
-                    </Link>
-                    <button className="flex w-full items-center gap-2 p-2 hover:bg-gray-100 rounded-lg text-xs font-black uppercase tracking-wider text-[#3a0e23]">
-                      <Settings size={14} /> Settings
-                    </button>
-                    <div className="h-px bg-gray-100 my-1" />
-                    <button
-                      className="flex w-full items-center gap-2 p-2 hover:bg-red-50 text-red-600 rounded-lg text-xs font-black uppercase tracking-wider"
-                      onClick={() => {
-                        setIsProfileOpen(false);
-                        navigate('/login');
-                      }}
-                    >
-                      <LogOut size={14} /> Logout
-                    </button>
-                  </div>
-                )}
-             </div>
+          <div className="flex items-center gap-4">
+            <Moon size={18} className="cursor-pointer opacity-50 hover:opacity-100 transition-opacity" />
+            
+            <div className="relative">
+              <div 
+                className="flex items-center gap-2 cursor-pointer group bg-black/10 p-1.5 px-3 rounded-full border border-white/10 hover:bg-black/20 transition-all"
+                onClick={() => setIsProfileOpen(!isProfileOpen)}
+              >
+                <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center border border-white/10">
+                  <User size={14} />
+                </div>
+                <span className="text-[10px] font-black uppercase tracking-widest">John</span>
+                <ChevronDown size={12} className={`transition-transform duration-300 ${isProfileOpen ? 'rotate-180' : ''}`} />
+              </div>
+
+              {isProfileOpen && (
+                <div className="absolute right-0 top-14 w-52 bg-white text-[#3a0e23] rounded-2xl shadow-2xl p-2 z-50 border border-gray-100 animate-in zoom-in-95 duration-200">
+                  <Link 
+                    to="/my-tickets" 
+                    className="flex w-full items-center gap-3 p-3 hover:bg-[#fff0f3] rounded-xl text-[11px] font-black uppercase tracking-wider no-underline text-[#3a0e23] transition-colors"
+                    onClick={() => setIsProfileOpen(false)}
+                  >
+                    <Ticket size={16} className="text-[#d3265b]" /> My Tickets
+                  </Link>
+                  <button className="flex w-full items-center gap-3 p-3 hover:bg-gray-50 rounded-xl text-[11px] font-black uppercase tracking-wider text-[#3a0e23]">
+                    <Settings size={16} className="text-gray-400" /> Settings
+                  </button>
+                  <div className="h-px bg-gray-100 my-1.5 mx-2" />
+                  <button
+                    className="flex w-full items-center gap-3 p-3 hover:bg-red-50 text-red-600 rounded-xl text-[11px] font-black uppercase tracking-wider"
+                    onClick={() => {
+                      setIsProfileOpen(false);
+                      navigate('/login');
+                    }}
+                  >
+                    <LogOut size={16} /> Logout
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
-          <Moon className="w-6 h-6 cursor-pointer hover:opacity-70 transition" />
         </div>
         
-        <div className="space-y-6 -mt-10">
-          <div className="flex items-center gap-3 -ml-6">
-             <img 
-               src={logo} 
-               alt="getAroom Logo" 
-               className="w-30 h-15 object-contain cursor-pointer ml-6" 
-               onClick={() => navigate('/home')}
-             />
+        <div className="relative z-10 flex-grow flex flex-col justify-end">
+          <div className="space-y-1 mb-6">
+            <h2 className="text-3xl font-black leading-tight tracking-tighter italic uppercase">
+              Search for <br/> <span className="text-white/40">an event</span>
+            </h2>
           </div>
-          <h2 className="text-3xl font-black leading-tight tracking-tighter italic uppercase">Search for <br/> an event:</h2>
-          <div className="relative">
+          
+          <div className="relative group">
             <input 
               type="text" 
-              placeholder="Start typing..." 
+              placeholder="Movie, theatre, city..." 
               onChange={(e) => onSearchChange(e.target.value)} 
-              className="w-full bg-white/20 border-b-2 border-white/40 text-white placeholder-white/50 px-2 py-3 outline-none focus:border-white transition-all font-bold"
+              className="w-full bg-white/5 border border-white/10 rounded-2xl text-white placeholder-white/20 px-5 py-4 outline-none focus:bg-white/10 focus:border-white/30 transition-all font-bold text-base shadow-inner"
             />
-            <Search className="absolute right-2 top-1/2 -translate-y-1/2 w-5 h-5 opacity-60" />
+            <Search className="absolute right-5 top-1/2 -translate-y-1/2 w-5 h-5 opacity-20 group-focus-within:opacity-100 transition-opacity" />
           </div>
         </div>
       </div>
