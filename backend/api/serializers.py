@@ -2,26 +2,25 @@ from rest_framework import serializers
 from .models import EventInstance, EventSeat, OrderSeat, Event, Venue, EventCategory
 
 class EventSerializer(serializers.ModelSerializer):
-    # Read fields
     title = serializers.CharField(source='event.name', read_only=True)
     image_url = serializers.CharField(source='event.image_url', read_only=True)
     venue_name = serializers.CharField(source='venue.name', read_only=True)
     type = serializers.CharField(source='event.category.name', read_only=True)
+    description = serializers.CharField(source='event.description', read_only=True)
     
-    # Write fields
+   
     event = serializers.PrimaryKeyRelatedField(queryset=Event.objects.all(), write_only=True)
     venue = serializers.PrimaryKeyRelatedField(queryset=Venue.objects.all(), write_only=True)
     
-    # Calculated fields
+
     price = serializers.SerializerMethodField()
     seatsLeft = serializers.SerializerMethodField()
 
     class Meta:
         model = EventInstance
-        fields = ['id', 'title', 'venue_name', 'type', 'price', 'seatsLeft', 'image_url', 'event', 'venue', 'time']
+        fields = ['id', 'title', 'venue_name', 'description', 'type', 'price', 'seatsLeft', 'image_url', 'event', 'venue', 'time']
 
     def get_price(self, obj):
-        # Calculate lowest price
         prices = EventSeat.objects.filter(event_instance=obj).values_list('seat_category__price', flat=True)
         if not prices:
             return "Free"
@@ -40,6 +39,7 @@ class VenueSerializer(serializers.ModelSerializer):
     class Meta:
         model = Venue
         fields = ['id', 'name', 'rows', 'seats_per_row']
+
 
 class EventCategorySerializer(serializers.ModelSerializer):
     class Meta:
