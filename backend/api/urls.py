@@ -22,7 +22,7 @@ urlpatterns = [
     path('events/', EventListCreateView.as_view()),
     path('categories/', EventCategoryListCreateView.as_view()),
     path('book-seats/', BookSeatsView.as_view()),
-    path('users-order/', UserOrdersListView.as_view()),
+    path('user-order/', UserOrdersListView.as_view()),
     path('users/', UserListView.as_view()),
     path('register/', RegisterView.as_view()),
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
