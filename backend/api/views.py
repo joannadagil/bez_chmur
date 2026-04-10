@@ -1,19 +1,26 @@
-from rest_framework import generics
+from rest_framework import views, status, permissions, generics
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from django.db import transaction
 
 
 from .models import (
     Venue,
     Event,
     EventCategory,
-    EventInstance)
+    EventInstance,
+    EventSeat,
+    OrderSeat,
+    Order
+    )
 
 from .serializers import (
     VenueSerializer,
     EventModelSerializer,
     EventCategorySerializer,
-    EventSerializer)
+    EventSerializer,
+    EventSeatSerializer,
+    )
 
 
 class EventListView(generics.ListCreateAPIView):
@@ -33,3 +40,43 @@ class EventListCreateView(generics.ListCreateAPIView):
 class EventCategoryListCreateView(generics.ListCreateAPIView):
     queryset = EventCategory.objects.all()
     serializer_class = EventCategorySerializer
+    
+class EventInstanceSeatsListView(generics.ListAPIView):
+    serializer_class = EventSeatSerializer
+
+    def get_queryset(self):
+        instance_id = self.kwargs['pk']
+        return EventSeat.objects.filter(event_instance_id=instance_id).select_related('seat', 'seat_category')
+
+class BookSeatsView(views.APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        event_instance_id = request.data.get('event_instance_id')
+        seat_ids = request.data.get('seat_ids', [])
+
+        if not seat_ids:
+            return Response({"error": "No seats selected"}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            with transaction.atomic():
+                event_instance = EventInstance.objects.get(id=event_instance_id)
+                order = Order.objects.create(
+                    user=user, 
+                    eventinstance=event_instance, 
+                    status="pending"
+                )
+
+                for s_id in seat_ids:
+                    event_seat = EventSeat.objects.get(id=s_id)
+                    
+                    if OrderSeat.objects.filter(event_seat=event_seat, order__status__in=['pending', 'paid']).exists():
+                        raise ValueError(f"Seat {s_id} already taken")
+
+                    OrderSeat.objects.create(order=order, event_seat=event_seat)
+
+                return Response({"order_id": order.id, "message": "Seats reserved"}, status=status.HTTP_201_CREATED)
+
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
