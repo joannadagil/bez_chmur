@@ -65,23 +65,53 @@ const SeatSelection = () => {
     }
   };
 
-  const handleProceedToPayment = () => {
+  const handleProceedToPayment = async () => {
     if (selectedSeatIds.length === 0) return;
-    
-    const selectedSeatLabels = seats
-      .filter(s => selectedSeatIds.includes(s.id))
-      .map(s => `${s.row}${s.number}`);
-
     setIsRedirecting(true);
-    updateBooking({ 
-      seats: selectedSeatLabels, 
-      totalPrice: currentTotalPrice
-    });
 
-    setTimeout(() => {
+    try {
+      const response = await axios.post('http://localhost:8000/api/book-seats/', {
+        event_instance_id: id,
+        seat_ids: selectedSeatIds
+      }, {
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        }
+      });
+
+      const { order_id } = response.data;
+
+      updateBooking({ 
+        orderId: order_id,
+        seats: seats.filter(s => selectedSeatIds.includes(s.id)).map(s => `${s.row}${s.number}`), 
+        totalPrice: currentTotalPrice
+      });
+
       navigate('/checkout/payment');
-    }, 1200);
+    } catch (error) {
+      alert("Could not reserve seats. They might be already taken.");
+      console.error(error);
+    } finally {
+      setIsRedirecting(false);
+    }
   };
+  // const handleProceedToPayment = () => {
+  //   if (selectedSeatIds.length === 0) return;
+    
+  //   const selectedSeatLabels = seats
+  //     .filter(s => selectedSeatIds.includes(s.id))
+  //     .map(s => `${s.row}${s.number}`);
+
+  //   setIsRedirecting(true);
+  //   updateBooking({ 
+  //     seats: selectedSeatLabels, 
+  //     totalPrice: currentTotalPrice
+  //   });
+
+  //   setTimeout(() => {
+  //     navigate('/checkout/payment');
+  //   }, 1200);
+  // };
 
   if (loading) return (
     <div className="h-screen flex items-center justify-center bg-[#f0f2f5]">

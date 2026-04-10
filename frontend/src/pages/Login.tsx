@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, User, ArrowRight, Users, Building2 } from 'lucide-react';
 import logo from '../assets/logo.png';
+import axios from 'axios';
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -54,33 +55,49 @@ const Login = () => {
 
     setIsLoading(true);
 
-    // Check if user exists and password matches
-    const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
-    const user = registeredUsers.find((u: any) => u.email === formData.email);
+    try {
+      const response = await axios.post('http://localhost:8000/api/token/', {
+        username: formData.email,
+        password: formData.password
+      });
 
-    if (!user) {
-      setErrors({ email: 'No account found with this email address' });
-      setIsLoading(false);
-      return;
-    }
-
-    if (user.password !== formData.password) {
-      setErrors({ password: 'Incorrect password' });
-      setIsLoading(false);
-      return;
-    }
-
-    // Simulate login - replace with actual authentication
-    setTimeout(() => {
+      localStorage.setItem('token', response.data.access);
       localStorage.setItem('isLoggedIn', 'true');
-      localStorage.setItem('currentUser', JSON.stringify(user));
+      
+      navigate(formData.userType === 'customer' ? '/home' : '/role-selection');
+    } catch (error) {
+      setErrors({ email: 'Invalid credentials' });
+    } finally {
       setIsLoading(false);
-      if (formData.userType === 'customer') {
-        navigate('/home');
-      } else {
-        navigate('/role-selection');
-      }
-    }, 1500);
+    }
+
+    // Check if user exists and password matches
+    // const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+    // const user = registeredUsers.find((u: any) => u.email === formData.email);
+
+    // if (!user) {
+    //   setErrors({ email: 'No account found with this email address' });
+    //   setIsLoading(false);
+    //   return;
+    // }
+
+    // if (user.password !== formData.password) {
+    //   setErrors({ password: 'Incorrect password' });
+    //   setIsLoading(false);
+    //   return;
+    // }
+
+    // // Simulate login - replace with actual authentication
+    // setTimeout(() => {
+    //   localStorage.setItem('isLoggedIn', 'true');
+    //   localStorage.setItem('currentUser', JSON.stringify(user));
+    //   setIsLoading(false);
+    //   if (formData.userType === 'customer') {
+    //     navigate('/home');
+    //   } else {
+    //     navigate('/role-selection');
+    //   }
+    // }, 1500);
   };
 
   const handleQuickLogin = () => {

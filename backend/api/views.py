@@ -11,7 +11,8 @@ from .models import (
     EventInstance,
     EventSeat,
     OrderSeat,
-    Order
+    Order,
+    User
     )
 
 from .serializers import (
@@ -20,6 +21,9 @@ from .serializers import (
     EventCategorySerializer,
     EventSerializer,
     EventSeatSerializer,
+    UserOrderSerializer,
+    UserSerializer,
+    RegisterSerializer,
     )
 
 
@@ -32,7 +36,6 @@ class VenueListCreateView(generics.ListCreateAPIView):
     queryset = Venue.objects.all()
     serializer_class = VenueSerializer
 
-
 class EventListCreateView(generics.ListCreateAPIView):
     queryset = Event.objects.all()
     serializer_class = EventModelSerializer
@@ -40,6 +43,20 @@ class EventListCreateView(generics.ListCreateAPIView):
 class EventCategoryListCreateView(generics.ListCreateAPIView):
     queryset = EventCategory.objects.all()
     serializer_class = EventCategorySerializer
+    
+class UserListView(generics.ListCreateAPIView):
+    username = User.objects.all()
+    serializer_class = UserSerializer
+    
+    def get_queryset(self):
+        return User.objects.order_by('-id')
+    
+class UserOrdersListView(generics.ListAPIView):
+    serializer_class = UserOrderSerializer
+    permission_classes = [permissions.IsAuthenticated]
+    
+    def get_queryset(self):
+        return Order.objects.filter(user=self.request.user)
     
 class EventInstanceSeatsListView(generics.ListAPIView):
     serializer_class = EventSeatSerializer
@@ -49,10 +66,21 @@ class EventInstanceSeatsListView(generics.ListAPIView):
         return EventSeat.objects.filter(event_instance_id=instance_id).select_related('seat', 'seat_category')
 
 class BookSeatsView(views.APIView):
-    permission_classes = [permissions.IsAuthenticated]
+    # TODO: add authentification
+    #permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
+        
         user = request.user
+        
+        # TODO: remove
+        from django.contrib.auth.models import User
+        if not user.is_authenticated:
+            user = User.objects.first()
+        if not user:
+            return Response({"error": "No users in database"}, status=400)
+        #
+        
         event_instance_id = request.data.get('event_instance_id')
         seat_ids = request.data.get('seat_ids', [])
 
@@ -80,3 +108,8 @@ class BookSeatsView(views.APIView):
 
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+        
+class RegisterView(generics.CreateAPIView):
+    queryset = User.objects.all()
+    serializer_class = RegisterSerializer
+    permission_classes = [permissions.AllowAny]

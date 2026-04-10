@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, User, ArrowRight, UserPlus } from 'lucide-react';
 import logo from '../assets/logo.png';
+import axios from 'axios';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -59,33 +60,53 @@ const Register = () => {
 
     setIsLoading(true);
 
-    // Check if user already exists
-    const existingUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
-    const userExists = existingUsers.some((user: any) => user.email === formData.email);
+    try {
+      const response = await axios.post('http://localhost:8000/api/register/', {
+        email: formData.email,
+        password: formData.password,
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        user_type: 'customer'
+      });
 
-    if (userExists) {
-      setErrors({ email: 'An account with this email already exists' });
+      navigate('/login');
+    } catch (error: any) {
+      if (error.response?.data?.email) {
+        setErrors({ email: 'Account with this email already exists' });
+      } else {
+        alert('Registration failed. Please try again.');
+      }
+    } finally {
       setIsLoading(false);
-      return;
     }
 
-    // Store user data
-    const newUser = {
-      firstName: formData.firstName,
-      lastName: formData.lastName,
-      email: formData.email,
-      password: formData.password, // In real app, this should be hashed
-      createdAt: new Date().toISOString()
-    };
+    // Check if user already exists
+    // const existingUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+    // const userExists = existingUsers.some((user: any) => user.email === formData.email);
 
-    existingUsers.push(newUser);
-    localStorage.setItem('registeredUsers', JSON.stringify(existingUsers));
+    // if (userExists) {
+    //   setErrors({ email: 'An account with this email already exists' });
+    //   setIsLoading(false);
+    //   return;
+    // }
 
-    // Simulate registration - replace with actual API call
-    setTimeout(() => {
-      setIsLoading(false);
-      navigate('/login');
-    }, 1500);
+    // // Store user data
+    // const newUser = {
+    //   firstName: formData.firstName,
+    //   lastName: formData.lastName,
+    //   email: formData.email,
+    //   password: formData.password, // In real app, this should be hashed
+    //   createdAt: new Date().toISOString()
+    // };
+
+    // existingUsers.push(newUser);
+    // localStorage.setItem('registeredUsers', JSON.stringify(existingUsers));
+
+    // // Simulate registration - replace with actual API call
+    // setTimeout(() => {
+    //   setIsLoading(false);
+    //   navigate('/login');
+    // }, 1500);
   };
 
   return (
