@@ -1,18 +1,31 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Mail, Lock, User, ArrowRight, Users, Building2 } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, ArrowRight, Building2 } from 'lucide-react';
 import logo from '../assets/logo.png';
+import logo_white from '../assets/logo_white.png';
+import { useTheme } from '../context/ThemeContext';
+
+const MOCK_HOST_USER = {
+  firstName: 'Host',
+  lastName: 'Demo',
+  email: 'host@getaroom.com',
+  password: 'HostDemo123!',
+  createdAt: new Date().toISOString(),
+};
+
+const HOST_EMAILS = new Set([MOCK_HOST_USER.email.toLowerCase()]);
 
 const Login = () => {
   const [formData, setFormData] = useState({
     email: '',
     password: '',
-    userType: 'customer' as 'customer' | 'host'
   });
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const navigate = useNavigate();
+  const { isDark } = useTheme();
+  const authLogo = isDark ? logo_white : logo;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -48,10 +61,20 @@ const Login = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  const ensureMockHostAccount = () => {
+    const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+    const hasHost = registeredUsers.some((u: any) => u.email?.toLowerCase() === MOCK_HOST_USER.email.toLowerCase());
+    if (!hasHost) {
+      registeredUsers.push(MOCK_HOST_USER);
+      localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
 
+    ensureMockHostAccount();
     setIsLoading(true);
 
     // Check if user exists and password matches
@@ -75,15 +98,13 @@ const Login = () => {
       localStorage.setItem('isLoggedIn', 'true');
       localStorage.setItem('currentUser', JSON.stringify(user));
       setIsLoading(false);
-      if (formData.userType === 'customer') {
-        navigate('/home');
-      } else {
-        navigate('/role-selection');
-      }
+      const isHost = HOST_EMAILS.has(user.email.toLowerCase()) || user.accountType === 'host';
+      navigate(isHost ? '/host-dashboard' : '/home');
     }, 1500);
   };
 
   const handleQuickLogin = () => {
+    ensureMockHostAccount();
     const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
     const quickUser = registeredUsers.find((u: any) => u.email === 'john.doe@example.com');
 
@@ -108,6 +129,17 @@ const Login = () => {
     }
   };
 
+  const handleHostQuickLogin = () => {
+    ensureMockHostAccount();
+    const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
+    const hostUser = registeredUsers.find((u: any) => u.email?.toLowerCase() === MOCK_HOST_USER.email.toLowerCase());
+    if (!hostUser) return;
+
+    localStorage.setItem('isLoggedIn', 'true');
+    localStorage.setItem('currentUser', JSON.stringify(hostUser));
+    navigate('/host-dashboard');
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#f27690] via-[#ffbb9c] to-[#fff2c4] flex items-center justify-center p-4" style={{ fontFamily: 'TT Firs Neue, sans-serif' }}>
       <div className="w-full max-w-md">
@@ -115,7 +147,7 @@ const Login = () => {
         <div className="text-center mb-8">
           <div className="flex justify-center mb-6">
             <img
-              src={logo}
+              src={authLogo}
               alt="getAroom Logo"
               className="w-250 h-30 object-contain cursor-pointer"
               onClick={() => navigate(localStorage.getItem('isLoggedIn') === 'true' ? '/home' : '/')}
@@ -141,31 +173,13 @@ const Login = () => {
             Log in as John Doe
           </button>
 
-          {/* User Type Selection */}
-          <div className="flex gap-2 mb-6 p-1 bg-gray-100 rounded-xl">
-            <button
-              onClick={() => setFormData(prev => ({ ...prev, userType: 'customer' }))}
-              className={`flex-1 py-2 px-4 rounded-lg font-bold uppercase tracking-wider text-sm transition-colors flex items-center justify-center gap-2 ${
-                formData.userType === 'customer'
-                  ? 'bg-[#e71555] text-white'
-                  : 'text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              <Users className="w-4 h-4" />
-              Customer
-            </button>
-            <button
-              onClick={() => setFormData(prev => ({ ...prev, userType: 'host' }))}
-              className={`flex-1 py-2 px-4 rounded-lg font-bold uppercase tracking-wider text-sm transition-colors flex items-center justify-center gap-2 ${
-                formData.userType === 'host'
-                  ? 'bg-[#e71555] text-white'
-                  : 'text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              <Building2 className="w-4 h-4" />
-              Host
-            </button>
-          </div>
+          <button
+            onClick={handleHostQuickLogin}
+            className="w-full mb-6 bg-[#3a0e23] text-white py-3 px-4 rounded-xl font-bold hover:bg-[#5a1636] transition-colors border-2 border-[#3a0e23] flex items-center justify-center gap-2"
+          >
+            <Building2 className="w-5 h-5" />
+            Log in as Host Demo
+          </button>
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div>

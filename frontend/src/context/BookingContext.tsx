@@ -4,11 +4,20 @@ import type { ReactNode } from 'react';
 interface BookingData {
   eventId: string;
   eventTitle: string;
+  eventCategory: string;
   date: string;
+  dateTo: string;
   time: string;
   seats: string[];
+  removedSeats: string[];
   totalPrice: number;
   selectedVenue: string;
+  venueLayout?: {
+    width: number;
+    depth: number;
+    floors: number;
+  };
+  totalTickets: number;
 }
 
 interface BookingContextType {
@@ -20,11 +29,16 @@ interface BookingContextType {
 const initialBooking: BookingData = {
   eventId: '',
   eventTitle: '',
+  eventCategory: '',
   selectedVenue: '',
   date: '',
+  dateTo: '',
   time: '',
   seats: [],
+  removedSeats: [],
   totalPrice: 0,
+  venueLayout: undefined,
+  totalTickets: 0,
 };
 
 const BookingContext = createContext<BookingContextType | undefined>(undefined);

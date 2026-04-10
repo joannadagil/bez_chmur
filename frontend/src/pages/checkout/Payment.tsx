@@ -56,6 +56,22 @@ const handleCvcChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (errors.cvc) setErrors(prev => ({ ...prev, cvc: '' }));
   };
 
+const handleRandomizePayment = () => {
+    const demoNames = ['John Doe', 'Anna Kowalska', 'Alex Rivera', 'Maya Smith'];
+    const randomName = demoNames[Math.floor(Math.random() * demoNames.length)];
+    const randomCard = Array.from({ length: 16 }, () => Math.floor(Math.random() * 10)).join('');
+    const formattedCard = randomCard.replace(/(\d{4})(?=\d)/g, '$1 ');
+    const month = String(1 + Math.floor(Math.random() * 12)).padStart(2, '0');
+    const year = String((new Date().getFullYear() + 2 + Math.floor(Math.random() * 3)) % 100).padStart(2, '0');
+    const randomCvc = String(100 + Math.floor(Math.random() * 900));
+
+    setCardHolder(randomName);
+    setCardNumber(formattedCard);
+    setExpiry(`${month}/${year}`);
+    setCvc(randomCvc);
+    setErrors({});
+  };
+
   const validateForm = () => {
     const newErrors: { [key: string]: string } = {};
     if (cardHolder.trim().split(' ').length < 2) {
@@ -204,6 +220,15 @@ const handlePayment = (e: React.FormEvent) => {
                   {errors.cvc && <p className="text-[9px] text-red-500 font-black uppercase mt-1 flex items-center gap-1 ml-1"><AlertCircle size={10}/> {errors.cvc}</p>}
                 </div>
               </div>
+
+              <button 
+                type="button"
+                onClick={handleRandomizePayment}
+                disabled={isProcessing}
+                className="w-full border-2 border-[#3a0e23]/30 text-[#3a0e23] font-black py-3 rounded-2xl transition-all uppercase text-[11px] tracking-[0.18em] hover:bg-[#f0f2f5] disabled:opacity-70 disabled:cursor-not-allowed"
+              >
+                Randomize Payment (Debug)
+              </button>
 
               <button 
                 type="submit"

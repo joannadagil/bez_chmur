@@ -4,9 +4,13 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import type { Event } from '../../data/mockEvents';
 
-interface EventCardProps { event: Event; }
+interface EventCardProps {
+  event: Event;
+  detailsPathBase?: string;
+  ctaLabel?: string;
+}
 
-export const EventCard: React.FC<EventCardProps> = ({ event }) => {
+export const EventCard: React.FC<EventCardProps> = ({ event, detailsPathBase = '/event', ctaLabel = 'Details' }) => {
   const typeColors: Record<string, string> = {
     Cinema: 'bg-[#d3265b]',      
     Theatre: 'bg-[#845ec2]',      
@@ -14,7 +18,7 @@ export const EventCard: React.FC<EventCardProps> = ({ event }) => {
   };
 
   return (
-    <Link to={`/event/${event.id}`} className="block group">
+    <Link to={`${detailsPathBase}/${event.id}`} className="block group">
       <div className="bg-[#3a0e23] rounded-[28px] overflow-hidden shadow-lg transition-all duration-300 group-hover:shadow-2xl text-white">
         <div className="relative h-44 overflow-hidden">
           <img
@@ -47,7 +51,7 @@ className="w-full h-full object-cover opacity-80 transition-all duration-500 gro
 </span>
 
             <button className="text-[9px] font-black uppercase tracking-widest bg-white/5 px-3 py-1.5 rounded-lg group-hover:bg-[#f27690] group-hover:text-white transition-all">
-              Details
+              {ctaLabel}
             </button>
           </div>
         </div>

@@ -1,11 +1,13 @@
 import type { ChangeEvent } from 'react';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useBooking } from '../context/BookingContext';
 import Navbar from '../components/layout/Navbar';
 import { ImagePlus } from 'lucide-react';
 
 const AddEvent = () => {
   const navigate = useNavigate();
+  const { updateBooking } = useBooking();
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [category, setCategory] = useState('Cinema');
@@ -18,12 +20,52 @@ const AddEvent = () => {
   const today = new Date().toISOString().split('T')[0];
 
   const categoryOptions = ['Cinema', 'Theatre', 'Lecture Hall'];
+  const debugImages = [
+    'https://www.superherotoystore.com/cdn/shop/articles/dune-part-two-2024-5k-rl-3840x2400_1600x.jpg?v=1709290352',
+    'https://beetlejuicethemusical.com.au/wp-content/uploads/2025/06/beetlejuice-title.jpg',
+    'https://aws-tiqets-cdn.imgix.net/images/content/af800c2a213a46b28e696d9efae8fcba.jpg?auto=format%2Ccompress&fit=crop&q=70&w=600&s=61daa83f62dc8edda6220caaa0ea0639',
+  ];
 
   const nameValid = name.trim().length >= 10;
   const descriptionValid = description.trim().length >= 10;
   const datesValid = Boolean(dateFrom && dateTo && dateFrom < dateTo);
   const imageValid = Boolean(imagePreview);
   const canSubmit = nameValid && descriptionValid && datesValid && category && imageValid;
+
+  const randomizeDebugEvent = () => {
+    const titles = [
+      'Moulin Rouge! Night Session',
+      'Dune Marathon Experience',
+      'AI and Society: Evening Special',
+      'Romeo and Juliet Anniversary Stage',
+    ];
+    const descriptions = [
+      'A fully randomized debug event to quickly verify host creation flow and form validation behavior.',
+      'Auto-generated event payload for QA checks, including date bounds, category assignment, and image preview handling.',
+      'Debug scenario event used to validate booking context handoff between Add Event and Venue Selection pages.',
+    ];
+
+    const randomTitle = titles[Math.floor(Math.random() * titles.length)];
+    const randomDescription = descriptions[Math.floor(Math.random() * descriptions.length)];
+    const randomCategory = categoryOptions[Math.floor(Math.random() * categoryOptions.length)];
+    const randomImage = debugImages[Math.floor(Math.random() * debugImages.length)];
+
+    const now = new Date();
+    const startOffset = 1 + Math.floor(Math.random() * 20);
+    const endOffset = startOffset + 1 + Math.floor(Math.random() * 4);
+    const startDate = new Date(now);
+    startDate.setDate(now.getDate() + startOffset);
+    const endDate = new Date(now);
+    endDate.setDate(now.getDate() + endOffset);
+
+    setName(randomTitle);
+    setDescription(randomDescription);
+    setCategory(randomCategory);
+    setDateFrom(startDate.toISOString().split('T')[0]);
+    setDateTo(endDate.toISOString().split('T')[0]);
+    setImageName('debug-poster.jpg');
+    setImagePreview(randomImage);
+  };
 
   const handleFileChange = (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -43,6 +85,13 @@ const AddEvent = () => {
 
   const handleSubmit = () => {
     if (!canSubmit) return;
+    updateBooking({
+      eventTitle: name,
+      eventCategory: category,
+      date: dateFrom,
+      dateTo,
+      time: '',
+    });
     navigate('/host-dashboard/add-event/venue');
   };
 
@@ -95,12 +144,8 @@ const AddEvent = () => {
                         onClick={() => setCategory(option)}
                         className={`rounded-full px-6 py-3 font-black uppercase tracking-[0.18em] transition ${
                           category === option
-                            ? 'bg-[#d3265b] text-white'
-                            : option === 'Cinema'
-                              ? 'bg-[#ff2f6e] text-white'
-                              : option === 'Theatre'
-                                ? 'bg-[#7f50ff] text-white'
-                                : 'bg-[#1f7b88] text-white'
+                            ? 'bg-[#d3265b] text-white ring-4 ring-[#d3265b]/25 scale-[1.03]'
+                            : 'bg-[#d8d8d8] text-[#3a0e23] hover:bg-[#c9c9c9]'
                         }`}
                       >
                         {option.toUpperCase()}
@@ -163,6 +208,13 @@ const AddEvent = () => {
             </div>
 
             <div className="pt-8">
+              <button
+                type="button"
+                onClick={randomizeDebugEvent}
+                className="mb-3 inline-flex w-full items-center justify-center rounded-full px-8 py-3 text-sm font-black uppercase tracking-[0.18em] text-[#3a0e23] border-2 border-[#d3265b]/50 bg-[#f5f5dc] hover:bg-[#ffe8f0] transition"
+              >
+                RANDOMIZE (DEBUG)
+              </button>
               <button
                 type="button"
                 onClick={handleSubmit}

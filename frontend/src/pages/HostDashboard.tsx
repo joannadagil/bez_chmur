@@ -1,14 +1,17 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { Plus, Moon, User } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Plus, Building2, ChevronDown, Settings, LogOut, Bell } from 'lucide-react';
 import { EventCard } from '../components/events/EventCard';
 import { mockEvents } from '../data/mockEvents';
 import logo from '../assets/logo_white.png';
+import ThemeToggle from '../components/layout/ThemeToggle';
 
 const HostDashboard = () => {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState('ALL EVENTS');
   const [searchQuery, setSearchQuery] = useState('');
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
 
   const filteredEvents = mockEvents.filter(event => {
     const categoryMatch = activeFilter === 'ALL EVENTS' ||
@@ -61,11 +64,63 @@ const HostDashboard = () => {
 
           <div className="relative z-10 flex flex-col justify-between h-full">
             <div className="flex items-center justify-between mb-8">
-              <img src={logo} alt="getAroom Logo" className="w-24 h-auto object-contain" />
+              <img
+                src={logo}
+                alt="getAroom Logo"
+                className="w-24 h-auto object-contain cursor-pointer hover:scale-105 transition-transform"
+                onClick={() => navigate('/host-dashboard')}
+              />
               <div className="flex items-center gap-4">
-                <Moon size={18} className="cursor-pointer opacity-80 hover:opacity-100 transition" />
-                <div className="w-10 h-10 rounded-full bg-white/10 border border-white/20 flex items-center justify-center">
-                  <User size={18} />
+                <ThemeToggle className="h-9 w-9 border-white/20 bg-white/10 text-white/80 hover:bg-white/20 hover:text-white" />
+                <div className="relative">
+                  <div
+                    className="flex items-center gap-2 cursor-pointer group bg-white/10 p-1.5 px-3 rounded-full border border-white/10 hover:bg-white/20 transition-all"
+                    onClick={() => setIsProfileOpen(!isProfileOpen)}
+                  >
+                    <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center border border-white/10">
+                      <Building2 size={14} />
+                    </div>
+                    <span className="text-[10px] font-black uppercase tracking-widest">{currentUser.companyName || currentUser.firstName || 'Company'}</span>
+                    <ChevronDown size={12} className={`transition-transform duration-300 ${isProfileOpen ? 'rotate-180' : ''}`} />
+                  </div>
+
+                  {isProfileOpen && (
+                    <div className="profile-menu absolute right-0 top-14 w-56 bg-white text-[#3a0e23] rounded-2xl shadow-2xl p-2 z-50 border border-gray-100 animate-in zoom-in-95 duration-200">
+                      <Link
+                        to="/company-profile"
+                        className="profile-menu-item flex w-full items-center gap-3 p-3 hover:bg-[#fff0f3] rounded-xl text-[11px] font-black uppercase tracking-wider no-underline text-[#3a0e23] transition-colors"
+                        onClick={() => setIsProfileOpen(false)}
+                      >
+                        <Building2 size={16} className="text-[#d3265b]" /> Company Profile
+                      </Link>
+                      <Link
+                        to="/notifications"
+                        className="profile-menu-item flex w-full items-center gap-3 p-3 hover:bg-[#fff0f3] rounded-xl text-[11px] font-black uppercase tracking-wider no-underline text-[#3a0e23] transition-colors"
+                        onClick={() => setIsProfileOpen(false)}
+                      >
+                        <Bell size={16} className="text-[#d3265b]" /> Notifications
+                      </Link>
+                      <Link
+                        to="/settings"
+                        className="profile-menu-item flex w-full items-center gap-3 p-3 hover:bg-gray-50 rounded-xl text-[11px] font-black uppercase tracking-wider no-underline text-[#3a0e23]"
+                        onClick={() => setIsProfileOpen(false)}
+                      >
+                        <Settings size={16} className="text-gray-400" /> Settings
+                      </Link>
+                      <div className="h-px bg-gray-100 my-1.5 mx-2" />
+                      <button
+                        className="profile-menu-item flex w-full items-center gap-3 p-3 hover:bg-red-50 text-red-600 rounded-xl text-[11px] font-black uppercase tracking-wider"
+                        onClick={() => {
+                          localStorage.removeItem('isLoggedIn');
+                          localStorage.removeItem('currentUser');
+                          setIsProfileOpen(false);
+                          navigate('/login');
+                        }}
+                      >
+                        <LogOut size={16} /> Logout
+                      </button>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -112,7 +167,7 @@ const HostDashboard = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-12 pb-20">
             {filteredEvents.map(event => (
               <div key={event.id} className="transform transition-all duration-500 hover:-translate-y-3 hover:rotate-[0.5deg]">
-                <EventCard event={event} />
+                <EventCard event={event} detailsPathBase="/host-dashboard/event" ctaLabel="Manage" />
               </div>
             ))}
           </div>
