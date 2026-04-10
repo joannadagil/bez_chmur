@@ -9,6 +9,7 @@ interface BookingData {
   seats: string[];
   totalPrice: number;
   selectedVenue: string;
+  orderId: string; //new
 }
 
 interface BookingContextType {
@@ -25,6 +26,7 @@ const initialBooking: BookingData = {
   time: '',
   seats: [],
   totalPrice: 0,
+  orderId: '', //new
 };
 
 const BookingContext = createContext<BookingContextType | undefined>(undefined);

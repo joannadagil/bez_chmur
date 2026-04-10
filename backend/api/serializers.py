@@ -7,6 +7,9 @@ from .models import (
     Venue, 
     EventCategory, 
     SeatCategory,
+    Order,
+    User,
+    Group,
     )
 
 class EventSerializer(serializers.ModelSerializer):
@@ -48,6 +51,10 @@ class VenueSerializer(serializers.ModelSerializer):
         model = Venue
         fields = ['id', 'name', 'rows', 'seats_per_row']
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'pk', 'first_name', 'last_name', 'username', 'email', 'password', 'is_active', 'is_staff', 'is_superuser']
 
 class EventCategorySerializer(serializers.ModelSerializer):
     class Meta:
@@ -88,3 +95,50 @@ class EventSeatSerializer(serializers.ModelSerializer):
             event_seat=obj,
             order__status__in=['pending', 'paid']
         ).exists()
+        
+class UserOrderSerializer(serializers.ModelSerializer):
+    user_email = serializers.CharField(source='user.email', read_only=True)
+    user_full_name = serializers.SerializerMethodField()
+    
+    event_name = serializers.CharField(source='eventinstance.event.name', read_only=True)
+    date = serializers.DateTimeField(source='eventinstance.time', read_only=True)
+    
+    seats = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Order
+        fields = ['id', 'user_email', 'user_full_name', 'event_name', 'date', 'status', 'seats']
+        
+    def get_user_full_name(self, obj):
+        full_name = f"{obj.user.first_name} {obj.user.last_name}".strip()
+        return full_name if full_name else obj.user.username
+    
+    def get_seats(self, obj):
+        order_seats = OrderSeat.objects.filter(order=obj)
+        return [f"{os.event_seat.seat.row}{os.event_seat.seat.number}" for os in order_seats]
+    
+class RegisterSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+    user_type = serializers.CharField(required=False, write_only=True, default='customer')
+
+    class Meta:
+        model = User
+        fields = ['email', 'password', 'first_name', 'last_name', 'user_type']
+
+    def create(self, validated_data):
+        user_type = validated_data.pop('user_type', 'customer')
+        email = validated_data.get('email')
+        
+        user = User.objects.create_user(
+            username=email, 
+            email=email,
+            password=validated_data['password'],
+            first_name=validated_data.get('first_name', ''),
+            last_name=validated_data.get('last_name', '')
+        )
+        
+        group_name = 'Host' if user_type == 'host' else 'Customer'
+        group, _ = Group.objects.get_or_create(name=group_name)
+        user.groups.add(group)
+        
+        return user

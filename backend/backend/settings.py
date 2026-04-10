@@ -28,6 +28,22 @@ DEBUG = os.getenv('DEBUG') == 'True'
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', 'backend']
 
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    ),
+}
+
+SIMPLE_JWT = {
+    'USER_ID_FIELD': 'id',
+    'USER_ID_CLAIM': 'user_id',
+    'LOGIN_FIELD': 'email', 
+}
+
+AUTHENTICATION_BACKENDS = [
+    'backends.EmailBackend',
+    'django.contrib.auth.backends.ModelBackend',
+]
 
 # Application definition
 

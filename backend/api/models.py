@@ -1,5 +1,5 @@
 from django.db import models
-from django.contrib.auth.models import User \
+from django.contrib.auth.models import User, Group
 
 class Venue(models.Model):
     name = models.CharField(max_length=255)
