@@ -13,6 +13,135 @@
   background-color: var(--color-bg-beige);
 }
 
+:root[data-theme='dark'] {
+  color-scheme: dark;
+}
+
+:root[data-theme='dark'] body,
+:root[data-theme='dark'] #root {
+  background: #3a0623;
+  color: #f3ebdf;
+}
+
+/* Dark-mode replacements for all pastel gradients used across pages */
+:root[data-theme='dark'] .bg-gradient-to-br {
+  background-image: linear-gradient(135deg, #17000f 0%, #5f1d47 52%, #ea4f8d 100%) !important;
+}
+
+:root[data-theme='dark'] .bg-gradient-to-r {
+  background-image: linear-gradient(90deg, #17000f 0%, #5f1d47 52%, #ea4f8d 100%) !important;
+}
+
+:root[data-theme='dark'] .bg-gradient-to-b {
+  background-image: linear-gradient(180deg, #5f1d47 0%, #ea4f8d 100%) !important;
+}
+
+/* Global dark surfaces */
+:root[data-theme='dark'] .bg-\[\#f5f5dc\],
+:root[data-theme='dark'] .bg-\[\#f0f2f5\],
+:root[data-theme='dark'] .bg-\[\#fcfbff\],
+:root[data-theme='dark'] .bg-\[\#faf9f0\],
+:root[data-theme='dark'] .bg-\[\#e8e8ec\],
+:root[data-theme='dark'] .bg-\[\#e7e6f0\] {
+  background-color: #3a0623 !important;
+}
+
+:root[data-theme='dark'] .bg-white,
+:root[data-theme='dark'] .bg-\[\#fff5f7\],
+:root[data-theme='dark'] .bg-\[\#fcfbff\],
+:root[data-theme='dark'] .bg-\[\#e7e7e7\],
+:root[data-theme='dark'] .bg-\[\#faf8f1\],
+:root[data-theme='dark'] .bg-\[\#efe6d8\] {
+  background-color: #4b0b30 !important;
+  border-color: #c21f5f !important;
+}
+
+:root[data-theme='dark'] .text-\[\#3a0e23\],
+:root[data-theme='dark'] .text-\[\#1a0b1a\],
+:root[data-theme='dark'] .text-\[\#301326\],
+:root[data-theme='dark'] .text-\[\#4a3142\],
+:root[data-theme='dark'] .text-\[\#8f1c3f\],
+:root[data-theme='dark'] .text-\[\#92717a\],
+:root[data-theme='dark'] .text-black,
+:root[data-theme='dark'] .text-black\/30,
+:root[data-theme='dark'] .text-black\/40,
+:root[data-theme='dark'] .text-gray-700,
+:root[data-theme='dark'] .text-gray-800,
+:root[data-theme='dark'] .text-gray-600,
+:root[data-theme='dark'] .text-gray-500,
+:root[data-theme='dark'] .text-gray-400 {
+  color: #f3ebdf !important;
+}
+
+:root[data-theme='dark'] .text-\[\#d3265b\],
+:root[data-theme='dark'] .text-\[\#ee5164\],
+:root[data-theme='dark'] .text-\[\#ff3366\],
+:root[data-theme='dark'] .text-\[\#bfc0cb\],
+:root[data-theme='dark'] .text-\[\#c1c2cc\] {
+  color: #ff4d8a !important;
+}
+
+:root[data-theme='dark'] .border-gray-100,
+:root[data-theme='dark'] .border-gray-200,
+:root[data-theme='dark'] .border-gray-300,
+:root[data-theme='dark'] .border-\[\#d5d6df\],
+:root[data-theme='dark'] .border-\[\#cdcfe0\] {
+  border-color: #8c2e55 !important;
+}
+
+:root[data-theme='dark'] .shadow-lg,
+:root[data-theme='dark'] .shadow-xl,
+:root[data-theme='dark'] .shadow-2xl,
+:root[data-theme='dark'] .shadow-sm {
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45) !important;
+}
+
+:root[data-theme='dark'] input,
+:root[data-theme='dark'] textarea,
+:root[data-theme='dark'] select {
+  background: #5b123a !important;
+  color: #f3ebdf !important;
+  border-color: #d3265b !important;
+}
+
+:root[data-theme='dark'] input::placeholder,
+:root[data-theme='dark'] textarea::placeholder {
+  color: #e2b8c9 !important;
+}
+
+:root[data-theme='dark'] .bg-\[\#3a0e23\],
+:root[data-theme='dark'] .bg-black {
+  background-color: #220315 !important;
+}
+
+:root[data-theme='dark'] .bg-\[\#d3265b\],
+:root[data-theme='dark'] .bg-\[\#ff3f7a\],
+:root[data-theme='dark'] .bg-\[\#f27690\] {
+  background-color: #e62468 !important;
+}
+
+:root[data-theme='dark'] .bg-\[\#ffbcc7\],
+:root[data-theme='dark'] .bg-\[\#ffb6d9\],
+:root[data-theme='dark'] .bg-\[\#fff0f2\] {
+  background-color: #7b1f48 !important;
+}
+
+/* Profile dropdown readability in dark mode */
+:root[data-theme='dark'] .profile-menu {
+  background-color: #2b061b !important;
+  color: #f3ebdf !important;
+  border-color: #8c2e55 !important;
+}
+
+:root[data-theme='dark'] .profile-menu-item {
+  color: #f3ebdf !important;
+}
+
+:root[data-theme='dark'] .profile-menu-item:hover {
+  background-color: #5b123a !important;
+  color: #fdf1e4 !important;
+}
+
 body {
   margin: 0;
   min-height: 100vh;

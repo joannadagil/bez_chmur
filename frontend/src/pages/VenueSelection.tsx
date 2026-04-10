@@ -1,33 +1,55 @@
 import type { ChangeEvent } from 'react';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Search, ChevronRight } from 'lucide-react';
-
-interface Venue {
-  id: string;
-  name: string;
-  type: 'seated' | 'no-seats';
-  size?: number;
-  color: string;
-}
-
-const venues: Venue[] = [
-  { id: '1', name: 'HALL A', type: 'seated', size: 500, color: '#d3265b' },
-  { id: '2', name: 'HALL B', type: 'seated', size: 300, color: '#ff6b6b' },
-  { id: '3', name: 'HALL C', type: 'seated', size: 200, color: '#845ec2' },
-  { id: '4', name: 'NO SEATS VENUE', type: 'no-seats', color: '#00bcd4' },
-];
+import { Search, ChevronRight, ChevronDown } from 'lucide-react';
+import Navbar from '../components/layout/Navbar';
+import { useBooking } from '../context/BookingContext';
+import { venues } from '../data/venues';
+import type { VenueData } from '../data/venues';
 
 const VenueSelection = () => {
   const navigate = useNavigate();
+  const { booking, updateBooking } = useBooking();
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterType, setFilterType] = useState<'all' | 'seated' | 'no-seats'>('all');
+  const [filterType, setFilterType] = useState<'all' | 'seated' | 'no-seats' | 'large' | 'small'>('all');
   const [sortBy, setSortBy] = useState<'name' | 'size'>('name');
   const [selectedVenue, setSelectedVenue] = useState<string | null>(null);
+  const [showFilterDropdown, setShowFilterDropdown] = useState(false);
+  const [showSortDropdown, setShowSortDropdown] = useState(false);
+  
+  const filterRef = useRef<HTMLDivElement>(null);
+  const sortRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (filterRef.current && !filterRef.current.contains(event.target as Node)) {
+        setShowFilterDropdown(false);
+      }
+      if (sortRef.current && !sortRef.current.contains(event.target as Node)) {
+        setShowSortDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   const filteredVenues = venues.filter(venue => {
     const matchesSearch = venue.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = filterType === 'all' || venue.type === filterType;
+    let matchesFilter = false;
+    
+    if (filterType === 'all') {
+      matchesFilter = true;
+    } else if (filterType === 'seated') {
+      matchesFilter = venue.type === 'seated';
+    } else if (filterType === 'no-seats') {
+      matchesFilter = venue.type === 'no-seats';
+    } else if (filterType === 'large') {
+      matchesFilter = venue.type === 'seated' && !!venue.size && venue.size >= 500;
+    } else if (filterType === 'small') {
+      matchesFilter = venue.type === 'seated' && !!venue.size && venue.size <= 100;
+    }
+    
     return matchesSearch && matchesFilter;
   });
 
@@ -40,57 +62,72 @@ const VenueSelection = () => {
     return a.name.localeCompare(b.name);
   });
 
-  const handleFilterClick = () => {
-    if (filterType === 'all') setFilterType('seated');
-    else if (filterType === 'seated') setFilterType('no-seats');
-    else setFilterType('all');
+  const handleFilterSelect = (type: 'all' | 'seated' | 'no-seats' | 'large' | 'small') => {
+    setFilterType(type);
+    setShowFilterDropdown(false);
   };
 
-  const handleSortClick = () => {
-    if (filterType === 'seated') {
-      setSortBy(sortBy === 'name' ? 'size' : 'name');
+  const handleSortSelect = (sort: 'name' | 'size') => {
+    setSortBy(sort);
+    setShowSortDropdown(false);
+    if (sort === 'size') {
+      setFilterType('seated');
     }
+  };
+
+  const parseDate = (value: string) => {
+    return value ? new Date(value) : null;
+  };
+
+  const eventStart = parseDate(booking.date);
+  const eventEnd = parseDate(booking.dateTo || booking.date);
+
+  const rangesOverlap = (startA: Date, endA: Date, startB: Date, endB: Date) => {
+    return startA <= endB && startB <= endA;
+  };
+
+  const isVenueBusy = (venue: VenueData) => {
+    if (!eventStart || !eventEnd) return false;
+    return venue.busyRanges.some(range => {
+      const busyStart = new Date(range.start);
+      const busyEnd = new Date(range.end);
+      return rangesOverlap(eventStart, eventEnd, busyStart, busyEnd);
+    });
   };
 
   const handleGoToSeating = () => {
     if (selectedVenue) {
-      navigate('/host-dashboard');
+      const currentVenue = venues.find(venue => venue.id === selectedVenue);
+      if (currentVenue) {
+        updateBooking({ selectedVenue: currentVenue.name });
+        if (currentVenue.type === 'seated') {
+          navigate(`/host-dashboard/add-event/venue/${selectedVenue}/seating`);
+        } else if (currentVenue.type === 'no-seats') {
+          navigate(`/host-dashboard/add-event/venue/${selectedVenue}/configure-no-seats`);
+        }
+      }
     }
   };
 
+  const selectedVenueData = selectedVenue ? venues.find((venue) => venue.id === selectedVenue) : null;
+  const canGoToSeating = Boolean(selectedVenueData);
+
   return (
     <div className="min-h-screen bg-[#f5f5dc] font-sans selection:bg-[#ffbcc7] selection:text-[#3a0e23]">
-      {/* Header */}
-      <div className="bg-[#3a0e23] px-6 md:px-12 py-8">
-        <div className="flex items-center justify-between mb-6">
-          <img src="/logo_white.png" alt="Logo" className="h-8" />
-          <div className="flex items-center gap-4">
-            <button className="p-2 hover:bg-white/10 rounded-full transition">
-              <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 3c1.66 0 3 1.34 3 3s-1.34 3-3 3-3-1.34-3-3 1.34-3 3-3zm0 14.2c-2.5 0-4.71-1.28-6-3.22.03-1.99 4-3.08 6-3.08 1.99 0 5.97 1.09 6 3.08-1.29 1.94-3.5 3.22-6 3.22z" />
-              </svg>
-            </button>
-            <button className="p-2 hover:bg-white/10 rounded-full transition">
-              <svg className="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z" />
-              </svg>
-            </button>
-          </div>
-        </div>
+      <Navbar hideTicketsLink logoLink="/host-dashboard" userName="Company Name" />
 
-        {/* Breadcrumb */}
-        <div className="text-white text-sm mb-4">
-          <span className="text-white/70">Adding new event</span>
-          <span className="mx-3 text-white/70">→</span>
-          <span className="font-semibold">Choosing venue</span>
-        </div>
-      </div>
+   
 
       {/* Main Content */}
       <div className="px-6 md:px-12 py-12">
         <div className="max-w-6xl mx-auto">
           {/* Title */}
-          <h1 className="text-4xl font-black text-[#3a0e23] mb-8">Pick venue</h1>
+          <h1 className="text-4xl font-black text-[#3a0e23] mb-8">Pick a venue</h1>
+          {booking.date && booking.dateTo && (
+            <p className="text-sm text-[#3a0e23]/80 mb-8">
+              Event dates: {booking.date} → {booking.dateTo}
+            </p>
+          )}
 
           {/* Search and Controls */}
           <div className="mb-8 flex flex-col gap-4">
@@ -98,7 +135,6 @@ const VenueSelection = () => {
             <div className="relative">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-[#d3265b] w-5 h-5" />
               <input
-                type="text"
                 placeholder="Search venue..."
                 value={searchTerm}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => setSearchTerm(e.target.value)}
@@ -107,73 +143,148 @@ const VenueSelection = () => {
             </div>
 
             {/* Filter and Sort Buttons */}
-            <div className="flex gap-3">
-              <button
-                onClick={handleFilterClick}
-                className="px-6 py-2 bg-[#d3265b] text-white font-black rounded-full uppercase text-sm hover:bg-[#b81d47] transition"
-              >
-                FILTER
-              </button>
-              {filterType === 'seated' && (
+            <div className="flex gap-3 relative">
+              <div className="relative" ref={filterRef}>
                 <button
-                  onClick={handleSortClick}
-                  className={`px-6 py-2 font-black rounded-full uppercase text-sm transition ${
-                    sortBy === 'size'
-                      ? 'bg-[#ff69b4] text-white'
-                      : 'bg-[#ffb6d9] text-[#d3265b]'
-                  }`}
+                  onClick={() => setShowFilterDropdown(!showFilterDropdown)}
+                  className="px-6 py-2 bg-[#d3265b] text-white font-black rounded-full uppercase text-sm hover:bg-[#b81d47] transition flex items-center gap-2"
+                >
+                  FILTER
+                  <ChevronDown className="w-4 h-4" />
+                </button>
+                {showFilterDropdown && (
+                  <div className="absolute top-full mt-2 w-48 bg-white border border-gray-200 rounded-2xl shadow-lg z-10">
+                    <button
+                      onClick={() => handleFilterSelect('all')}
+                      className="w-full text-left px-4 py-3 hover:bg-[#f5f5dc] rounded-t-2xl font-semibold text-[#3a0e23]"
+                    >
+                      All Venues
+                    </button>
+                    <button
+                      onClick={() => handleFilterSelect('no-seats')}
+                      className="w-full text-left px-4 py-3 hover:bg-[#f5f5dc] font-semibold text-[#3a0e23]"
+                    >
+                      No Seats Venues
+                    </button>
+                    <button
+                      onClick={() => handleFilterSelect('large')}
+                      className="w-full text-left px-4 py-3 hover:bg-[#f5f5dc] font-semibold text-[#3a0e23]"
+                    >
+                      Large (≥500 seats)
+                    </button>
+                    <button
+                      onClick={() => handleFilterSelect('small')}
+                      className="w-full text-left px-4 py-3 hover:bg-[#f5f5dc] rounded-b-2xl font-semibold text-[#3a0e23]"
+                    >
+                      Small (≤100 seats)
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              <div className="relative" ref={sortRef}>
+                <button
+                  onClick={() => setShowSortDropdown(!showSortDropdown)}
+                  className="px-6 py-2 bg-[#ff69b4] text-white font-black rounded-full uppercase text-sm hover:bg-[#ff1493] transition flex items-center gap-2"
                 >
                   SORT
+                  <ChevronDown className="w-4 h-4" />
                 </button>
-              )}
-              {filterType === 'seated' && (
-                <span className="px-4 py-2 text-sm text-[#3a0e23] font-semibold">
-                  {sortBy === 'size' ? 'Size' : 'Name'}
-                </span>
-              )}
+                {showSortDropdown && (
+                  <div className="absolute top-full mt-2 w-32 bg-white border border-gray-200 rounded-2xl shadow-lg z-10">
+                    <button
+                      onClick={() => handleSortSelect('name')}
+                      className="w-full text-left px-4 py-3 hover:bg-[#f5f5dc] rounded-t-2xl font-semibold text-[#3a0e23]"
+                    >
+                      Name
+                    </button>
+                    <button
+                      onClick={() => handleSortSelect('size')}
+                      className="w-full text-left px-4 py-3 hover:bg-[#f5f5dc] rounded-b-2xl font-semibold text-[#3a0e23]"
+                    >
+                      Size
+                    </button>
+                  </div>
+                )}
+              </div>
+
               {filterType !== 'all' && (
-                <span className="px-4 py-2 text-sm text-[#3a0e23] font-semibold capitalize">
-                  {filterType === 'seated' ? 'Seated' : 'No Seats'}
+                <span className="px-4 py-2 text-sm text-[#3a0e23] font-semibold capitalize bg-[#ffbcc7] rounded-full">
+                  {filterType === 'seated' ? 'Seated' : 
+                   filterType === 'no-seats' ? 'No Seats' :
+                   filterType === 'large' ? 'Large (≥500)' :
+                   filterType === 'small' ? 'Small (≤100)' : filterType}
                 </span>
               )}
+
+              <span className="px-4 py-2 text-sm text-[#3a0e23] font-semibold bg-[#ffb6d9] rounded-full">
+                Sort: {sortBy === 'size' ? 'Size' : 'Name'}
+              </span>
             </div>
           </div>
 
           {/* Venues Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            {sortedVenues.map(venue => (
-              <button
-                key={venue.id}
-                onClick={() => setSelectedVenue(venue.id)}
-                className={`py-12 px-6 rounded-3xl font-black text-xl text-white transition-all transform ${
-                  selectedVenue === venue.id
-                    ? 'ring-4 ring-[#3a0e23] scale-105 shadow-xl'
-                    : 'hover:scale-105 shadow-lg'
-                }`}
-                style={{ backgroundColor: venue.color }}
-              >
-                <div className="flex flex-col items-center gap-2">
-                  <span>{venue.name}</span>
-                  {venue.size && (
-                    <span className="text-sm font-semibold opacity-90">{venue.size} seats</span>
-                  )}
-                </div>
-              </button>
-            ))}
+            {sortedVenues.map(venue => {
+              const venueIsBusy = isVenueBusy(venue);
+              const venueDisabled = venueIsBusy;
+              return (
+                <button
+                  key={venue.id}
+                  onClick={() => !venueDisabled && setSelectedVenue(venue.id)}
+                  disabled={venueDisabled}
+                  className={`py-16 px-8 rounded-full font-black text-xl text-white transition-all transform duration-300 shadow-lg ${
+                    selectedVenue === venue.id && !venueDisabled
+                      ? 'ring-4 ring-[#3a0e23] scale-110 shadow-2xl'
+                      : 'hover:scale-110 hover:shadow-xl'
+                  } ${venueDisabled ? 'cursor-not-allowed opacity-60' : ''}`}
+                  title={
+                    venueIsBusy
+                      ? 'This venue is busy during your event'
+                      : undefined
+                  }
+                  style={{ backgroundColor: venueDisabled ? '#8f8f8f' : venue.color }}
+                >
+                  <div className="flex flex-col items-center gap-3">
+                    <span className="text-2xl">{venue.name}</span>
+                    {venueIsBusy && (
+                      <span className="text-xs uppercase tracking-[0.2em] text-white/90 bg-black/20 px-3 py-1 rounded-full">
+                        Busy during event
+                      </span>
+                    )}
+                    {venue.size && (
+                      <span className="text-lg font-bold opacity-90 bg-white/20 px-3 py-1 rounded-full">
+                        {venue.size} seats
+                      </span>
+                    )}
+                    {venue.type === 'seated' && (
+                      <span className="text-xs font-semibold opacity-90 bg-white/20 px-3 py-1 rounded-full">
+                        matrix: {venue.layout.rows.length * venue.layout.seatsPerRow} seats
+                      </span>
+                    )}
+                    {!venue.size && (
+                      <span className="text-lg font-bold opacity-90 bg-white/20 px-3 py-1 rounded-full">
+                        No seats
+                      </span>
+                    )}
+                  </div>
+                </button>
+              );
+            })}
           </div>
 
           {/* Go to Seating Button */}
           <div className="flex justify-end">
             <button
               onClick={handleGoToSeating}
-              disabled={!selectedVenue}
+              disabled={!canGoToSeating}
               className={`px-8 py-3 rounded-full font-black text-white uppercase tracking-wide flex items-center gap-2 transition ${
-                selectedVenue
+                canGoToSeating
                   ? 'bg-[#d3265b] hover:bg-[#b81d47] cursor-pointer'
                   : 'bg-[#d3265b]/50 cursor-not-allowed'
               }`}
             >
-              GO TO SEATING
+              CONTINUE
               <ChevronRight className="w-5 h-5" />
             </button>
           </div>
@@ -182,5 +293,4 @@ const VenueSelection = () => {
     </div>
   );
 };
-
 export default VenueSelection;

@@ -1,51 +1,141 @@
 // src/pages/SeatSelection.tsx
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useMemo, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar';
 import { Loader2 } from 'lucide-react';
 import { useBooking } from '../context/BookingContext';
+import { venues } from '../data/venues';
+
+type Category = 'vip' | 'area1' | 'area2' | 'handicap';
+
+const CATEGORY_META: Record<Category, { label: string; color: string }> = {
+  vip: { label: 'VIP', color: '#ff66c4' },
+  area1: { label: 'AREA 1', color: '#6dd3d9' },
+  area2: { label: 'AREA 2', color: '#a438e7' },
+  handicap: { label: 'HANDICAP', color: '#fbb035' },
+};
+
+const CATEGORY_PRICES: Record<string, Record<Category, number>> = {
+  cinema: { area1: 6, area2: 9, vip: 12, handicap: 4 },
+  theatre: { area1: 10, area2: 7, vip: 13, handicap: 5 },
+  'lecture hall': { area1: 8, area2: 10, vip: 12, handicap: 5 },
+  default: { area1: 8, area2: 10, vip: 12, handicap: 5 },
+};
+
+const splitSeatSections = (seatsPerRow: number) => {
+  const left = Math.max(2, Math.floor(seatsPerRow * 0.3));
+  const right = left;
+  const center = Math.max(2, seatsPerRow - left - right);
+  return [left, center, right];
+};
+
+const hashToInt = (value: string) => {
+  let hash = 0;
+  for (let i = 0; i < value.length; i += 1) {
+    hash = (hash << 5) - hash + value.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash);
+};
 
 const SeatSelection = () => {
   const navigate = useNavigate();
+  const { id: venueId } = useParams();
   const { booking, updateBooking } = useBooking();
   const [isRedirecting, setIsRedirecting] = useState(false);
   const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
 
-  const rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
-  const seatsPerRow = 14;
-  
-  const getSeatPrice = (row: string) => {
-    if (['A', 'B'].includes(row)) return 6;
-    if (['C', 'D', 'E'].includes(row)) return 8;
-    if (['F', 'G'].includes(row)) return 10;
-    return 12;
+  const defaultLayout = { rows: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'], seatsPerRow: 14 };
+  const selectedVenue =
+    venues.find((venue) => venue.id === venueId && venue.type === 'seated') ||
+    venues.find((venue) => venue.name === booking.selectedVenue && venue.type === 'seated');
+  const currentLayout = selectedVenue?.layout ?? defaultLayout;
+  const seatSections = splitSeatSections(currentLayout.seatsPerRow);
+  const matrixWidth = Math.min(currentLayout.seatsPerRow * 42, 1040);
+  const removedSeats = new Set(booking.removedSeats ?? []);
+
+  const eventKey = (booking.eventCategory || 'default').toLowerCase();
+  const priceMap = CATEGORY_PRICES[eventKey] ?? CATEGORY_PRICES.default;
+
+  const getSeatCategory = (rowIndex: number, seatIndex: number): Category => {
+    const totalRows = currentLayout.rows.length;
+    const firstQuarterEnd = Math.max(0, Math.ceil(totalRows * 0.25) - 1);
+    const thirdCut = Math.ceil(totalRows * 0.33);
+
+    const isHandicap = rowIndex === 0 && (seatIndex === 0 || seatIndex === currentLayout.seatsPerRow - 1);
+    if (isHandicap) return 'handicap';
+
+    if (eventKey === 'theatre') {
+      if (rowIndex < thirdCut) return 'vip';
+      if (rowIndex < Math.ceil(totalRows * 0.66)) return 'area1';
+      return 'area2';
+    }
+
+    if (eventKey === 'cinema') {
+      if (rowIndex <= firstQuarterEnd) return 'area1';
+      if (rowIndex >= Math.floor(totalRows * 0.65)) return 'vip';
+      return 'area2';
+    }
+
+    if (rowIndex >= Math.floor(totalRows * 0.7)) return 'vip';
+    if (rowIndex >= Math.floor(totalRows * 0.35)) return 'area2';
+    return 'area1';
   };
-  // OBLICZANIE SUMY NA ŻYWO
+
+  const isTakenSeat = (seatId: string) => hashToInt(`${booking.eventId}-${seatId}`) % 11 === 0;
+
+  const getSeatPrice = (seatId: string) => {
+    const rowLabel = seatId.match(/^[A-Z]+/)?.[0];
+    const seatNumber = Number(seatId.match(/\d+$/)?.[0] ?? 0);
+    const rowIndex = rowLabel ? currentLayout.rows.indexOf(rowLabel) : -1;
+    const seatIndex = seatNumber - 1;
+    if (rowIndex < 0 || seatIndex < 0) return priceMap.area1;
+    const category = getSeatCategory(rowIndex, seatIndex);
+    return priceMap[category];
+  };
+
   const currentTotalPrice = selectedSeats.reduce((sum, seatId) => {
-    return sum + getSeatPrice(seatId.charAt(0));
+    return sum + getSeatPrice(seatId);
   }, 0);
+
   const toggleSeat = (seatId: string) => {
-    setSelectedSeats(prev => 
-      prev.includes(seatId) 
+    setSelectedSeats((prev) =>
+      prev.includes(seatId)
         ? prev.filter(s => s !== seatId) 
         : [...prev, seatId]
     );
   };
 
-  const getSeatColor = (row: string) => {
-    if (['A', 'B'].includes(row)) return 'bg-orange-400';
-    if (['C', 'D', 'E'].includes(row)) return 'bg-blue-400';
-    if (['F', 'G'].includes(row)) return 'bg-emerald-400';
-    return 'bg-indigo-400';
+  const randomizeDebugSeats = () => {
+    if (isRedirecting) return;
+
+    const availableSeats: string[] = [];
+    currentLayout.rows.forEach((row, rowIndex) => {
+      for (let seatIndex = 0; seatIndex < currentLayout.seatsPerRow; seatIndex += 1) {
+        const seatId = `${row}${seatIndex + 1}`;
+        if (removedSeats.has(seatId)) continue;
+        if (isTakenSeat(seatId)) continue;
+        availableSeats.push(seatId);
+      }
+    });
+
+    if (availableSeats.length === 0) {
+      setSelectedSeats([]);
+      return;
+    }
+
+    const shuffled = [...availableSeats].sort(() => Math.random() - 0.5);
+    const amount = Math.min(4, Math.max(1, Math.floor(Math.random() * 4) + 1), shuffled.length);
+    setSelectedSeats(shuffled.slice(0, amount));
   };
 
   const handleProceedToPayment = () => {
     if (selectedSeats.length === 0) return;
     setIsRedirecting(true);
-  updateBooking({ 
-    seats: selectedSeats, 
-    totalPrice: currentTotalPrice
-  });
+    updateBooking({
+      seats: selectedSeats,
+      totalPrice: currentTotalPrice,
+    });
     setTimeout(() => {
       navigate('/checkout/payment');
     }, 1200);
@@ -67,11 +157,11 @@ const SeatSelection = () => {
       <main className="max-w-[1200px] mx-auto px-8 py-12">
         <div className="mb-12">
           <h1 className="text-4xl font-black text-[#1a0b1a] tracking-tighter uppercase">
-            {booking.eventTitle} — <span className="text-gray-500 not-italic text-2xl">Hall A</span>
+            {booking.eventTitle} — <span className="text-gray-500 not-italic text-2xl">{booking.selectedVenue || 'Venue'}</span>
           </h1>
           <p className="text-gray-400 font-black text-[11px] uppercase tracking-[0.2em] mt-2 flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-[#ff3366] animate-pulse"></span>
-           {booking.selectedVenue} · {booking.date}, {booking.time}
+            {booking.selectedVenue} · {booking.date}, {booking.time}
           </p>
         </div>
 
@@ -83,48 +173,81 @@ const SeatSelection = () => {
               <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-[9px] font-black text-gray-300 uppercase tracking-[0.5em]">Screen Area</span>
             </div>
 
-            <div className="space-y-4 w-full max-w-2xl px-4">
-              {rows.map(row => (
-                <div key={row} className="flex items-center gap-6">
-                  <span className="text-[10px] font-black text-gray-300 w-4">{row}</span>
-                  <div className="flex gap-2.5 flex-grow justify-center">
-                    {Array.from({ length: seatsPerRow }).map((_, i) => {
-                      const seatId = `${row}${i + 1}`;
-                      const isSelected = selectedSeats.includes(seatId);
-                      const isTaken = (row === 'E' && i > 5 && i < 9) || (row === 'A' && i === 2);
+            <div className="mx-auto w-full overflow-x-auto select-none">
+              <div className="space-y-4 mx-auto" style={{ width: `${matrixWidth}px` }}>
+                {currentLayout.rows.map((row, rowIndex) => (
+                  <div key={row} className="flex items-center gap-5 justify-center">
+                    <span className="text-[10px] font-black text-gray-300 w-4">{row}</span>
+                    <div className="flex items-center gap-8">
+                      {seatSections.map((sectionCount, sectionIndex) => {
+                        const sectionStart = seatSections.slice(0, sectionIndex).reduce((sum, value) => sum + value, 0);
+                        return (
+                          <div
+                            key={`${row}-section-${sectionIndex}`}
+                            className="grid"
+                            style={{ gridTemplateColumns: `repeat(${sectionCount}, minmax(0, 1fr))`, gap: '8px' }}
+                          >
+                            {Array.from({ length: sectionCount }).map((_, localIndex) => {
+                              const seatIndex = sectionStart + localIndex;
+                              const seatId = `${row}${seatIndex + 1}`;
+                              if (removedSeats.has(seatId)) return null;
 
-                      return (
-                        <button
-                          key={seatId}
-                          disabled={isTaken || isRedirecting}
-                          onClick={() => toggleSeat(seatId)}
-                          className={`
-                            w-7 h-7 rounded-[8px] transition-all duration-300 relative group
-                            ${isTaken ? 'bg-gray-100 cursor-not-allowed opacity-50' : 
-                              isSelected ? 'bg-[#3a0e23] ring-4 ring-[#3a0e23]/10 scale-110 z-10' : 
-                              `${getSeatColor(row)} hover:scale-125 hover:rotate-3 shadow-sm`}
-                          `}
-                        >
-                          {!isTaken && (
-                            <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[#3a0e23] text-white text-[8px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none font-bold z-20">
-                              {seatId}
-                            </span>
-                          )}
-                        </button>
-                      );
-                    })}
+                              const isSelected = selectedSeats.includes(seatId);
+                              const isTaken = isTakenSeat(seatId);
+                              const category = getSeatCategory(rowIndex, seatIndex);
+
+                              return (
+                                <button
+                                  key={seatId}
+                                  disabled={isTaken || isRedirecting}
+                                  onClick={() => toggleSeat(seatId)}
+                                  className="w-7 h-7 rounded-[8px] transition-all duration-300 relative group border"
+                                  style={
+                                    isTaken
+                                      ? {
+                                          backgroundColor: '#efeff3',
+                                          borderColor: '#d5d6df',
+                                          opacity: 0.65,
+                                          cursor: 'not-allowed',
+                                        }
+                                      : isSelected
+                                        ? {
+                                            backgroundColor: '#3a0e23',
+                                            borderColor: '#3a0e23',
+                                            boxShadow: '0 0 0 3px rgba(58,14,35,0.12)',
+                                            transform: 'scale(1.1)',
+                                          }
+                                        : {
+                                            backgroundColor: `${CATEGORY_META[category].color}30`,
+                                            borderColor: `${CATEGORY_META[category].color}A0`,
+                                          }
+                                  }
+                                  title={seatId}
+                                >
+                                  {!isTaken && (
+                                    <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[#3a0e23] text-white text-[8px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none font-bold z-20">
+                                      {seatId}
+                                    </span>
+                                  )}
+                                </button>
+                              );
+                            })}
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
 
             <div className="mt-16 pt-8 border-t border-gray-100 grid grid-cols-2 md:grid-cols-3 gap-y-4 gap-x-8 text-[9px] font-black uppercase tracking-widest text-gray-400">
-              <div className="flex items-center gap-3"><div className="w-4 h-4 rounded-md bg-orange-400 shadow-sm"/> Economy</div>
-              <div className="flex items-center gap-3"><div className="w-4 h-4 rounded-md bg-blue-400 shadow-sm"/> Standard</div>
-              <div className="flex items-center gap-3"><div className="w-4 h-4 rounded-md bg-emerald-400 shadow-sm"/> Premium</div>
-              <div className="flex items-center gap-3"><div className="w-4 h-4 rounded-md bg-indigo-400 shadow-sm"/> VIP</div>
+              <div className="flex items-center gap-3"><div className="w-4 h-4 rounded-md" style={{ backgroundColor: CATEGORY_META.area1.color }} /> {CATEGORY_META.area1.label}</div>
+              <div className="flex items-center gap-3"><div className="w-4 h-4 rounded-md" style={{ backgroundColor: CATEGORY_META.area2.color }} /> {CATEGORY_META.area2.label}</div>
+              <div className="flex items-center gap-3"><div className="w-4 h-4 rounded-md" style={{ backgroundColor: CATEGORY_META.vip.color }} /> {CATEGORY_META.vip.label}</div>
+              <div className="flex items-center gap-3"><div className="w-4 h-4 rounded-md" style={{ backgroundColor: CATEGORY_META.handicap.color }} /> {CATEGORY_META.handicap.label}</div>
               <div className="flex items-center gap-3"><div className="w-4 h-4 rounded-md bg-[#3a0e23] shadow-sm"/> Selected</div>
-              <div className="flex items-center gap-3"><div className="w-4 h-4 rounded-md bg-gray-100"/> Taken</div>
+              <div className="flex items-center gap-3"><div className="w-4 h-4 rounded-md bg-gray-200"/> Taken</div>
             </div>
           </div>
 
@@ -136,13 +259,13 @@ const SeatSelection = () => {
                 <span className="text-gray-400 uppercase tracking-[0.2em] text-[10px] font-black">Selected seats:</span>
                 <div className="flex flex-wrap gap-2.5 mt-4">
                   {selectedSeats.length > 0 ? (
-                    selectedSeats.sort().map(seat => (
+                    [...selectedSeats].sort().map(seat => (
                       <span key={seat} className="bg-[#f0f2f5] border border-gray-200 px-4 py-2 rounded-xl text-[11px] font-black text-[#3a0e23] shadow-sm animate-in zoom-in duration-300">
                         {seat}
                       </span>
                     ))
                   ) : (
-                    <p className="text-[11px] italic text-gray-400 font-medium py-2 uppercase tracking-widest">Pick your spot...</p>
+                    <p className="text-[11px] italic text-gray-400 font-medium py-2 uppercase tracking-widest">Pick your seat...</p>
                   )}
                 </div>
               </div>
@@ -153,6 +276,14 @@ const SeatSelection = () => {
                   ${currentTotalPrice} 
                 </span>
               </div>
+
+              <button 
+                onClick={randomizeDebugSeats}
+                disabled={isRedirecting}
+                className="w-full mb-3 py-3 rounded-xl font-black text-[11px] uppercase tracking-[0.18em] transition-all border-2 border-[#3a0e23]/40 text-[#3a0e23] bg-[#f5f5dc] hover:bg-[#eee4d6] disabled:opacity-50"
+              >
+                Randomize Seats (Debug)
+              </button>
 
               <button 
                 onClick={handleProceedToPayment}

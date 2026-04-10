@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import Header from '../components/layout/Header';
 import { EventCard } from '../components/events/EventCard';
 import { mockEvents } from '../data/mockEvents';
