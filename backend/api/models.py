@@ -52,7 +52,7 @@ class Seat(models.Model):
     venue = models.ForeignKey(Venue, on_delete=models.CASCADE)
     row = models.IntegerField()
     number = models.IntegerField()
-    exist = models.BooleanField(default=True)
+    if_exist = models.BooleanField(default=True)
 
     class Meta:
         unique_together = ("venue", "row", "number")
@@ -108,7 +108,7 @@ class Payment(models.Model):
     ]
 
     order = models.OneToOneField(Order, on_delete=models.CASCADE)
-    stripe_session_id = models.CharField(max_length=255, blank=True, null=True)
+    stripe_session_id = models.CharField(max_length=255, blank=True, default="")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
 
     def __str__(self):

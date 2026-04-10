@@ -1,5 +1,13 @@
 from rest_framework import serializers
-from .models import EventInstance, EventSeat, OrderSeat, Event, Venue, EventCategory
+from .models import (
+    EventInstance, 
+    EventSeat, 
+    OrderSeat, 
+    Event, 
+    Venue, 
+    EventCategory, 
+    SeatCategory,
+    )
 
 class EventSerializer(serializers.ModelSerializer):
     title = serializers.CharField(source='event.name', read_only=True)
@@ -56,3 +64,27 @@ class EventModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
         fields = ['id', 'name', 'description', 'category', 'image_url']
+
+class SeatCategoryShortSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SeatCategory
+        fields = ['name', 'price']
+        
+class EventSeatSerializer(serializers.ModelSerializer):
+    row = serializers.CharField(source='seat.row', read_only=True)
+    number = serializers.IntegerField(source='seat.number', read_only=True)
+    if_exist = serializers.BooleanField(source='seat.if_exist', read_only=True)
+    
+    is_reserved = serializers.SerializerMethodField()
+
+    seat_category = SeatCategoryShortSerializer(read_only=True)
+    
+    class Meta:
+        model = EventSeat
+        fields = ['id', 'row', 'number', 'is_reserved', 'if_exist', 'seat_category']
+
+    def get_is_reserved(self, obj):
+        return OrderSeat.objects.filter(
+            event_seat=obj,
+            order__status__in=['pending', 'paid']
+        ).exists()
