@@ -11,6 +11,8 @@ import SeatSelection from './pages/SeatSelection';
 import MyTickets from './pages/MyTickets';
 import RoleSelection from './pages/RoleSelection';
 import HostDashboard from './pages/HostDashboard';
+import AddEvent from './pages/AddEvent';
+import VenueSelection from './pages/VenueSelection';
 import { Payment } from './pages/checkout/Payment';
 import SuccessPage from './pages/checkout/SuccessPage';
 
@@ -36,6 +38,8 @@ function App() {
           <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
           <Route path="/role-selection" element={<ProtectedRoute><RoleSelection /></ProtectedRoute>} />
           <Route path="/host-dashboard" element={<ProtectedRoute><HostDashboard /></ProtectedRoute>} />
+          <Route path="/host-dashboard/add-event" element={<ProtectedRoute><AddEvent /></ProtectedRoute>} />
+          <Route path="/host-dashboard/add-event/venue" element={<ProtectedRoute><VenueSelection /></ProtectedRoute>} />
           <Route path="/event/:id" element={<ProtectedRoute><EventDetails /></ProtectedRoute>} />
           <Route path="/checkout/success" element={<ProtectedRoute><SuccessPage /></ProtectedRoute>} />
           <Route path="/checkout/payment" element={<ProtectedRoute><Payment /></ProtectedRoute>} />
