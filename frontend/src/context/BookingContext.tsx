@@ -1,13 +1,15 @@
-import React, { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useState } from 'react';
 import type { ReactNode } from 'react';
 
 interface BookingData {
   eventId: string;
   eventTitle: string;
   eventCategory: string;
+  eventImageUrl: string;
   date: string;
   dateTo: string;
   time: string;
+  showSchedule: Array<{ date: string; times: string[] }>;
   seats: string[];
   removedSeats: string[];
   totalPrice: number;
@@ -30,10 +32,12 @@ const initialBooking: BookingData = {
   eventId: '',
   eventTitle: '',
   eventCategory: '',
+  eventImageUrl: '',
   selectedVenue: '',
   date: '',
   dateTo: '',
   time: '',
+  showSchedule: [],
   seats: [],
   removedSeats: [],
   totalPrice: 0,

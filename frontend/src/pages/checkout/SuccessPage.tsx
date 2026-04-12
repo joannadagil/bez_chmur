@@ -4,10 +4,12 @@ import { useNavigate } from 'react-router-dom';
 import Confetti from 'react-confetti';
 import Navbar from '../../components/layout/Navbar';
 import { useBooking } from '../../context/BookingContext';
+import { useTheme } from '../../context/ThemeContext';
 
 const SuccessPage: React.FC = () => {
   const navigate = useNavigate();
   const { booking, resetBooking } = useBooking();
+  const { isDark } = useTheme();
   const [showConfetti, setShowConfetti] = useState(true);
   const [windowSize, setWindowSize] = useState({
     width: window.innerWidth,
@@ -66,20 +68,20 @@ const detailsList = [
           <Check size={48} className="text-white stroke-[4]" />
         </div>
 
-        <h1 className="text-3xl font-black text-[#1a0b1a] mb-3 tracking-tighter">
+        <h1 className={`text-3xl font-black mb-3 tracking-tighter ${isDark ? 'text-[#fdf1e4]' : 'text-[#1a0b1a]'}`}>
           Booking confirmed!
         </h1>
-        <p className="text-gray-500 font-medium text-sm mb-12 tracking-tight">
-          Success! Your tickets for <span className="text-[#3a0e23] font-bold">{booking.eventTitle}</span> are ready.
+        <p className={`font-medium text-sm mb-12 tracking-tight ${isDark ? 'text-[#f3d8e3]' : 'text-gray-500'}`}>
+          Success! Your tickets for <span className={`font-bold ${isDark ? 'text-[#ffd7e8]' : 'text-[#3a0e23]'}`}>{booking.eventTitle}</span> are ready.
         </p>
 
-        <div className="w-full bg-[#f3f4f6] rounded-3xl p-8 border border-gray-100 shadow-sm mb-12">
+        <div className={`w-full rounded-3xl p-8 border shadow-sm mb-12 ${isDark ? 'bg-[#2a081b] border-[#8c2e55]' : 'bg-[#f3f4f6] border-gray-100'}`}>
           
           <div className="mb-8">
-            <h2 className="text-2xl font-extrabold text-[#1a0b1a] tracking-tight">
+            <h2 className={`text-2xl font-extrabold tracking-tight ${isDark ? 'text-[#fdf1e4]' : 'text-[#1a0b1a]'}`}>
 {booking.eventTitle || "Title"}
             </h2>
-            <p className="text-xs font-bold uppercase tracking-widest text-gray-400 mt-1">
+            <p className={`text-xs font-bold uppercase tracking-widest mt-1 ${isDark ? 'text-[#e2b8c9]' : 'text-gray-400'}`}>
 {booking.selectedVenue || "Venue"}
             </p>
           </div>
@@ -87,14 +89,14 @@ const detailsList = [
           <div className="grid grid-cols-2 gap-y-6 gap-x-12">
             {detailsList.map((detail, index) => (
               <div key={index} className="flex items-center gap-4">
-                <div className="text-gray-400">
+                <div className={isDark ? 'text-[#e2b8c9]' : 'text-gray-400'}>
                   <detail.icon size={18} />
                 </div>
                 <div className="flex flex-col">
-                  <span className="text-xs font-bold uppercase tracking-widest text-gray-400">
+                  <span className={`text-xs font-bold uppercase tracking-widest ${isDark ? 'text-[#e2b8c9]' : 'text-gray-400'}`}>
                     {detail.label}
                   </span>
-                  <span className="text-sm font-extrabold text-[#1a0b1a]">
+                  <span className={`text-sm font-extrabold ${isDark ? 'text-[#fdf1e4]' : 'text-[#1a0b1a]'}`}>
                     {detail.value}
                   </span>
                 </div>

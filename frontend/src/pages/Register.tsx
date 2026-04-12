@@ -9,6 +9,7 @@ const Register = () => {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
+    companyName: '',
     email: '',
     password: '',
     confirmPassword: '',
@@ -44,8 +45,12 @@ const Register = () => {
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
-    if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
-    if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
+    if (formData.accountType === 'host') {
+      if (!formData.companyName.trim()) newErrors.companyName = 'Company name is required';
+    } else {
+      if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
+      if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
+    }
     if (!formData.email.trim()) newErrors.email = 'Email is required';
     else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Email is invalid';
     if (!formData.password) newErrors.password = 'Password is required';
@@ -76,8 +81,9 @@ const Register = () => {
 
     // Store user data
     const newUser = {
-      firstName: formData.firstName,
-      lastName: formData.lastName,
+      firstName: formData.accountType === 'customer' ? formData.firstName : '',
+      lastName: formData.accountType === 'customer' ? formData.lastName : '',
+      companyName: formData.accountType === 'host' ? formData.companyName : '',
       email: formData.email,
       password: formData.password, // In real app, this should be hashed
       accountType: formData.accountType,
@@ -92,7 +98,7 @@ const Register = () => {
       localStorage.setItem('isLoggedIn', 'true');
       localStorage.setItem('currentUser', JSON.stringify(newUser));
       setIsLoading(false);
-      navigate(formData.accountType === 'host' ? '/host-dashboard' : '/home');
+      navigate(formData.accountType === 'host' ? '/host-onboarding' : '/home');
     }, 1500);
   };
 
@@ -100,8 +106,9 @@ const Register = () => {
     const token = Math.floor(Math.random() * 10000);
     const hostLike = type === 'host';
     setFormData({
-      firstName: hostLike ? 'Host' : 'John',
-      lastName: hostLike ? `Company${token}` : `Doe${token}`,
+      firstName: hostLike ? '' : 'John',
+      lastName: hostLike ? '' : `Doe${token}`,
+      companyName: hostLike ? `Company ${token}` : '',
       email: hostLike ? `host${token}@example.com` : `john${token}@example.com`,
       password: 'Password123!',
       confirmPassword: 'Password123!',
@@ -188,51 +195,75 @@ const Register = () => {
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
+            {formData.accountType === 'host' ? (
               <div>
                 <label className="block text-sm font-bold text-[#3a0e23] uppercase tracking-wider mb-2" style={{ fontFamily: 'Montserrat, sans-serif' }}>
-                  First Name
+                  Company Name
                 </label>
                 <div className="relative">
                   <input
                     type="text"
-                    name="firstName"
-                    value={formData.firstName}
+                    name="companyName"
+                    value={formData.companyName}
                     onChange={handleChange}
                     className={`w-full px-4 py-3 pl-12 border rounded-xl bg-[#f05258]/10 border-white/30 focus:outline-none transition-colors font-medium ${
-                      errors.firstName ? 'border-red-300 focus:border-red-500' : 'border-white/30 focus:border-white'
+                      errors.companyName ? 'border-red-300 focus:border-red-500' : 'border-white/30 focus:border-white'
                     }`}
-                    placeholder="John"
+                    placeholder="Your company"
                     required
                     style={{ fontFamily: 'TT Firs Neue, sans-serif' }}
                   />
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 </div>
-                {errors.firstName && <p className="text-red-500 text-xs mt-1 font-medium">{errors.firstName}</p>}
+                {errors.companyName && <p className="text-red-500 text-xs mt-1 font-medium">{errors.companyName}</p>}
               </div>
+            ) : (
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-bold text-[#3a0e23] uppercase tracking-wider mb-2" style={{ fontFamily: 'Montserrat, sans-serif' }}>
+                    First Name
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      name="firstName"
+                      value={formData.firstName}
+                      onChange={handleChange}
+                      className={`w-full px-4 py-3 pl-12 border rounded-xl bg-[#f05258]/10 border-white/30 focus:outline-none transition-colors font-medium ${
+                        errors.firstName ? 'border-red-300 focus:border-red-500' : 'border-white/30 focus:border-white'
+                      }`}
+                      placeholder="John"
+                      required
+                      style={{ fontFamily: 'TT Firs Neue, sans-serif' }}
+                    />
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  </div>
+                  {errors.firstName && <p className="text-red-500 text-xs mt-1 font-medium">{errors.firstName}</p>}
+                </div>
 
-              <div>
-                <label className="block text-sm font-bold text-[#3a0e23] uppercase tracking-wider mb-2" style={{ fontFamily: 'Montserrat, sans-serif' }}>
-                  Last Name
-                </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    name="lastName"
-                    value={formData.lastName}
-                    onChange={handleChange}
-                    className={`w-full px-4 py-3 pl-12 border rounded-xl bg-[#f05258]/10 border-white/30 focus:outline-none transition-colors font-medium ${
-                      errors.lastName ? 'border-red-300 focus:border-red-500' : 'border-white/30 focus:border-white'
-                    }`}
-                    placeholder="Doe"
-                    required
-                    style={{ fontFamily: 'TT Firs Neue, sans-serif' }}
-                  />
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <div>
+                  <label className="block text-sm font-bold text-[#3a0e23] uppercase tracking-wider mb-2" style={{ fontFamily: 'Montserrat, sans-serif' }}>
+                    Last Name
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="text"
+                      name="lastName"
+                      value={formData.lastName}
+                      onChange={handleChange}
+                      className={`w-full px-4 py-3 pl-12 border rounded-xl bg-[#f05258]/10 border-white/30 focus:outline-none transition-colors font-medium ${
+                        errors.lastName ? 'border-red-300 focus:border-red-500' : 'border-white/30 focus:border-white'
+                      }`}
+                      placeholder="Doe"
+                      required
+                      style={{ fontFamily: 'TT Firs Neue, sans-serif' }}
+                    />
+                    <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  </div>
+                  {errors.lastName && <p className="text-red-500 text-xs mt-1 font-medium">{errors.lastName}</p>}
                 </div>
-                {errors.lastName && <p className="text-red-500 text-xs mt-1 font-medium">{errors.lastName}</p>}
               </div>
-            </div>
+            )}
 
             <div>
               <label className="block text-sm font-bold text-[#3a0e23] uppercase tracking-wider mb-2" style={{ fontFamily: 'Montserrat, sans-serif' }}>

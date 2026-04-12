@@ -6,8 +6,10 @@ import logo_white from '../assets/logo_white.png';
 import { useTheme } from '../context/ThemeContext';
 
 const MOCK_HOST_USER = {
-  firstName: 'Host',
-  lastName: 'Demo',
+  firstName: '',
+  lastName: '',
+  companyName: 'Host Demo Company',
+  accountType: 'host' as const,
   email: 'host@getaroom.com',
   password: 'HostDemo123!',
   createdAt: new Date().toISOString(),
@@ -99,7 +101,8 @@ const Login = () => {
       localStorage.setItem('currentUser', JSON.stringify(user));
       setIsLoading(false);
       const isHost = HOST_EMAILS.has(user.email.toLowerCase()) || user.accountType === 'host';
-      navigate(isHost ? '/host-dashboard' : '/home');
+      const needsOnboarding = isHost && (!user.nip || !user.companyName || !user.address);
+      navigate(isHost ? (needsOnboarding ? '/host-onboarding' : '/host-dashboard') : '/home');
     }, 1500);
   };
 
@@ -137,7 +140,8 @@ const Login = () => {
 
     localStorage.setItem('isLoggedIn', 'true');
     localStorage.setItem('currentUser', JSON.stringify(hostUser));
-    navigate('/host-dashboard');
+    const needsOnboarding = !hostUser.nip || !hostUser.companyName || !hostUser.address;
+    navigate(needsOnboarding ? '/host-onboarding' : '/host-dashboard');
   };
 
   return (
