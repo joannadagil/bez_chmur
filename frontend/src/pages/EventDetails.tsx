@@ -1,9 +1,31 @@
 // src/pages/EventDetails.tsx
-import React, { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom'; 
 import Navbar from '../components/layout/Navbar';
-import { Loader2, CheckCircle2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { useBooking } from '../context/BookingContext';
+import { mockEvents } from '../data/mockEvents';
+
+type DateOption = {
+  iso: string;
+  label: string;
+};
+
+const buildDateOptions = (): DateOption[] => {
+  const formatter = new Intl.DateTimeFormat('en-US', {
+    weekday: 'short',
+    day: '2-digit',
+    month: 'short',
+  });
+
+  return Array.from({ length: 4 }).map((_, index) => {
+    const date = new Date();
+    date.setHours(0, 0, 0, 0);
+    date.setDate(date.getDate() + index + 1);
+    const iso = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+    return { iso, label: formatter.format(date) };
+  });
+};
 
 
 const EventDetails = () => {
@@ -11,20 +33,31 @@ const EventDetails = () => {
   const navigate = useNavigate();
   const { updateBooking } = useBooking();
   const cinemaSectionRef = useRef<HTMLDivElement>(null);
-
-  const [eventTitle, setEventTitle] = useState('Dune: Part Two');
-  
-  useEffect(() => {
-    if (id !== 'dune-2' && id !== '1') { 
-        // fetchMovieFromBackend(id)
-        // navigate('/404'); 
-    }
-  }, [id, navigate]);
-
-  const [selectedDate, setSelectedDate] = useState('Sun 23 Mar');
+  const dateOptions = buildDateOptions();
+  const selectedEvent = mockEvents.find((event) => event.id === id);
+  const [selectedDate, setSelectedDate] = useState(dateOptions[0]?.iso ?? '');
   const [selectedTime, setSelectedTime] = useState('14:30');
-  const [selectedVenue, setSelectedVenue] = useState('Multikino Złote Tarasy');
+  const [selectedVenue, setSelectedVenue] = useState(selectedEvent?.venue ?? '');
   const [isRedirecting, setIsRedirecting] = useState(false);
+
+  useEffect(() => {
+    if (!selectedEvent) {
+      navigate('/', { replace: true });
+    }
+  }, [selectedEvent, navigate]);
+
+  useEffect(() => {
+    if (selectedEvent) {
+      setSelectedVenue(selectedEvent.venue);
+    }
+  }, [selectedEvent]);
+
+  if (!selectedEvent) {
+    return null;
+  }
+
+  const eventTitle = selectedEvent.title;
+  const selectedDateLabel = dateOptions.find((option) => option.iso === selectedDate)?.label ?? selectedDate;
   
 
   const handleDateSelect = (date: string) => {
@@ -66,9 +99,9 @@ const EventDetails = () => {
         <div className="max-w-[1100px] mx-auto px-8 h-full flex items-center gap-10 relative">
           <div className="relative w-[160px] h-[230px] flex-shrink-0 z-20 shadow-2xl transition-transform duration-500 hover:scale-105 cursor-pointer group">
             <img 
-              src="https://s3.amazonaws.com/nightjarprod/content/uploads/sites/189/2024/05/29150236/czembW0Rk1Ke7lCJGahbOhdCuhV-scaled.jpg" 
+              src={selectedEvent.imageUrl}
               className="w-full h-full object-cover rounded-xl border-[4px] border-white transition-all group-hover:border-[#ffafbd]"
-              alt="Dune Movie Poster"
+              alt={selectedEvent.title}
             />
           </div>
 
@@ -77,7 +110,7 @@ const EventDetails = () => {
               {eventTitle}
             </h1>
             <div className="flex gap-2.5">
-              {['Cinema', '2h 38min', 'Sci-Fi'].map(tag => (
+              {[selectedEvent.type, Number(selectedEvent.price) > 0 ? `$${selectedEvent.price}` : 'Free', selectedEvent.venue].map(tag => (
                 <span key={tag} className="bg-[#2d6a7a] text-white px-5 py-2 rounded-full font-bold text-[10px] uppercase tracking-widest shadow-md transition-transform hover:-translate-y-0.5">
                   {tag}
                 </span>
@@ -102,17 +135,17 @@ With breathtaking visuals, massive battles, and deep philosophical themes, Dune:
           <section>
             <h2 className="text-lg font-black mb-6 uppercase tracking-tight text-gray-800">Choose a date</h2>
             <div className="flex flex-wrap gap-3">
-              {['Sat 22 Mar', 'Sun 23 Mar', 'Mon 24 Mar', 'Tue 25 Mar'].map((date) => (
+              {dateOptions.map((dateOption) => (
                 <button
-                  key={date}
-                  onClick={() => handleDateSelect(date)}
+                  key={dateOption.iso}
+                  onClick={() => handleDateSelect(dateOption.iso)}
                   className={`px-5 py-3.5 rounded-xl font-bold text-[11px] transition-all duration-300 min-w-[110px] border active:scale-95 ${
-                    selectedDate === date 
+                    selectedDate === dateOption.iso
                     ? 'bg-[#2d6a7a] border-[#2d6a7a] text-white shadow-xl -translate-y-1' 
                     : 'bg-white border-gray-200 text-gray-500 hover:border-[#2d6a7a] hover:bg-gray-50'
                   }`}
                 >
-                  {date}
+                  {dateOption.label}
                 </button>
               ))}
             </div>
@@ -121,16 +154,16 @@ With breathtaking visuals, massive battles, and deep philosophical themes, Dune:
           <section ref={cinemaSectionRef} className="transition-all duration-700">
             <h2 className="text-lg font-black mb-6 uppercase tracking-tight text-gray-800">Choose a cinema & showtime</h2>
             <div className="space-y-6">
-              {['Multikino Złote Tarasy', 'Cinema City Arkadia'].map((cinema) => (
-                <div key={cinema} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm transition-all hover:shadow-md hover:border-gray-200">
-                  <h3 className="font-bold text-sm mb-5 text-gray-400 uppercase tracking-widest">{cinema}</h3>
+              {[selectedEvent.venue].map((venue) => (
+                <div key={venue} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm transition-all hover:shadow-md hover:border-gray-200">
+                  <h3 className="font-bold text-sm mb-5 text-gray-400 uppercase tracking-widest">{venue}</h3>
                   <div className="flex gap-3">
                     {['14:30', '17:00', '20:15'].map(time => (
                       <button 
                         key={time}
-                        onClick={() => { setSelectedTime(time); setSelectedVenue(cinema); }}
+                        onClick={() => { setSelectedTime(time); setSelectedVenue(venue); }}
                         className={`px-6 py-3 rounded-xl font-black text-xs transition-all duration-200 active:scale-90 ${
-                          selectedTime === time && selectedVenue === cinema
+                          selectedTime === time && selectedVenue === venue
                           ? 'bg-[#d64060] text-white shadow-md scale-105'
                           : 'bg-[#fcfbff] text-gray-500 border border-gray-100 hover:bg-gray-100'
                         }`}
@@ -152,7 +185,7 @@ With breathtaking visuals, massive battles, and deep philosophical themes, Dune:
             <div className="space-y-4 text-xs font-bold border-b border-gray-300/50 pb-7 mb-7">
               {[
                 { label: 'Film', value: eventTitle },
-                { label: 'Date', value: selectedDate },
+                { label: 'Date', value: selectedDateLabel },
                 { label: 'Cinema', value: selectedVenue },
                 { label: 'Time', value: selectedTime }
               ].map((item) => (

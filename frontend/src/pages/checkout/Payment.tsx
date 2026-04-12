@@ -3,6 +3,7 @@ import { CreditCard, Lock, ShieldCheck, Clock,User, Loader2,AlertCircle } from '
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../../components/layout/Navbar';
 import { useBooking } from '../../context/BookingContext';
+import { createOrder } from '../../api/tickets';
 
 export const Payment: React.FC = () => {
   const navigate = useNavigate();
@@ -16,6 +17,7 @@ export const Payment: React.FC = () => {
   const [cvc, setCvc] = useState('');
 
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [submissionError, setSubmissionError] = useState('');
 
   useEffect(() => {
     if (timeLeft <= 0) return;
@@ -103,16 +105,39 @@ const handleRandomizePayment = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-const handlePayment = (e: React.FormEvent) => {
+const handlePayment = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!validateForm()) return;
 
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    if (!currentUser?.email) {
+      setSubmissionError('You need to be logged in before completing payment.');
+      return;
+    }
+
     setIsProcessing(true);
-    setTimeout(() => {
+    setSubmissionError('');
+
+    try {
+      await createOrder({
+        email: currentUser.email,
+        first_name: currentUser.firstName || '',
+        last_name: currentUser.lastName || '',
+        event_title: booking.eventTitle,
+        venue_name: booking.selectedVenue,
+        event_date: booking.date,
+        event_time: booking.time,
+        seats: booking.seats,
+        total_price: booking.totalPrice,
+      });
+
       setIsProcessing(false);
-      navigate('/checkout/success'); 
-    }, 2000);
+      navigate('/checkout/success');
+    } catch {
+      setIsProcessing(false);
+      setSubmissionError('Could not complete payment right now. Please try again.');
+    }
   };
   const getInputClass = (fieldName: string) => `
     w-full bg-[#fcfbff] border-2 rounded-2xl p-4.5 text-sm font-bold shadow-sm transition-all outline-none
@@ -241,6 +266,10 @@ const handlePayment = (e: React.FormEvent) => {
                   'Complete Purchase'
                 )}
               </button>
+
+              {submissionError && (
+                <p className="text-[10px] font-black uppercase tracking-[0.14em] text-red-500 text-center">{submissionError}</p>
+              )}
 
               <div className="flex items-center justify-center gap-2 pt-5 opacity-40">
                 <ShieldCheck size={14} className="text-emerald-500" />

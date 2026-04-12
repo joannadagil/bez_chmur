@@ -1,5 +1,5 @@
 // src/pages/SeatSelection.tsx
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar';
 import { Loader2 } from 'lucide-react';
@@ -110,7 +110,7 @@ const SeatSelection = () => {
     if (isRedirecting) return;
 
     const availableSeats: string[] = [];
-    currentLayout.rows.forEach((row, rowIndex) => {
+    currentLayout.rows.forEach((row) => {
       for (let seatIndex = 0; seatIndex < currentLayout.seatsPerRow; seatIndex += 1) {
         const seatId = `${row}${seatIndex + 1}`;
         if (removedSeats.has(seatId)) continue;
@@ -177,7 +177,9 @@ const SeatSelection = () => {
               <div className="space-y-4 mx-auto" style={{ width: `${matrixWidth}px` }}>
                 {currentLayout.rows.map((row, rowIndex) => (
                   <div key={row} className="flex items-center gap-5 justify-center">
-                    <span className="text-[10px] font-black text-gray-300 w-4">{row}</span>
+                    <span className="text-[10px] font-black text-gray-300 w-4">
+                      {Array.from({ length: currentLayout.seatsPerRow }).some((_, seatIndex) => !removedSeats.has(`${row}${seatIndex + 1}`)) ? row : ''}
+                    </span>
                     <div className="flex items-center gap-8">
                       {seatSections.map((sectionCount, sectionIndex) => {
                         const sectionStart = seatSections.slice(0, sectionIndex).reduce((sum, value) => sum + value, 0);
@@ -190,7 +192,7 @@ const SeatSelection = () => {
                             {Array.from({ length: sectionCount }).map((_, localIndex) => {
                               const seatIndex = sectionStart + localIndex;
                               const seatId = `${row}${seatIndex + 1}`;
-                              if (removedSeats.has(seatId)) return null;
+                              if (removedSeats.has(seatId)) return <div key={seatId} className="w-7 h-7" title={`${seatId} removed`} />;
 
                               const isSelected = selectedSeats.includes(seatId);
                               const isTaken = isTakenSeat(seatId);
