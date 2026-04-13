@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Eye, EyeOff, Mail, Lock, User, ArrowRight, UserPlus } from 'lucide-react';
+import { Eye, EyeOff, Mail, Lock, User, ArrowRight, UserPlus, Building2, Users } from 'lucide-react';
 import logo from '../assets/logo.png';
 import axios from 'axios';
+import logo_white from '../assets/logo_white.png';
+import { useTheme } from '../context/ThemeContext';
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -10,13 +12,16 @@ const Register = () => {
     lastName: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    accountType: 'customer' as 'customer' | 'host',
   });
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const navigate = useNavigate();
+  const { isDark } = useTheme();
+  const authLogo = isDark ? logo_white : logo;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -80,9 +85,15 @@ const Register = () => {
       setIsLoading(false);
     }
 
-    // Check if user already exists
-    // const existingUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
-    // const userExists = existingUsers.some((user: any) => user.email === formData.email);
+    // Store user data
+    const newUser = {
+      firstName: formData.firstName,
+      lastName: formData.lastName,
+      email: formData.email,
+      password: formData.password, // In real app, this should be hashed
+      accountType: formData.accountType,
+      createdAt: new Date().toISOString()
+    };
 
     // if (userExists) {
     //   setErrors({ email: 'An account with this email already exists' });
@@ -90,23 +101,27 @@ const Register = () => {
     //   return;
     // }
 
-    // // Store user data
-    // const newUser = {
-    //   firstName: formData.firstName,
-    //   lastName: formData.lastName,
-    //   email: formData.email,
-    //   password: formData.password, // In real app, this should be hashed
-    //   createdAt: new Date().toISOString()
-    // };
+    // Simulate registration - replace with actual API call
+    setTimeout(() => {
+      localStorage.setItem('isLoggedIn', 'true');
+      localStorage.setItem('currentUser', JSON.stringify(newUser));
+      setIsLoading(false);
+      navigate(formData.accountType === 'host' ? '/host-dashboard' : '/home');
+    }, 1500);
+  };
 
-    // existingUsers.push(newUser);
-    // localStorage.setItem('registeredUsers', JSON.stringify(existingUsers));
-
-    // // Simulate registration - replace with actual API call
-    // setTimeout(() => {
-    //   setIsLoading(false);
-    //   navigate('/login');
-    // }, 1500);
+  const randomizeSignup = (type: 'customer' | 'host') => {
+    const token = Math.floor(Math.random() * 10000);
+    const hostLike = type === 'host';
+    setFormData({
+      firstName: hostLike ? 'Host' : 'John',
+      lastName: hostLike ? `Company${token}` : `Doe${token}`,
+      email: hostLike ? `host${token}@example.com` : `john${token}@example.com`,
+      password: 'Password123!',
+      confirmPassword: 'Password123!',
+      accountType: type,
+    });
+    setErrors({});
   };
 
   return (
@@ -116,7 +131,7 @@ const Register = () => {
         <div className="text-center mb-8">
           <div className="flex justify-center mb-6">
             <img 
-              src={logo} 
+              src={authLogo} 
               alt="getAroom Logo" 
               className="w-250 h-30 object-contain cursor-pointer" 
               onClick={() => navigate('/')}
@@ -132,6 +147,59 @@ const Register = () => {
           <h2 className="text-2xl font-black text-[#3a0e23] uppercase tracking-tighter mb-6 text-center" style={{ fontFamily: 'Montserrat, sans-serif' }}>
             Create Account
           </h2>
+
+          <div
+            className="grid grid-cols-2 gap-2 mb-4 p-1 rounded-xl"
+            style={{ backgroundColor: isDark ? '#5b123a' : '#f3f4f6' }}
+          >
+            <button
+              type="button"
+              onClick={() => setFormData((prev) => ({ ...prev, accountType: 'customer' }))}
+              className="flex items-center justify-center gap-2 rounded-lg py-2 text-xs font-black uppercase tracking-wider transition"
+              style={
+                formData.accountType === 'customer'
+                  ? { backgroundColor: '#e71555', color: '#ffffff' }
+                  : {
+                      color: isDark ? '#f3ebdf' : '#4b2032',
+                      backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'transparent',
+                    }
+              }
+            >
+              <Users className="w-4 h-4" /> Customer
+            </button>
+            <button
+              type="button"
+              onClick={() => setFormData((prev) => ({ ...prev, accountType: 'host' }))}
+              className="flex items-center justify-center gap-2 rounded-lg py-2 text-xs font-black uppercase tracking-wider transition"
+              style={
+                formData.accountType === 'host'
+                  ? { backgroundColor: '#e71555', color: '#ffffff' }
+                  : {
+                      color: isDark ? '#f3ebdf' : '#4b2032',
+                      backgroundColor: isDark ? 'rgba(255,255,255,0.06)' : 'transparent',
+                    }
+              }
+            >
+              <Building2 className="w-4 h-4" /> Host
+            </button>
+          </div>
+
+          <div className="grid grid-cols-2 gap-2 mb-6">
+            <button
+              type="button"
+              onClick={() => randomizeSignup('customer')}
+              className="rounded-xl border border-[#e71555]/40 bg-[#f5f5dc] py-2 text-[11px] font-black uppercase tracking-wider text-[#3a0e23]"
+            >
+              Randomize Customer
+            </button>
+            <button
+              type="button"
+              onClick={() => randomizeSignup('host')}
+              className="rounded-xl border border-[#e71555]/40 bg-[#f5f5dc] py-2 text-[11px] font-black uppercase tracking-wider text-[#3a0e23]"
+            >
+              Randomize Host
+            </button>
+          </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
