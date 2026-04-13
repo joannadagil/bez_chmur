@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { User, Moon, Search, Settings, LogOut, Ticket, ChevronDown } from 'lucide-react';
+import { Search, Settings, LogOut, Ticket, ChevronDown, User, Bell } from 'lucide-react';
 import logo from '../../assets/logo_white.png';
+import ThemeToggle from './ThemeToggle';
 
 interface HeaderProps {
   activeFilter: string;
@@ -12,6 +13,7 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ activeFilter, onFilterChange, onSearchChange }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const navigate = useNavigate();
+  const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
 
   const filters = ['ALL EVENTS', 'CINEMA', 'THEATRE', 'LECTURE HALL'];
 
@@ -56,38 +58,58 @@ const Header: React.FC<HeaderProps> = ({ activeFilter, onFilterChange, onSearchC
             className="w-28 h-auto object-contain cursor-pointer hover:scale-105 transition-transform" 
             onClick={() => navigate('/home')}
           />
-          
+
           <div className="flex items-center gap-4">
-            <Moon size={18} className="cursor-pointer opacity-50 hover:opacity-100 transition-opacity" />
-            
+            <ThemeToggle className="h-9 w-9 border-white/20 bg-black/10 text-white/80 hover:bg-black/20 hover:text-white" />
+
             <div className="relative">
-              <div 
+              <div
                 className="flex items-center gap-2 cursor-pointer group bg-black/10 p-1.5 px-3 rounded-full border border-white/10 hover:bg-black/20 transition-all"
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
               >
                 <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center border border-white/10">
                   <User size={14} />
                 </div>
-                <span className="text-[10px] font-black uppercase tracking-widest">John</span>
+                <span className="text-[10px] font-black uppercase tracking-widest">{currentUser.firstName || 'John'}</span>
                 <ChevronDown size={12} className={`transition-transform duration-300 ${isProfileOpen ? 'rotate-180' : ''}`} />
               </div>
 
               {isProfileOpen && (
-                <div className="absolute right-0 top-14 w-52 bg-white text-[#3a0e23] rounded-2xl shadow-2xl p-2 z-50 border border-gray-100 animate-in zoom-in-95 duration-200">
-                  <Link 
-                    to="/my-tickets" 
-                    className="flex w-full items-center gap-3 p-3 hover:bg-[#fff0f3] rounded-xl text-[11px] font-black uppercase tracking-wider no-underline text-[#3a0e23] transition-colors"
+                <div className="profile-menu absolute right-0 top-14 w-56 bg-white text-[#3a0e23] rounded-2xl shadow-2xl p-2 z-50 border border-gray-100 animate-in zoom-in-95 duration-200">
+                  <Link
+                    to="/my-tickets"
+                    className="profile-menu-item flex w-full items-center gap-3 p-3 hover:bg-[#fff0f3] rounded-xl text-[11px] font-black uppercase tracking-wider no-underline text-[#3a0e23] transition-colors"
                     onClick={() => setIsProfileOpen(false)}
                   >
                     <Ticket size={16} className="text-[#d3265b]" /> My Tickets
                   </Link>
-                  <button className="flex w-full items-center gap-3 p-3 hover:bg-gray-50 rounded-xl text-[11px] font-black uppercase tracking-wider text-[#3a0e23]">
+                  <Link
+                    to="/profile"
+                    className="profile-menu-item flex w-full items-center gap-3 p-3 hover:bg-[#fff0f3] rounded-xl text-[11px] font-black uppercase tracking-wider no-underline text-[#3a0e23] transition-colors"
+                    onClick={() => setIsProfileOpen(false)}
+                  >
+                    <User size={16} className="text-[#d3265b]" /> Profile
+                  </Link>
+                  <Link
+                    to="/notifications"
+                    className="profile-menu-item flex w-full items-center gap-3 p-3 hover:bg-[#fff0f3] rounded-xl text-[11px] font-black uppercase tracking-wider no-underline text-[#3a0e23] transition-colors"
+                    onClick={() => setIsProfileOpen(false)}
+                  >
+                    <Bell size={16} className="text-[#d3265b]" /> Notifications
+                  </Link>
+                  <Link
+                    to="/settings"
+                    className="profile-menu-item flex w-full items-center gap-3 p-3 hover:bg-gray-50 rounded-xl text-[11px] font-black uppercase tracking-wider no-underline text-[#3a0e23]"
+                    onClick={() => setIsProfileOpen(false)}
+                  >
                     <Settings size={16} className="text-gray-400" /> Settings
-                  </button>
+                  </Link>
                   <div className="h-px bg-gray-100 my-1.5 mx-2" />
                   <button
-                    className="flex w-full items-center gap-3 p-3 hover:bg-red-50 text-red-600 rounded-xl text-[11px] font-black uppercase tracking-wider"
+                    className="profile-menu-item flex w-full items-center gap-3 p-3 hover:bg-red-50 text-red-600 rounded-xl text-[11px] font-black uppercase tracking-wider"
                     onClick={() => {
+                      localStorage.removeItem('isLoggedIn');
+                      localStorage.removeItem('currentUser');
                       setIsProfileOpen(false);
                       navigate('/login');
                     }}

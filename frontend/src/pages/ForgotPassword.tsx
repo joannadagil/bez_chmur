@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, ArrowRight, CheckCircle, ArrowLeft } from 'lucide-react';
 import logo from '../assets/logo.png';
+import logo_white from '../assets/logo_white.png';
+import { useTheme } from '../context/ThemeContext';
 
 const ForgotPassword = () => {
   const navigate = useNavigate();
@@ -10,6 +12,8 @@ const ForgotPassword = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState('');
+  const { isDark } = useTheme();
+  const authLogo = isDark ? logo_white : logo;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,7 +45,7 @@ const ForgotPassword = () => {
           {/* Logo */}
           <div className="text-center mb-8">
             <div className="flex justify-center mb-6">
-              <img src={logo} alt="getAroom Logo" className="w-250 h-30" />
+              <img src={authLogo} alt="getAroom Logo" className="w-250 h-30" />
             </div>
             {/* <h1 className="text-4xl font-black text-[#d3265b] uppercase tracking-tighter italic mb-2" style={{ fontFamily: 'Placard Next, sans-serif' }}>
               find or or create your next event
@@ -96,7 +100,7 @@ const ForgotPassword = () => {
         <div className="text-center mb-8">
           <div className="flex justify-center mb-6">
             <img
-              src={logo}
+              src={authLogo}
               alt="getAroom Logo"
               className="w-24 h-24 object-contain cursor-pointer"
               onClick={() => navigate(isLoggedIn ? '/home' : '/login')}
