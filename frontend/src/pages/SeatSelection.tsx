@@ -56,14 +56,6 @@ const SeatSelection = () => {
     );
   };
 
-<<<<<<< HEAD
-  const getCategoryColor = (categoryName: string) => {
-    switch (categoryName.toLowerCase()) {
-      case 'vip': return 'bg-indigo-400';
-      case 'premium': return 'bg-emerald-400';
-      case 'standard': return 'bg-blue-400';
-      default: return 'bg-orange-400';
-=======
   const randomizeDebugSeats = () => {
     if (isRedirecting) return;
 
@@ -80,7 +72,6 @@ const SeatSelection = () => {
     if (availableSeats.length === 0) {
       setSelectedSeats([]);
       return;
->>>>>>> origin/feature/user-ui
     }
   };
 
@@ -169,20 +160,6 @@ const SeatSelection = () => {
               <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-[9px] font-black text-gray-300 uppercase tracking-[0.5em]">Screen Area</span>
             </div>
 
-<<<<<<< HEAD
-            <div className="space-y-4 w-full max-w-2xl px-4">
-              {rows.map(rowLabel => (
-                <div key={rowLabel} className="flex items-center gap-6">
-                  <span className="text-[10px] font-black text-gray-300 w-4">{rowLabel}</span>
-                  <div className="flex gap-2.5 flex-grow justify-center">
-                    {seats
-                      .filter(s => s.row === rowLabel)
-                      .sort((a, b) => a.number - b.number)
-                      .map(seat => {
-                        const isSelected = selectedSeatIds.includes(seat.id);
-                        const isTaken = seat.is_reserved;
-
-=======
             <div className="mx-auto w-full overflow-x-auto select-none">
               <div className="space-y-4 mx-auto" style={{ width: `${matrixWidth}px` }}>
                 {currentLayout.rows.map((row, rowIndex) => (
@@ -193,7 +170,6 @@ const SeatSelection = () => {
                     <div className="flex items-center gap-8">
                       {seatSections.map((sectionCount, sectionIndex) => {
                         const sectionStart = seatSections.slice(0, sectionIndex).reduce((sum, value) => sum + value, 0);
->>>>>>> origin/feature/user-ui
                         return (
                           <button
                             key={seat.id}
@@ -206,14 +182,6 @@ const SeatSelection = () => {
                                 `${getCategoryColor(seat.seat_category.name)} hover:scale-125 hover:rotate-3 shadow-sm`}
                             `}
                           >
-<<<<<<< HEAD
-                            {!isTaken && (
-                              <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[#3a0e23] text-white text-[8px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none font-bold z-20">
-                                {seat.row}{seat.number} - ${seat.seat_category.price}
-                              </span>
-                            )}
-                          </button>
-=======
                             {Array.from({ length: sectionCount }).map((_, localIndex) => {
                               const seatIndex = sectionStart + localIndex;
                               const seatId = `${row}${seatIndex + 1}`;
@@ -260,7 +228,6 @@ const SeatSelection = () => {
                               );
                             })}
                           </div>
->>>>>>> origin/feature/user-ui
                         );
                     })}
                   </div>

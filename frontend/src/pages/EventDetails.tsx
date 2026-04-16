@@ -43,57 +43,6 @@ const EventDetails = () => {
   const navigate = useNavigate();
   const { updateBooking } = useBooking();
   const cinemaSectionRef = useRef<HTMLDivElement>(null);
-<<<<<<< HEAD
-
-  const [allInstances, setAllInstances] = useState<EventInstance[]>([]);
-  const [loading, setLoading] = useState(true);
-
-
-const [selectedDate, setSelectedDate] = useState('');
-  const [selectedVenue, setSelectedVenue] = useState('');
-  const [selectedTime, setSelectedTime] = useState('');
-  const [selectedInstanceId, setSelectedInstanceId] = useState<number | null>(null);
-  const [isRedirecting, setIsRedirecting] = useState(false);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await axios.get('http://localhost:8000/api/event-instances/');
-        const data: EventInstance[] = response.data;
-        
-        const initialEvent = data.find(e => e.id.toString() === id);
-        
-        if (initialEvent) {
-          const movieShows = data.filter(e => e.title === initialEvent.title);
-          setAllInstances(movieShows);
-          
-          const dateStr = new Date(initialEvent.time).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', weekday: 'short' });
-          const timeStr = new Date(initialEvent.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-          
-          setSelectedDate(dateStr);
-          setSelectedVenue(initialEvent.venue_name);
-          setSelectedTime(timeStr);
-          setSelectedInstanceId(initialEvent.id);
-        }
-      } catch (error) {
-        console.error("Error fetching event details:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchData();
-  }, [id]);
-
-
-  const availableDates = Array.from(new Set(allInstances.map(e => 
-    new Date(e.time).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', weekday: 'short' })
-  )));
-
-  const venuesForSelectedDate = Array.from(new Set(allInstances
-    .filter(e => new Date(e.time).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', weekday: 'short' }) === selectedDate)
-    .map(e => e.venue_name)
-  ));
-=======
   const dateOptions = buildDateOptions();
   const selectedEvent = mockEvents.find((event) => event.id === id);
   const [selectedDate, setSelectedDate] = useState(dateOptions[0]?.iso ?? '');
@@ -120,7 +69,6 @@ const [selectedDate, setSelectedDate] = useState('');
   const eventTitle = selectedEvent.title;
   const selectedDateLabel = dateOptions.find((option) => option.iso === selectedDate)?.label ?? selectedDate;
   
->>>>>>> origin/feature/user-ui
 
   const handleDateSelect = (date: string) => {
     setSelectedDate(date);
@@ -171,15 +119,9 @@ const [selectedDate, setSelectedDate] = useState('');
         <div className="max-w-[1100px] mx-auto px-8 h-full flex items-center gap-10 relative">
           <div className="relative w-[160px] h-[230px] flex-shrink-0 z-20 shadow-2xl transition-transform duration-500 hover:scale-105 group">
             <img 
-<<<<<<< HEAD
-              src={mainEvent.image_url} 
-              className="w-full h-full object-cover rounded-xl border-[4px] border-white transition-all group-hover:border-[#ffafbd]"
-              alt={mainEvent.title}
-=======
               src={selectedEvent.imageUrl}
               className="w-full h-full object-cover rounded-xl border-[4px] border-white transition-all group-hover:border-[#ffafbd]"
               alt={selectedEvent.title}
->>>>>>> origin/feature/user-ui
             />
           </div>
 
@@ -188,17 +130,11 @@ const [selectedDate, setSelectedDate] = useState('');
               {mainEvent.title}
             </h1>
             <div className="flex gap-2.5">
-<<<<<<< HEAD
-              <span className="bg-[#2d6a7a] text-white px-5 py-2 rounded-full font-bold text-[10px] uppercase tracking-widest shadow-md">
-                {mainEvent.type}
-              </span>
-=======
               {[selectedEvent.type, Number(selectedEvent.price) > 0 ? `$${selectedEvent.price}` : 'Free', selectedEvent.venue].map(tag => (
                 <span key={tag} className="bg-[#2d6a7a] text-white px-5 py-2 rounded-full font-bold text-[10px] uppercase tracking-widest shadow-md transition-transform hover:-translate-y-0.5">
                   {tag}
                 </span>
               ))}
->>>>>>> origin/feature/user-ui
             </div>
           </div>
         </div>
@@ -219,11 +155,7 @@ const [selectedDate, setSelectedDate] = useState('');
           <section>
             <h2 className="text-lg font-black mb-6 uppercase tracking-tight text-gray-800">Choose a date</h2>
             <div className="flex flex-wrap gap-3">
-<<<<<<< HEAD
-              {availableDates.map((date) => (
-=======
               {dateOptions.map((dateOption) => (
->>>>>>> origin/feature/user-ui
                 <button
                   key={dateOption.iso}
                   onClick={() => handleDateSelect(dateOption.iso)}
@@ -242,39 +174,6 @@ const [selectedDate, setSelectedDate] = useState('');
           <section ref={cinemaSectionRef} className="transition-all duration-700">
             <h2 className="text-lg font-black mb-6 uppercase tracking-tight text-gray-800">Choose a venue & showtime</h2>
             <div className="space-y-6">
-<<<<<<< HEAD
-              {venuesForSelectedDate.length > 0 ? venuesForSelectedDate.map((cinema) => (
-                <div key={cinema} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
-                  <h3 className="font-bold text-sm mb-5 text-gray-400 uppercase tracking-widest">{cinema}</h3>
-                  <div className="flex gap-3">
-                    {allInstances
-                      .filter(e => 
-                        new Date(e.time).toLocaleDateString('en-GB', { day: '2-digit', month: 'short', weekday: 'short' }) === selectedDate && 
-                        e.venue_name === cinema
-                      )
-                      .map(instance => {
-                        const timeStr = new Date(instance.time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-                        const isSelected = selectedTime === timeStr && selectedVenue === cinema;
-                        
-                        return (
-                          <button 
-                            key={instance.id}
-                            onClick={() => { 
-                              setSelectedTime(timeStr); 
-                              setSelectedVenue(cinema); 
-                              setSelectedInstanceId(instance.id);
-                            }}
-                            className={`px-6 py-3 rounded-xl font-black text-xs transition-all duration-200 ${
-                              isSelected
-                              ? 'bg-[#d64060] text-white shadow-md scale-105'
-                              : 'bg-[#fcfbff] text-gray-500 border border-gray-100 hover:bg-gray-100'
-                            }`}
-                          >
-                            {timeStr}
-                          </button>
-                        );
-                      })}
-=======
               {[selectedEvent.venue].map((venue) => (
                 <div key={venue} className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm transition-all hover:shadow-md hover:border-gray-200">
                   <h3 className="font-bold text-sm mb-5 text-gray-400 uppercase tracking-widest">{venue}</h3>
@@ -292,7 +191,6 @@ const [selectedDate, setSelectedDate] = useState('');
                         {time}
                       </button>
                     ))}
->>>>>>> origin/feature/user-ui
                   </div>
                 </div>
               )) : (
@@ -308,17 +206,10 @@ const [selectedDate, setSelectedDate] = useState('');
             
             <div className="space-y-4 text-xs font-bold border-b border-gray-300/50 pb-7 mb-7">
               {[
-<<<<<<< HEAD
-                { label: 'Film', value: mainEvent.title },
-                { label: 'Date', value: selectedDate || '---' },
-                { label: 'Venue', value: selectedVenue || '---' },
-                { label: 'Time', value: selectedTime || '---' }
-=======
                 { label: 'Film', value: eventTitle },
                 { label: 'Date', value: selectedDateLabel },
                 { label: 'Cinema', value: selectedVenue },
                 { label: 'Time', value: selectedTime }
->>>>>>> origin/feature/user-ui
               ].map((item) => (
                 <div key={item.label} className="flex justify-between items-center text-[#3a0e23] transition-all hover:translate-x-1">
                   <span className="text-gray-500 uppercase tracking-[0.15em] text-[10px]">{item.label}</span>
