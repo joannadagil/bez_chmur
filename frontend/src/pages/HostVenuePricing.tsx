@@ -1,8 +1,14 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar';
 import { useBooking } from '../context/BookingContext';
 import { venues } from '../data/venues';
+import { createHostEvent, fetchHostEvents } from '../api/hostEvents';
+
+const toMinutes = (timeValue: string) => {
+  const [hours, minutes] = timeValue.split(':').map(Number);
+  return hours * 60 + minutes;
+};
 
 type Category = 'vip' | 'area1' | 'area2' | 'handicap';
 type GridPoint = { rowIndex: number; seatIndex: number };
@@ -33,10 +39,36 @@ const HostVenuePricing = () => {
   const [dragCurrent, setDragCurrent] = useState<GridPoint | null>(null);
   const [prices, setPrices] = useState<PriceState>({ vip: '', area1: '', area2: '', handicap: '' });
   const [errors, setErrors] = useState<string[]>([]);
+  const [existingHostEvents, setExistingHostEvents] = useState<any[]>([]);
 
   const selectedVenue = venues.find((venue) => venue.id === venueId && venue.type === 'seated');
   const layout = selectedVenue?.layout ?? { rows: [], seatsPerRow: 0 };
   const removedSeats = new Set(booking.removedSeats ?? []);
+
+  useEffect(() => {
+    let ignore = false;
+
+    const loadHostEvents = async () => {
+      const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+      if (!currentUser?.email) return;
+
+      try {
+        const data = await fetchHostEvents(currentUser.email);
+        if (!ignore) {
+          setExistingHostEvents(data);
+        }
+      } catch {
+        if (!ignore) {
+          setExistingHostEvents([]);
+        }
+      }
+    };
+
+    loadHostEvents();
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   const splitSeatSections = (seatsPerRow: number) => {
     const left = Math.max(2, Math.floor(seatsPerRow * 0.3));
@@ -271,11 +303,79 @@ const HostVenuePricing = () => {
     return validationErrors;
   };
 
-  const handleCreateEvent = () => {
+  const handleCreateEvent = async () => {
+    if (!selectedVenue) return;
+
     const validationErrors = validatePricingRules();
     setErrors(validationErrors);
     if (validationErrors.length > 0) return;
-    navigate('/host-dashboard');
+
+    const currentSchedule = booking.showSchedule || [];
+    const existingInVenue = existingHostEvents.filter(
+      (event) => event.venue === selectedVenue.name && event.schedule && event.schedule.length > 0,
+    );
+
+    for (const day of currentSchedule) {
+      const newTimes = [...day.times].sort((a, b) => toMinutes(a) - toMinutes(b));
+      for (const event of existingInVenue) {
+        const existingDay = event.schedule?.find((sessionDay: any) => sessionDay.date === day.date);
+        if (!existingDay) continue;
+        for (const newTime of newTimes) {
+          for (const existingTime of existingDay.times) {
+            const diff = Math.abs(toMinutes(newTime) - toMinutes(existingTime));
+            if (diff < 60) {
+              setErrors([
+                `Show ${newTime} on ${day.date} conflicts with another show in ${selectedVenue.name}. Keep at least 1 hour gap between shows in one venue.`,
+              ]);
+              return;
+            }
+          }
+        }
+      }
+    }
+
+    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+    if (!currentUser?.email) {
+      setErrors(['You need to be logged in as host to create this event.']);
+      return;
+    }
+
+    const eventType =
+      booking.eventCategory.toLowerCase() === 'theatre'
+        ? 'Theatre'
+        : booking.eventCategory.toLowerCase() === 'lecture hall'
+          ? 'Lecture'
+          : 'Cinema';
+
+    try {
+      const created = await createHostEvent({
+        email: currentUser.email,
+        first_name: currentUser.firstName || '',
+        last_name: currentUser.lastName || '',
+        title: booking.eventTitle,
+        description: '',
+        event_type: eventType,
+        image_url: booking.eventImageUrl || '',
+        date_from: booking.date,
+        date_to: booking.dateTo || booking.date,
+        venue_name: selectedVenue.name,
+        venue_rows: layout.rows.length,
+        venue_seats_per_row: layout.seatsPerRow,
+        schedule: booking.showSchedule,
+        removed_seats: Array.from(removedSeats),
+        seat_assignments: seatAssignments,
+        prices: {
+          vip: Number(prices.vip) || 0,
+          area1: Number(prices.area1) || 0,
+          area2: Number(prices.area2) || 0,
+          handicap: Number(prices.handicap) || 0,
+        },
+      });
+
+      navigate(`/host-dashboard/event/${created.id}`);
+    } catch (error) {
+      setErrors([error instanceof Error ? error.message : 'Could not save this event to backend. Please try again.']);
+    }
   };
 
   const randomizeDebugPricing = () => {
@@ -441,27 +541,24 @@ const HostVenuePricing = () => {
             <div className="space-y-4 mx-auto" style={{ width: `${matrixWidth}px` }}>
               {layout.rows.map((row, rowIndex) => (
                 <div key={row} className="flex items-center gap-5 justify-center">
-                  <span className="text-[10px] font-black text-[#c1c2cc] w-4">{row}</span>
+                  <span className="text-[10px] font-black text-[#c1c2cc] w-4">
+                    {Array.from({ length: layout.seatsPerRow }).some((_, seatIndex) => !removedSeats.has(`${row}${seatIndex + 1}`)) ? row : ''}
+                  </span>
                   <div className="flex items-center gap-8">
                     {seatSections.map((sectionCount, sectionIndex) => {
                       const sectionStart = seatSections.slice(0, sectionIndex).reduce((sum, value) => sum + value, 0);
-                      const availableSeats = Array.from({ length: sectionCount }).filter((_, localIndex) => {
-                        const seatIndex = sectionStart + localIndex;
-                        const seatId = `${row}${seatIndex + 1}`;
-                        return !removedSeats.has(seatId);
-                      });
 
                       return (
                         <div
                           key={`${row}-section-${sectionIndex}`}
                           className="grid"
-                          style={{ gridTemplateColumns: `repeat(${availableSeats.length}, minmax(0, 1fr))`, gap: '8px' }}
+                          style={{ gridTemplateColumns: `repeat(${sectionCount}, minmax(0, 1fr))`, gap: '8px' }}
                         >
                           {Array.from({ length: sectionCount }).map((_, localIndex) => {
                             const seatIndex = sectionStart + localIndex;
                             const seatId = `${row}${seatIndex + 1}`;
                             const isRemoved = removedSeats.has(seatId);
-                            if (isRemoved) return null;
+                            if (isRemoved) return <div key={seatId} className="h-8 w-8" title={`${seatId} removed`} />;
                             
                             const assignedCategory = seatAssignments[seatId];
                             const isPreview = previewSeatSet.has(seatId);

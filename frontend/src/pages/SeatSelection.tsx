@@ -1,5 +1,5 @@
 // src/pages/SeatSelection.tsx
-import React, { useState , useEffect} from 'react';
+import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar';
 import { Loader2 } from 'lucide-react';
@@ -56,12 +56,31 @@ const SeatSelection = () => {
     );
   };
 
+<<<<<<< HEAD
   const getCategoryColor = (categoryName: string) => {
     switch (categoryName.toLowerCase()) {
       case 'vip': return 'bg-indigo-400';
       case 'premium': return 'bg-emerald-400';
       case 'standard': return 'bg-blue-400';
       default: return 'bg-orange-400';
+=======
+  const randomizeDebugSeats = () => {
+    if (isRedirecting) return;
+
+    const availableSeats: string[] = [];
+    currentLayout.rows.forEach((row) => {
+      for (let seatIndex = 0; seatIndex < currentLayout.seatsPerRow; seatIndex += 1) {
+        const seatId = `${row}${seatIndex + 1}`;
+        if (removedSeats.has(seatId)) continue;
+        if (isTakenSeat(seatId)) continue;
+        availableSeats.push(seatId);
+      }
+    });
+
+    if (availableSeats.length === 0) {
+      setSelectedSeats([]);
+      return;
+>>>>>>> origin/feature/user-ui
     }
   };
 
@@ -150,6 +169,7 @@ const SeatSelection = () => {
               <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-[9px] font-black text-gray-300 uppercase tracking-[0.5em]">Screen Area</span>
             </div>
 
+<<<<<<< HEAD
             <div className="space-y-4 w-full max-w-2xl px-4">
               {rows.map(rowLabel => (
                 <div key={rowLabel} className="flex items-center gap-6">
@@ -162,6 +182,18 @@ const SeatSelection = () => {
                         const isSelected = selectedSeatIds.includes(seat.id);
                         const isTaken = seat.is_reserved;
 
+=======
+            <div className="mx-auto w-full overflow-x-auto select-none">
+              <div className="space-y-4 mx-auto" style={{ width: `${matrixWidth}px` }}>
+                {currentLayout.rows.map((row, rowIndex) => (
+                  <div key={row} className="flex items-center gap-5 justify-center">
+                    <span className="text-[10px] font-black text-gray-300 w-4">
+                      {Array.from({ length: currentLayout.seatsPerRow }).some((_, seatIndex) => !removedSeats.has(`${row}${seatIndex + 1}`)) ? row : ''}
+                    </span>
+                    <div className="flex items-center gap-8">
+                      {seatSections.map((sectionCount, sectionIndex) => {
+                        const sectionStart = seatSections.slice(0, sectionIndex).reduce((sum, value) => sum + value, 0);
+>>>>>>> origin/feature/user-ui
                         return (
                           <button
                             key={seat.id}
@@ -174,12 +206,61 @@ const SeatSelection = () => {
                                 `${getCategoryColor(seat.seat_category.name)} hover:scale-125 hover:rotate-3 shadow-sm`}
                             `}
                           >
+<<<<<<< HEAD
                             {!isTaken && (
                               <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[#3a0e23] text-white text-[8px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none font-bold z-20">
                                 {seat.row}{seat.number} - ${seat.seat_category.price}
                               </span>
                             )}
                           </button>
+=======
+                            {Array.from({ length: sectionCount }).map((_, localIndex) => {
+                              const seatIndex = sectionStart + localIndex;
+                              const seatId = `${row}${seatIndex + 1}`;
+                              if (removedSeats.has(seatId)) return <div key={seatId} className="w-7 h-7" title={`${seatId} removed`} />;
+
+                              const isSelected = selectedSeats.includes(seatId);
+                              const isTaken = isTakenSeat(seatId);
+                              const category = getSeatCategory(rowIndex, seatIndex);
+
+                              return (
+                                <button
+                                  key={seatId}
+                                  disabled={isTaken || isRedirecting}
+                                  onClick={() => toggleSeat(seatId)}
+                                  className="w-7 h-7 rounded-[8px] transition-all duration-300 relative group border"
+                                  style={
+                                    isTaken
+                                      ? {
+                                          backgroundColor: '#efeff3',
+                                          borderColor: '#d5d6df',
+                                          opacity: 0.65,
+                                          cursor: 'not-allowed',
+                                        }
+                                      : isSelected
+                                        ? {
+                                            backgroundColor: '#3a0e23',
+                                            borderColor: '#3a0e23',
+                                            boxShadow: '0 0 0 3px rgba(58,14,35,0.12)',
+                                            transform: 'scale(1.1)',
+                                          }
+                                        : {
+                                            backgroundColor: `${CATEGORY_META[category].color}30`,
+                                            borderColor: `${CATEGORY_META[category].color}A0`,
+                                          }
+                                  }
+                                  title={seatId}
+                                >
+                                  {!isTaken && (
+                                    <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[#3a0e23] text-white text-[8px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none font-bold z-20">
+                                      {seatId}
+                                    </span>
+                                  )}
+                                </button>
+                              );
+                            })}
+                          </div>
+>>>>>>> origin/feature/user-ui
                         );
                     })}
                   </div>

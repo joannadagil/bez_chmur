@@ -104,11 +104,11 @@ const HostSeatRemoval = () => {
   }, [isDragging, dragStart, dragCurrent]);
 
   const seatSections = splitSeatSections(currentLayout.seatsPerRow);
-  const canGoToPricing = removedSeats.length > 0 && removedSeats.length < seatCount;
+  const canGoToPricing = removedSeats.length < seatCount;
 
   const handleGoToPricing = () => {
     setIsRedirecting(true);
-    updateBooking({ seats: removedSeats });
+    updateBooking({ removedSeats });
     setTimeout(() => {
       navigate(`/host-dashboard/add-event/venue/${venueId}/pricing`);
     }, 900);
@@ -163,7 +163,9 @@ const HostSeatRemoval = () => {
             <div className="space-y-4 mx-auto" style={{ width: `${matrixWidth}px` }}>
             {currentLayout.rows.map((row, rowIndex) => (
               <div key={row} className="flex items-center gap-5 justify-center">
-                <span className="text-[10px] font-black text-[#c1c2cc] w-4">{row}</span>
+                <span className="text-[10px] font-black text-[#c1c2cc] w-4">
+                  {Array.from({ length: currentLayout.seatsPerRow }).some((_, seatIndex) => !removedSeats.includes(`${row}${seatIndex + 1}`)) ? row : ''}
+                </span>
                 <div className="flex items-center gap-8">
                   {seatSections.map((sectionCount, sectionIndex) => {
                     const sectionStart = seatSections

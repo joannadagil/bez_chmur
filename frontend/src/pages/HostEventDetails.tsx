@@ -1,8 +1,7 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Film, MapPin, Ticket } from 'lucide-react';
 import Navbar from '../components/layout/Navbar';
-import { mockEvents } from '../data/mockEvents';
+import { fetchHostEventById, type HostEventDto } from '../api/hostEvents';
 
 type SessionRow = {
   id: string;
@@ -38,18 +37,78 @@ const buildHostSessions = (eventId: string, seatsLeft: number): SessionRow[] => 
   });
 };
 
+const buildSessionsFromSchedule = (eventId: string, schedule: Array<{ date: string; times: string[] }>, seatsLeft: number): SessionRow[] => {
+  const totalSeats = Math.max(40, seatsLeft + 40);
+  const flattened = schedule.flatMap((day) => day.times.map((time) => ({ date: day.date, time })));
+
+  return flattened.map((item, idx) => {
+    const spread = Math.max(0, seatsLeft - idx * 2);
+    return {
+      id: `${eventId}-${idx}`,
+      label: `${item.date} ${item.time}`,
+      unsoldSeats: spread,
+      roomLabel: idx % 3 === 0 ? 'Hall C' : idx % 3 === 1 ? 'Hall B' : 'Hall A',
+      totalSeats,
+    };
+  });
+};
+
 const HostEventDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
   const [posterOrientation, setPosterOrientation] = useState<'portrait' | 'landscape' | 'square'>('portrait');
+  const [event, setEvent] = useState<HostEventDto | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const event = mockEvents.find((item) => item.id === id);
+  useEffect(() => {
+    let ignore = false;
+
+    const loadEvent = async () => {
+      const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+      if (!id || !currentUser?.email) return;
+
+      try {
+        const data = await fetchHostEventById(id, currentUser.email);
+        if (!ignore) {
+          setEvent(data);
+        }
+      } catch {
+        if (!ignore) {
+          setEvent(null);
+        }
+      } finally {
+        if (!ignore) {
+          setIsLoading(false);
+        }
+      }
+    };
+
+    loadEvent();
+    return () => {
+      ignore = true;
+    };
+  }, [id]);
 
   const sessions = useMemo(() => {
     if (!event) return [];
-    return buildHostSessions(event.id, event.seatsLeft ?? 0);
+    if (event.schedule && event.schedule.length > 0) {
+      return buildSessionsFromSchedule(String(event.id), event.schedule, event.seatsLeft ?? 0);
+    }
+    return buildHostSessions(String(event.id), event.seatsLeft ?? 0);
   }, [event]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#fcfbff] font-sans text-[#1a0b1a] animate-in fade-in duration-700 relative">
+        <Navbar hideTicketsLink logoLink="/host-dashboard" userName="Company Name" />
+        <main className="max-w-[1100px] mx-auto px-8 py-12">
+          <section className="rounded-2xl border border-gray-100 bg-white p-8 text-[#3a0e23] font-bold shadow-sm">
+            Loading event details...
+          </section>
+        </main>
+      </div>
+    );
+  }
 
   if (!event) {
     return (
@@ -137,9 +196,6 @@ const HostEventDetails = () => {
           <h2 className="text-lg font-black mb-7 text-[#3a0e23] uppercase tracking-tighter italic">Dates and tickets</h2>
           <div className="space-y-4">
             {sessions.map((session) => {
-              const occupancy = Math.round(((session.totalSeats - session.unsoldSeats) / session.totalSeats) * 100);
-              const isOpen = activeSessionId === session.id;
-
               return (
                 <div key={session.id} className="rounded-2xl bg-white p-4 border border-gray-100 shadow-sm">
                   <div className="grid grid-cols-1 gap-3">
@@ -150,23 +206,13 @@ const HostEventDetails = () => {
                     <span className="text-sm font-black text-[#3a0e23] uppercase tracking-[0.08em]">{session.unsoldSeats} unsold tickets</span>
                     <button
                       type="button"
-                      onClick={() => setActiveSessionId(isOpen ? null : session.id)}
+                      onClick={() => navigate(`/host-dashboard/event/${event.id}/room-outline?session=${encodeURIComponent(session.label)}`)}
                       className="text-[11px] font-black uppercase tracking-[0.14em] text-[#3a0e23] underline decoration-[#3a0e23]/40 underline-offset-4"
                     >
-                      {isOpen ? 'Hide room' : 'See details'}
+                      See details
                     </button>
                     </div>
                   </div>
-
-                  {isOpen && (
-                    <div className="mt-4 rounded-xl border border-gray-200 bg-[#fcfbff] px-4 py-4 text-[#2b2237]">
-                      <div className="space-y-2 text-[11px] font-black uppercase tracking-[0.1em] text-gray-600">
-                        <p className="inline-flex items-center gap-2"><MapPin size={14} /> {session.roomLabel}</p>
-                        <p className="inline-flex items-center gap-2"><Ticket size={14} /> {session.unsoldSeats} unsold / {session.totalSeats}</p>
-                        <p className="inline-flex items-center gap-2"><Film size={14} /> {occupancy}% sold</p>
-                      </div>
-                    </div>
-                  )}
                 </div>
               );
             })}
