@@ -8,6 +8,7 @@ import Home from './pages/Home';
 import EventDetails from './pages/EventDetails';
 import SeatSelection from './pages/SeatSelection';
 import MyTickets from './pages/MyTickets';
+import TicketView from './pages/TicketView';
 import RoleSelection from './pages/RoleSelection';
 import HostDashboard from './pages/HostDashboard';
 import AddEvent from './pages/AddEvent';
@@ -16,6 +17,7 @@ import HostSeatRemoval from './pages/HostSeatRemoval';
 import HostVenuePricing from './pages/HostVenuePricing';
 import HostNoSeatsVenue from './pages/HostNoSeatsVenue';
 import HostEventDetails from './pages/HostEventDetails';
+import HostRoomOutline from './pages/HostRoomOutline';
 import { Payment } from './pages/checkout/Payment';
 import SuccessPage from './pages/checkout/SuccessPage';
 import ThemeToggle from './components/layout/ThemeToggle';
@@ -72,11 +74,13 @@ const AppLayout = () => {
         <Route path="/host-dashboard/add-event/venue/:id/pricing" element={<ProtectedRoute><HostVenuePricing /></ProtectedRoute>} />
         <Route path="/host-dashboard/add-event/venue/:id/configure-no-seats" element={<ProtectedRoute><HostNoSeatsVenue /></ProtectedRoute>} />
         <Route path="/host-dashboard/event/:id" element={<ProtectedRoute><HostEventDetails /></ProtectedRoute>} />
+        <Route path="/host-dashboard/event/:id/room-outline" element={<ProtectedRoute><HostRoomOutline /></ProtectedRoute>} />
         <Route path="/event/:id" element={<ProtectedRoute><EventDetails /></ProtectedRoute>} />
         <Route path="/checkout/success" element={<ProtectedRoute><SuccessPage /></ProtectedRoute>} />
         <Route path="/checkout/payment" element={<ProtectedRoute><Payment /></ProtectedRoute>} />
         <Route path="/checkout/:id" element={<ProtectedRoute><SeatSelection /></ProtectedRoute>} />
         <Route path="/my-tickets" element={<ProtectedRoute><MyTickets /></ProtectedRoute>} />
+        <Route path="/my-tickets/:id" element={<ProtectedRoute><TicketView /></ProtectedRoute>} />
       </Routes>
     </div>
   );

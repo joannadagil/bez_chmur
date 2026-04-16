@@ -257,11 +257,6 @@ const VenueSelection = () => {
                         {venue.size} seats
                       </span>
                     )}
-                    {venue.type === 'seated' && (
-                      <span className="text-xs font-semibold opacity-90 bg-white/20 px-3 py-1 rounded-full">
-                        matrix: {venue.layout.rows.length * venue.layout.seatsPerRow} seats
-                      </span>
-                    )}
                     {!venue.size && (
                       <span className="text-lg font-bold opacity-90 bg-white/20 px-3 py-1 rounded-full">
                         No seats

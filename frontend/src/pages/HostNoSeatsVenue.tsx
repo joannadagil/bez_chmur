@@ -7,7 +7,7 @@ import { venues } from '../data/venues';
 const HostNoSeatsVenue = () => {
   const navigate = useNavigate();
   const { id: venueId } = useParams();
-  const { booking, updateBooking } = useBooking();
+  const { updateBooking } = useBooking();
 
   const [width, setWidth] = useState('');
   const [depth, setDepth] = useState('');

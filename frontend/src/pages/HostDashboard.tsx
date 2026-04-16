@@ -1,8 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Plus, Building2, ChevronDown, Settings, LogOut, Bell } from 'lucide-react';
 import { EventCard } from '../components/events/EventCard';
-import { mockEvents } from '../data/mockEvents';
+import { fetchHostEvents, type HostEventDto } from '../api/hostEvents';
 import logo from '../assets/logo_white.png';
 import ThemeToggle from '../components/layout/ThemeToggle';
 
@@ -11,9 +11,40 @@ const HostDashboard = () => {
   const [activeFilter, setActiveFilter] = useState('ALL EVENTS');
   const [searchQuery, setSearchQuery] = useState('');
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [hostEvents, setHostEvents] = useState<HostEventDto[]>([]);
+  const [loadingError, setLoadingError] = useState('');
   const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
 
-  const filteredEvents = mockEvents.filter(event => {
+  useEffect(() => {
+    let ignore = false;
+
+    const loadHostEvents = async () => {
+      if (!currentUser?.email) {
+        setLoadingError('Missing host email for loading events.');
+        return;
+      }
+
+      try {
+        const data = await fetchHostEvents(currentUser.email);
+        if (!ignore) {
+          setHostEvents(data);
+          setLoadingError('');
+        }
+      } catch {
+        if (!ignore) {
+          setLoadingError('Could not load host events from backend.');
+          setHostEvents([]);
+        }
+      }
+    };
+
+    loadHostEvents();
+    return () => {
+      ignore = true;
+    };
+  }, [currentUser?.email]);
+
+  const filteredEvents = useMemo(() => hostEvents.filter(event => {
     const categoryMatch = activeFilter === 'ALL EVENTS' ||
       (activeFilter === 'CINEMA' && event.type === 'Cinema') ||
       (activeFilter === 'THEATRE' && event.type === 'Theatre') ||
@@ -23,7 +54,7 @@ const HostDashboard = () => {
       event.venue.toLowerCase().includes(searchQuery.toLowerCase());
 
     return categoryMatch && searchMatch;
-  });
+  }), [hostEvents, activeFilter, searchQuery]);
 
   const filters = ['ALL EVENTS', 'CINEMA', 'THEATRE', 'LECTURE HALL'];
 
@@ -36,7 +67,7 @@ const HostDashboard = () => {
               Create your next event
             </h1>
             <p className="text-[#d3265b] text-xl font-bold opacity-90 uppercase tracking-[0.2em]">
-              Manage your listings, launch new shows and keep your venue schedule up to date.
+              Manage and launch shows.
             </p>
           </div>
 
@@ -163,11 +194,27 @@ const HostDashboard = () => {
           />
         </div>
 
+        {loadingError && (
+          <div className="px-4 text-sm font-bold text-red-500 uppercase tracking-[0.12em]">{loadingError}</div>
+        )}
+
         {filteredEvents.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-x-8 gap-y-12 pb-20">
             {filteredEvents.map(event => (
               <div key={event.id} className="transform transition-all duration-500 hover:-translate-y-3 hover:rotate-[0.5deg]">
-                <EventCard event={event} detailsPathBase="/host-dashboard/event" ctaLabel="Manage" />
+                <EventCard
+                  event={{
+                    id: String(event.id),
+                    title: event.title,
+                    venue: event.venue,
+                    type: event.type,
+                    price: event.price > 0 ? event.price : 'Free',
+                    seatsLeft: event.seatsLeft,
+                    imageUrl: event.imageUrl,
+                  }}
+                  detailsPathBase="/host-dashboard/event"
+                  ctaLabel="Manage"
+                />
               </div>
             ))}
           </div>
