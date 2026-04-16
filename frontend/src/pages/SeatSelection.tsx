@@ -1,133 +1,192 @@
 // src/pages/SeatSelection.tsx
-import { useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar';
 import { Loader2 } from 'lucide-react';
 import { useBooking } from '../context/BookingContext';
-import axios from 'axios';
+import { venues } from '../data/venues';
+import { apiClient } from '../api/client';
 
-interface Seat {
+type Category = 'vip' | 'area1' | 'area2' | 'handicap';
+
+type BackendSeat = {
   id: number;
   row: string;
   number: number;
   is_reserved: boolean;
+  if_exist: boolean;
   seat_category: {
     name: string;
-    price: string | number;
-    color_code?: string; 
+    price: number;
   };
-}
+};
+
+const CATEGORY_META: Record<Category, { label: string; color: string }> = {
+  vip: { label: 'VIP', color: '#ff66c4' },
+  area1: { label: 'AREA 1', color: '#6dd3d9' },
+  area2: { label: 'AREA 2', color: '#a438e7' },
+  handicap: { label: 'HANDICAP', color: '#fbb035' },
+};
+
+const splitSeatSections = (seatsPerRow: number) => {
+  const left = Math.max(2, Math.floor(seatsPerRow * 0.3));
+  const right = left;
+  const center = Math.max(2, seatsPerRow - left - right);
+  return [left, center, right];
+};
+
+const normalizeCategory = (name?: string): Category => {
+  const value = (name || '').trim().toLowerCase();
+
+  if (value.includes('vip')) return 'vip';
+  if (value.includes('handicap') || value.includes('accessible')) return 'handicap';
+  if (value.includes('area 2') || value.includes('area2')) return 'area2';
+  return 'area1';
+};
 
 const SeatSelection = () => {
-  const { id } = useParams(); 
   const navigate = useNavigate();
+  const { id: venueId } = useParams();
   const { booking, updateBooking } = useBooking();
-  
-  const [seats, setSeats] = useState<Seat[]>([]);
-  const [loading, setLoading] = useState(true);
+
   const [isRedirecting, setIsRedirecting] = useState(false);
+  const [loadingSeats, setLoadingSeats] = useState(true);
+  const [seatError, setSeatError] = useState('');
+  const [backendSeats, setBackendSeats] = useState<BackendSeat[]>([]);
+  const [selectedSeats, setSelectedSeats] = useState<string[]>([]);
   const [selectedSeatIds, setSelectedSeatIds] = useState<number[]>([]);
 
+  const defaultLayout = {
+    rows: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'],
+    seatsPerRow: 14,
+  };
+
+  const selectedVenue =
+    venues.find((venue) => venue.id === venueId && venue.type === 'seated') ||
+    venues.find((venue) => venue.name === booking.selectedVenue && venue.type === 'seated');
+
+  const currentLayout = selectedVenue?.layout ?? defaultLayout;
+  const seatSections = splitSeatSections(currentLayout.seatsPerRow);
+  const matrixWidth = Math.min(currentLayout.seatsPerRow * 42, 1040);
+  const removedSeats = new Set(booking.removedSeats ?? []);
+
+  const eventInstanceId = useMemo(() => {
+    if (booking.eventInstanceId) return booking.eventInstanceId;
+    const parsed = Number(booking.eventId);
+    return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+  }, [booking.eventId, booking.eventInstanceId]);
+
   useEffect(() => {
-    const fetchSeats = async () => {
+    let ignore = false;
+
+    const loadSeats = async () => {
+      if (!eventInstanceId) {
+        if (!ignore) {
+          setSeatError('Missing event instance. Please go back and choose an event again.');
+          setLoadingSeats(false);
+        }
+        return;
+      }
+
       try {
-        const response = await axios.get(`http://localhost:8000/api/event-instances/${id}/seats/`);
-        setSeats(response.data);
-      } catch (error) {
-        console.error("Error fetching seats:", error);
+        const response = await apiClient.get<BackendSeat[]>(
+          `/event-instances/${eventInstanceId}/seats/`
+        );
+
+        if (!ignore) {
+          setBackendSeats(response.data);
+          setSeatError('');
+        }
+      } catch {
+        if (!ignore) {
+          setSeatError('Could not load seats from backend.');
+        }
       } finally {
-        setLoading(false);
+        if (!ignore) {
+          setLoadingSeats(false);
+        }
       }
     };
-    fetchSeats();
-  }, [id]);
 
-  const rows = Array.from(new Set(seats.map(s => s.row))).sort();
+    loadSeats();
 
-  const currentTotalPrice = seats
-    .filter(s => selectedSeatIds.includes(s.id))
-    .reduce((sum, s) => sum + Number(s.seat_category.price), 0);
+    return () => {
+      ignore = true;
+    };
+  }, [eventInstanceId]);
 
-  const toggleSeat = (seatId: number) => {
-    setSelectedSeatIds(prev => 
-      prev.includes(seatId) 
-        ? prev.filter(id => id !== seatId) 
-        : [...prev, seatId]
+  const seatMap = useMemo(() => {
+    const map = new Map<string, BackendSeat>();
+    backendSeats.forEach((seat) => {
+      map.set(`${seat.row}${seat.number}`, seat);
+    });
+    return map;
+  }, [backendSeats]);
+
+  const currentTotalPrice = useMemo(() => {
+    return backendSeats
+      .filter((seat) => selectedSeatIds.includes(seat.id))
+      .reduce((sum, seat) => sum + Number(seat.seat_category?.price ?? 0), 0);
+  }, [backendSeats, selectedSeatIds]);
+
+  const toggleSeat = (seat: BackendSeat) => {
+    if (seat.is_reserved || isRedirecting || !seat.if_exist) return;
+
+    const seatLabel = `${seat.row}${seat.number}`;
+
+    setSelectedSeats((prev) =>
+      prev.includes(seatLabel)
+        ? prev.filter((s) => s !== seatLabel)
+        : [...prev, seatLabel]
+    );
+
+    setSelectedSeatIds((prev) =>
+      prev.includes(seat.id)
+        ? prev.filter((id) => id !== seat.id)
+        : [...prev, seat.id]
     );
   };
 
   const randomizeDebugSeats = () => {
     if (isRedirecting) return;
 
-    const availableSeats: string[] = [];
-    currentLayout.rows.forEach((row) => {
-      for (let seatIndex = 0; seatIndex < currentLayout.seatsPerRow; seatIndex += 1) {
-        const seatId = `${row}${seatIndex + 1}`;
-        if (removedSeats.has(seatId)) continue;
-        if (isTakenSeat(seatId)) continue;
-        availableSeats.push(seatId);
-      }
-    });
+    const availableSeats = backendSeats.filter(
+      (seat) =>
+        seat.if_exist &&
+        !seat.is_reserved &&
+        !removedSeats.has(`${seat.row}${seat.number}`)
+    );
 
     if (availableSeats.length === 0) {
       setSelectedSeats([]);
+      setSelectedSeatIds([]);
       return;
     }
+
+    const shuffled = [...availableSeats].sort(() => Math.random() - 0.5);
+    const amount = Math.min(4, Math.max(1, Math.floor(Math.random() * 4) + 1), shuffled.length);
+    const picked = shuffled.slice(0, amount);
+
+    setSelectedSeats(picked.map((seat) => `${seat.row}${seat.number}`));
+    setSelectedSeatIds(picked.map((seat) => seat.id));
   };
 
-  const handleProceedToPayment = async () => {
-    if (selectedSeatIds.length === 0) return;
+  const handleProceedToPayment = () => {
+    if (!eventInstanceId || selectedSeatIds.length === 0) return;
+
     setIsRedirecting(true);
 
-    try {
-      const response = await axios.post('http://localhost:8000/api/book-seats/', {
-        event_instance_id: id,
-        seat_ids: selectedSeatIds
-      }, {
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        }
-      });
+    updateBooking({
+      eventInstanceId,
+      seats: selectedSeats,
+      seatIds: selectedSeatIds,
+      totalPrice: currentTotalPrice,
+    });
 
-      const { order_id } = response.data;
-
-      updateBooking({ 
-        orderId: order_id,
-        seats: seats.filter(s => selectedSeatIds.includes(s.id)).map(s => `${s.row}${s.number}`), 
-        totalPrice: currentTotalPrice
-      });
-
+    setTimeout(() => {
       navigate('/checkout/payment');
-    } catch (error) {
-      alert("Could not reserve seats. They might be already taken.");
-      console.error(error);
-    } finally {
-      setIsRedirecting(false);
-    }
+    }, 1200);
   };
-  // const handleProceedToPayment = () => {
-  //   if (selectedSeatIds.length === 0) return;
-    
-  //   const selectedSeatLabels = seats
-  //     .filter(s => selectedSeatIds.includes(s.id))
-  //     .map(s => `${s.row}${s.number}`);
-
-  //   setIsRedirecting(true);
-  //   updateBooking({ 
-  //     seats: selectedSeatLabels, 
-  //     totalPrice: currentTotalPrice
-  //   });
-
-  //   setTimeout(() => {
-  //     navigate('/checkout/payment');
-  //   }, 1200);
-  // };
-
-  if (loading) return (
-    <div className="h-screen flex items-center justify-center bg-[#f0f2f5]">
-      <Loader2 className="w-12 h-12 animate-spin text-[#3a0e23]" />
-    </div>
-  );
 
   return (
     <div className="min-h-screen bg-[#f0f2f5] font-sans text-[#1a0b1a] animate-in fade-in duration-700">
@@ -137,7 +196,9 @@ const SeatSelection = () => {
         <div className="fixed top-24 left-1/2 -translate-x-1/2 z-[100] animate-in slide-in-from-top-10 duration-500">
           <div className="bg-[#3a0e23] text-white px-8 py-4 rounded-2xl shadow-2xl flex items-center gap-4 border border-white/10">
             <Loader2 className="w-5 h-5 animate-spin text-[#ffafbd]" />
-            <span className="text-[11px] font-black uppercase tracking-widest">Securing your seats...</span>
+            <span className="text-[11px] font-black uppercase tracking-widest">
+              Securing your seats...
+            </span>
           </div>
         </div>
       )}
@@ -145,57 +206,64 @@ const SeatSelection = () => {
       <main className="max-w-[1200px] mx-auto px-8 py-12">
         <div className="mb-12">
           <h1 className="text-4xl font-black text-[#1a0b1a] tracking-tighter uppercase">
-            {booking.eventTitle} — <span className="text-gray-500 not-italic text-2xl">{booking.selectedVenue}</span>
+            {booking.eventTitle} —{' '}
+            <span className="text-gray-500 not-italic text-2xl">
+              {booking.selectedVenue || 'Venue'}
+            </span>
           </h1>
           <p className="text-gray-400 font-black text-[11px] uppercase tracking-[0.2em] mt-2 flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-[#ff3366] animate-pulse"></span>
-            {booking.date}, {booking.time}
+            {booking.selectedVenue} · {booking.date}, {booking.time}
           </p>
         </div>
 
         <div className="grid md:grid-cols-12 gap-16 items-start">
-
-          <div className="md:col-span-8 flex flex-col items-center bg-white p-12 rounded-[40px] shadow-[0_15px_40px_rgba(0,0,0,0.08)] border border-white">
+          <div className="md:col-span-8 flex flex-col items-center bg-white p-12 rounded-[40px] shadow-[0_15px_40px_rgba(0,0,0,0.08)] border border-white transition-all hover:shadow-[0_20px_50px_rgba(0,0,0,0.12)]">
             <div className="w-3/4 h-1.5 bg-gray-200 rounded-full mb-20 relative shadow-sm">
-              <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-[9px] font-black text-gray-300 uppercase tracking-[0.5em]">Screen Area</span>
+              <div className="absolute inset-0 bg-gradient-to-b from-gray-300/20 to-transparent blur-xl -bottom-12"></div>
+              <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-[9px] font-black text-gray-300 uppercase tracking-[0.5em]">
+                Screen Area
+              </span>
             </div>
 
-            <div className="mx-auto w-full overflow-x-auto select-none">
-              <div className="space-y-4 mx-auto" style={{ width: `${matrixWidth}px` }}>
-                {currentLayout.rows.map((row, rowIndex) => (
-                  <div key={row} className="flex items-center gap-5 justify-center">
-                    <span className="text-[10px] font-black text-gray-300 w-4">
-                      {Array.from({ length: currentLayout.seatsPerRow }).some((_, seatIndex) => !removedSeats.has(`${row}${seatIndex + 1}`)) ? row : ''}
-                    </span>
-                    <div className="flex items-center gap-8">
-                      {seatSections.map((sectionCount, sectionIndex) => {
-                        const sectionStart = seatSections.slice(0, sectionIndex).reduce((sum, value) => sum + value, 0);
-                        return (
-                          <button
-                            key={seat.id}
-                            disabled={isTaken || isRedirecting}
-                            onClick={() => toggleSeat(seat.id)}
-                            className={`
-                              w-7 h-7 rounded-[8px] transition-all duration-300 relative group
-                              ${isTaken ? 'bg-gray-100 cursor-not-allowed opacity-50' : 
-                                isSelected ? 'bg-[#3a0e23] ring-4 ring-[#3a0e23]/10 scale-110 z-10' : 
-                                `${getCategoryColor(seat.seat_category.name)} hover:scale-125 hover:rotate-3 shadow-sm`}
-                            `}
-                          >
-                            {Array.from({ length: sectionCount }).map((_, localIndex) => {
-                              const seatIndex = sectionStart + localIndex;
-                              const seatId = `${row}${seatIndex + 1}`;
-                              if (removedSeats.has(seatId)) return <div key={seatId} className="w-7 h-7" title={`${seatId} removed`} />;
+            {loadingSeats && (
+              <div className="w-full text-center py-12 text-[#3a0e23] font-bold">
+                Loading seats...
+              </div>
+            )}
 
-                              const isSelected = selectedSeats.includes(seatId);
-                              const isTaken = isTakenSeat(seatId);
-                              const category = getSeatCategory(rowIndex, seatIndex);
+            {!loadingSeats && seatError && (
+              <div className="w-full text-center py-12 text-red-500 font-bold">
+                {seatError}
+              </div>
+            )}
+
+            {!loadingSeats && !seatError && (
+              <>
+                <div className="mx-auto w-full select-none">
+                  <div className="space-y-4">
+                    {Array.from(new Set(backendSeats.map((seat) => seat.row))).map((row) => {
+                      const rowSeats = backendSeats
+                        .filter((seat) => seat.row === row && seat.if_exist)
+                        .sort((a, b) => a.number - b.number);
+
+                      return (
+                        <div key={row} className="flex items-center gap-5 justify-center">
+                          <span className="text-[10px] font-black text-gray-300 w-4">{row}</span>
+
+                          <div className="flex items-center gap-2 flex-wrap max-w-[760px]">
+                            {rowSeats.map((seat) => {
+                              const seatLabel = `${seat.row}${seat.number}`;
+                              const isSelected = selectedSeatIds.includes(seat.id);
+                              const isTaken = seat.is_reserved;
+                              const category = normalizeCategory(seat.seat_category?.name);
 
                               return (
                                 <button
-                                  key={seatId}
+                                  key={seat.id}
+                                  type="button"
                                   disabled={isTaken || isRedirecting}
-                                  onClick={() => toggleSeat(seatId)}
+                                  onClick={() => toggleSeat(seat)}
                                   className="w-7 h-7 rounded-[8px] transition-all duration-300 relative group border"
                                   style={
                                     isTaken
@@ -217,73 +285,125 @@ const SeatSelection = () => {
                                             borderColor: `${CATEGORY_META[category].color}A0`,
                                           }
                                   }
-                                  title={seatId}
+                                  title={`${seatLabel} · $${seat.seat_category?.price ?? 0}`}
                                 >
                                   {!isTaken && (
-                                    <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[#3a0e23] text-white text-[8px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none font-bold z-20">
-                                      {seatId}
+                                    <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[#3a0e23] text-white text-[8px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none font-bold z-20 whitespace-nowrap">
+                                      {seatLabel}
                                     </span>
                                   )}
                                 </button>
                               );
                             })}
                           </div>
-                        );
+                        </div>
+                      );
                     })}
                   </div>
                 </div>
-              ))}
-            </div>
 
-            <div className="mt-16 pt-8 border-t border-gray-100 grid grid-cols-2 md:grid-cols-3 gap-y-4 gap-x-8 text-[9px] font-black uppercase tracking-widest text-gray-400">
-              <div className="flex items-center gap-3"><div className="w-4 h-4 rounded-md bg-orange-400 shadow-sm"/> Economy</div>
-              <div className="flex items-center gap-3"><div className="w-4 h-4 rounded-md bg-blue-400 shadow-sm"/> Standard</div>
-              <div className="flex items-center gap-3"><div className="w-4 h-4 rounded-md bg-emerald-400 shadow-sm"/> Premium</div>
-              <div className="flex items-center gap-3"><div className="w-4 h-4 rounded-md bg-indigo-400 shadow-sm"/> VIP</div>
-              <div className="flex items-center gap-3"><div className="w-4 h-4 rounded-md bg-[#3a0e23] shadow-sm"/> Selected</div>
-              <div className="flex items-center gap-3"><div className="w-4 h-4 rounded-md bg-gray-100"/> Taken</div>
-            </div>
+                <div className="mt-16 pt-8 border-t border-gray-100 grid grid-cols-2 md:grid-cols-3 gap-y-4 gap-x-8 text-[9px] font-black uppercase tracking-widest text-gray-400">
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="w-4 h-4 rounded-md"
+                      style={{ backgroundColor: CATEGORY_META.area1.color }}
+                    />{' '}
+                    {CATEGORY_META.area1.label}
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="w-4 h-4 rounded-md"
+                      style={{ backgroundColor: CATEGORY_META.area2.color }}
+                    />{' '}
+                    {CATEGORY_META.area2.label}
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="w-4 h-4 rounded-md"
+                      style={{ backgroundColor: CATEGORY_META.vip.color }}
+                    />{' '}
+                    {CATEGORY_META.vip.label}
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="w-4 h-4 rounded-md"
+                      style={{ backgroundColor: CATEGORY_META.handicap.color }}
+                    />{' '}
+                    {CATEGORY_META.handicap.label}
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-4 h-4 rounded-md bg-[#3a0e23] shadow-sm" /> Selected
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-4 h-4 rounded-md bg-gray-200" /> Taken
+                  </div>
+                </div>
+              </>
+            )}
           </div>
 
           <aside className="md:col-span-4 relative">
-            <div className="bg-white p-8 rounded-[35px] border border-white shadow-[0_25px_60px_rgba(0,0,0,0.12)] sticky top-28">
-              <h2 className="text-xl font-black mb-8 text-[#3a0e23] uppercase tracking-tighter italic">Your selection</h2>
-              
+            <div className="bg-white p-8 rounded-[35px] border border-white shadow-[0_25px_60px_rgba(0,0,0,0.12)] sticky top-28 transition-all hover:shadow-[0_30px_70px_rgba(0,0,0,0.18)]">
+              <h2 className="text-xl font-black mb-8 text-[#3a0e23] uppercase tracking-tighter italic">
+                Your selection
+              </h2>
+
               <div className="min-h-[120px] border-b border-gray-100 pb-8 mb-8">
-                <span className="text-gray-400 uppercase tracking-[0.2em] text-[10px] font-black">Selected seats:</span>
+                <span className="text-gray-400 uppercase tracking-[0.2em] text-[10px] font-black">
+                  Selected seats:
+                </span>
                 <div className="flex flex-wrap gap-2.5 mt-4">
-                  {selectedSeatIds.length > 0 ? (
-                    seats
-                      .filter(s => selectedSeatIds.includes(s.id))
-                      .map(seat => (
-                        <span key={seat.id} className="bg-[#f0f2f5] border border-gray-200 px-4 py-2 rounded-xl text-[11px] font-black text-[#3a0e23] shadow-sm">
-                          {seat.row}{seat.number}
-                        </span>
-                      ))
+                  {selectedSeats.length > 0 ? (
+                    [...selectedSeats].sort().map((seat) => (
+                      <span
+                        key={seat}
+                        className="bg-[#f0f2f5] border border-gray-200 px-4 py-2 rounded-xl text-[11px] font-black text-[#3a0e23] shadow-sm animate-in zoom-in duration-300"
+                      >
+                        {seat}
+                      </span>
+                    ))
                   ) : (
-                    <p className="text-[11px] italic text-gray-400 font-medium py-2 uppercase tracking-widest">Pick your spot...</p>
+                    <p className="text-[11px] italic text-gray-400 font-medium py-2 uppercase tracking-widest">
+                      Pick your seat...
+                    </p>
                   )}
                 </div>
               </div>
 
               <div className="flex justify-between items-center mb-8">
-                <span className="text-gray-400 uppercase tracking-[0.2em] text-[10px] font-black">Total Price:</span>
+                <span className="text-gray-400 uppercase tracking-[0.2em] text-[10px] font-black">
+                  Total Price:
+                </span>
                 <span className="text-2xl font-black text-[#3a0e23] tracking-tighter italic">
-                  ${currentTotalPrice.toFixed(2)} 
+                  ${currentTotalPrice}
                 </span>
               </div>
 
-              <button 
+              <button
+                onClick={randomizeDebugSeats}
+                disabled={isRedirecting || loadingSeats || !!seatError}
+                className="w-full mb-3 py-3 rounded-xl font-black text-[11px] uppercase tracking-[0.18em] transition-all border-2 border-[#3a0e23]/40 text-[#3a0e23] bg-[#f5f5dc] hover:bg-[#eee4d6] disabled:opacity-50"
+              >
+                Randomize Seats (Debug)
+              </button>
+
+              <button
                 onClick={handleProceedToPayment}
-                disabled={selectedSeatIds.length === 0 || isRedirecting}
+                disabled={selectedSeats.length === 0 || isRedirecting || loadingSeats || !!seatError}
                 className={`w-full py-5 rounded-2xl font-black text-[12px] uppercase tracking-[0.2em] transition-all shadow-xl active:scale-95 flex items-center justify-center gap-2
-                  ${selectedSeatIds.length > 0 && !isRedirecting
-                    ? 'bg-[#3a0e23] text-white hover:bg-black' 
-                    : 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none'}
+                  ${
+                    selectedSeats.length > 0 && !isRedirecting && !loadingSeats && !seatError
+                      ? 'bg-[#3a0e23] text-white hover:bg-black hover:shadow-[#3a0e23]/20'
+                      : 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none'
+                  }
                 `}
               >
                 {isRedirecting ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Proceed to payment'}
               </button>
+
+              <p className="text-center text-[9px] opacity-40 uppercase font-black tracking-widest mt-6 text-gray-500 italic">
+                Seats reserved for 10 min during checkout
+              </p>
             </div>
           </aside>
         </div>

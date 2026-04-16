@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 
 interface BookingData {
   eventId: string;
+  eventInstanceId: number | null;
   eventTitle: string;
   eventCategory: string;
   eventImageUrl: string;
@@ -11,6 +12,7 @@ interface BookingData {
   time: string;
   showSchedule: Array<{ date: string; times: string[] }>;
   seats: string[];
+  seatIds: number[];
   removedSeats: string[];
   totalPrice: number;
   selectedVenue: string;
@@ -30,6 +32,7 @@ interface BookingContextType {
 
 const initialBooking: BookingData = {
   eventId: '',
+  eventInstanceId: null,
   eventTitle: '',
   eventCategory: '',
   eventImageUrl: '',
@@ -39,6 +42,7 @@ const initialBooking: BookingData = {
   time: '',
   showSchedule: [],
   seats: [],
+  seatIds: [],
   removedSeats: [],
   totalPrice: 0,
   venueLayout: undefined,

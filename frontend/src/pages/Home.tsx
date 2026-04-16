@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Header from '../components/layout/Header';
 import { EventCard } from '../components/events/EventCard';
-import axios from 'axios';
+import { apiClient } from '../api/client';
 
 interface EventFromDB {
   id: number;
@@ -22,7 +22,7 @@ const [events, setEvents] = useState<EventFromDB[]>([]);
   useEffect(() => {
     const fetchEvents = async () => {
       try {
-        const response = await axios.get('http://localhost:8000/api/event-instances/');
+        const response = await apiClient.get('/event-instances/');
         setEvents(response.data);
       } catch (error) {
         console.error("Błąd pobierania danych z API:", error);
@@ -80,7 +80,17 @@ const uniqueEvents = events.reduce((acc: EventFromDB[], current) => {
                 key={event.id} 
                 className="transform transition-all duration-500 hover:-translate-y-3 hover:rotate-[0.5deg]"
               >
-                <EventCard event={event} />
+                <EventCard
+                  event={{
+                    id: String(event.id),
+                    title: event.title,
+                    venue: event.venue_name,
+                    type: event.type,
+                    price: event.price,
+                    seatsLeft: event.seatsLeft,
+                    imageUrl: event.image_url,
+                  }}
+                />
               </div>
             ))}
           </div>

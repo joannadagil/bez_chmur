@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, User, ArrowRight, UserPlus, Building2, Users } from 'lucide-react';
 import logo from '../assets/logo.png';
-import axios from 'axios';
+import { apiClient } from '../api/client';
 import logo_white from '../assets/logo_white.png';
 import { useTheme } from '../context/ThemeContext';
 
@@ -69,51 +69,49 @@ const Register = () => {
     if (!validateForm()) return;
 
     setIsLoading(true);
+    setErrors({});
 
     try {
-      const response = await axios.post('http://localhost:8000/api/register/', {
+      await apiClient.post('/register/', {
         email: formData.email,
         password: formData.password,
-        first_name: formData.firstName,
-        last_name: formData.lastName,
-        user_type: 'customer'
+        first_name: formData.accountType === 'customer' ? formData.firstName : '',
+        last_name: formData.accountType === 'customer' ? formData.lastName : '',
+        user_type: formData.accountType,
       });
 
-      navigate('/login');
+      const tokenResponse = await apiClient.post('/token/', {
+        username: formData.email,
+        password: formData.password,
+      });
+
+      const { access, refresh } = tokenResponse.data;
+
+      localStorage.setItem('access', access);
+      localStorage.setItem('refresh', refresh);
+      localStorage.setItem('isLoggedIn', 'true');
+
+      const newUser = {
+        firstName: formData.accountType === 'customer' ? formData.firstName : '',
+        lastName: formData.accountType === 'customer' ? formData.lastName : '',
+        companyName: formData.accountType === 'host' ? formData.companyName : '',
+        email: formData.email,
+        accountType: formData.accountType,
+        createdAt: new Date().toISOString(),
+      };
+
+      localStorage.setItem('currentUser', JSON.stringify(newUser));
+
+      navigate(formData.accountType === 'host' ? '/host-onboarding' : '/home');
     } catch (error: any) {
-      if (error.response?.data?.email) {
+      if (error?.response?.data?.email) {
         setErrors({ email: 'Account with this email already exists' });
       } else {
-        alert('Registration failed. Please try again.');
+        setErrors({ email: 'Registration failed. Please try again.' });
       }
     } finally {
       setIsLoading(false);
     }
-
-    // Store user data
-    const newUser = {
-      firstName: formData.accountType === 'customer' ? formData.firstName : '',
-      lastName: formData.accountType === 'customer' ? formData.lastName : '',
-      companyName: formData.accountType === 'host' ? formData.companyName : '',
-      email: formData.email,
-      password: formData.password, // In real app, this should be hashed
-      accountType: formData.accountType,
-      createdAt: new Date().toISOString()
-    };
-
-    // if (userExists) {
-    //   setErrors({ email: 'An account with this email already exists' });
-    //   setIsLoading(false);
-    //   return;
-    // }
-
-    // Simulate registration - replace with actual API call
-    setTimeout(() => {
-      localStorage.setItem('isLoggedIn', 'true');
-      localStorage.setItem('currentUser', JSON.stringify(newUser));
-      setIsLoading(false);
-      navigate(formData.accountType === 'host' ? '/host-onboarding' : '/home');
-    }, 1500);
   };
 
   const randomizeSignup = (type: 'customer' | 'host') => {

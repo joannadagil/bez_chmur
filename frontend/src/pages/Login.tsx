@@ -2,9 +2,10 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Eye, EyeOff, Mail, Lock, User, ArrowRight, Building2 } from 'lucide-react';
 import logo from '../assets/logo.png';
-import axios from 'axios';
 import logo_white from '../assets/logo_white.png';
 import { useTheme } from '../context/ThemeContext';
+
+import { apiClient } from '../api/client';
 
 const MOCK_HOST_USER = {
   firstName: '',
@@ -64,80 +65,94 @@ const Login = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const ensureMockHostAccount = () => {
-    const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
-    const hasHost = registeredUsers.some((u: any) => u.email?.toLowerCase() === MOCK_HOST_USER.email.toLowerCase());
-    if (!hasHost) {
-      registeredUsers.push(MOCK_HOST_USER);
-      localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
-    }
+  const loginWithBackend = async (
+    email: string,
+    password: string,
+    fallbackAccountType: 'customer' | 'host' = 'customer'
+  ) => {
+    const response = await apiClient.post('/token/', {
+      username: email,
+      password,
+    });
+
+    const { access, refresh } = response.data;
+
+    localStorage.setItem('access', access);
+    localStorage.setItem('refresh', refresh);
+    localStorage.setItem('isLoggedIn', 'true');
+
+    const currentUser = {
+      email,
+      accountType: fallbackAccountType,
+    };
+
+    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+
+    return currentUser;
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!validateForm()) return;
 
-    ensureMockHostAccount();
     setIsLoading(true);
+    setErrors({});
 
     try {
-      const response = await axios.post('http://localhost:8000/api/token/', {
-        username: formData.email,
-        password: formData.password
-      });
+      const isHost = HOST_EMAILS.has(formData.email.toLowerCase());
+      const currentUser = await loginWithBackend(
+        formData.email,
+        formData.password,
+        isHost ? 'host' : 'customer'
+      );
 
-      localStorage.setItem('token', response.data.access);
-      localStorage.setItem('isLoggedIn', 'true');
-      
-      navigate(formData.userType === 'customer' ? '/home' : '/role-selection');
-    } catch (error) {
-      setErrors({ email: 'Invalid credentials' });
+      navigate(currentUser.accountType === 'host' ? '/host-dashboard' : '/home');
+    } catch (error: any) {
+      if (error?.response?.status === 401) {
+        setErrors({ password: 'Incorrect email or password' });
+      } else {
+        setErrors({ email: 'Login failed. Please try again.' });
+      }
     } finally {
       setIsLoading(false);
-      const isHost = HOST_EMAILS.has(user.email.toLowerCase()) || user.accountType === 'host';
-      const needsOnboarding = isHost && (!user.nip || !user.companyName || !user.address);
-      navigate(isHost ? (needsOnboarding ? '/host-onboarding' : '/host-dashboard') : '/home');
-    }, 1500);
-  };
-
-  const handleQuickLogin = () => {
-    ensureMockHostAccount();
-    const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
-    const quickUser = registeredUsers.find((u: any) => u.email === 'john.doe@example.com');
-
-    if (quickUser) {
-      localStorage.setItem('isLoggedIn', 'true');
-      localStorage.setItem('currentUser', JSON.stringify(quickUser));
-      navigate('/home');
-    } else {
-      // If quick user doesn't exist, create it
-      const newUser = {
-        firstName: 'John',
-        lastName: 'Doe',
-        email: 'john.doe@example.com',
-        password: 'Password123!',
-        createdAt: new Date().toISOString()
-      };
-      registeredUsers.push(newUser);
-      localStorage.setItem('registeredUsers', JSON.stringify(registeredUsers));
-      localStorage.setItem('isLoggedIn', 'true');
-      localStorage.setItem('currentUser', JSON.stringify(newUser));
-      navigate('/home');
     }
   };
 
-  const handleHostQuickLogin = () => {
-    ensureMockHostAccount();
-    const registeredUsers = JSON.parse(localStorage.getItem('registeredUsers') || '[]');
-    const hostUser = registeredUsers.find((u: any) => u.email?.toLowerCase() === MOCK_HOST_USER.email.toLowerCase());
-    if (!hostUser) return;
+  const handleQuickLogin = async () => {
+    setIsLoading(true);
+    setErrors({});
 
-    localStorage.setItem('isLoggedIn', 'true');
-    localStorage.setItem('currentUser', JSON.stringify(hostUser));
-    const needsOnboarding = !hostUser.nip || !hostUser.companyName || !hostUser.address;
-    navigate(needsOnboarding ? '/host-onboarding' : '/host-dashboard');
+    try {
+      await loginWithBackend('john.doe@example.com', 'Password123!', 'customer');
+      navigate('/home');
+    } catch (error: any) {
+      if (error?.response?.status === 401) {
+        setErrors({ email: 'Quick login failed: demo customer does not exist in backend.' });
+      } else {
+        setErrors({ email: 'Quick login failed. Please try again.' });
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
+  const handleHostQuickLogin = async () => {
+    setIsLoading(true);
+    setErrors({});
+
+    try {
+      await loginWithBackend(MOCK_HOST_USER.email, MOCK_HOST_USER.password, 'host');
+      navigate('/host-dashboard');
+    } catch (error: any) {
+      if (error?.response?.status === 401) {
+        setErrors({ email: 'Quick login failed: demo host does not exist in backend.' });
+      } else {
+        setErrors({ email: 'Quick login failed. Please try again.' });
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#f27690] via-[#ffbb9c] to-[#fff2c4] flex items-center justify-center p-4" style={{ fontFamily: 'TT Firs Neue, sans-serif' }}>
       <div className="w-full max-w-md">
@@ -165,6 +180,7 @@ const Login = () => {
           {/* Quick Login Button */}
           <button
             onClick={handleQuickLogin}
+            disabled={isLoading}
             className="w-full mb-6 bg-[#f5f5dc] text-[#3a0e23] py-3 px-4 rounded-xl font-bold hover:bg-[#e71555] hover:text-white transition-colors border-2 border-[#e71555] flex items-center justify-center gap-2"
           >
             <User className="w-5 h-5" />
@@ -173,6 +189,7 @@ const Login = () => {
 
           <button
             onClick={handleHostQuickLogin}
+            disabled={isLoading}
             className="w-full mb-6 bg-[#3a0e23] text-white py-3 px-4 rounded-xl font-bold hover:bg-[#5a1636] transition-colors border-2 border-[#3a0e23] flex items-center justify-center gap-2"
           >
             <Building2 className="w-5 h-5" />

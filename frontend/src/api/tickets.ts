@@ -1,5 +1,15 @@
 import { apiClient } from './client';
 
+type BackendOrderDto = {
+  id: number;
+  user_email: string;
+  user_full_name: string;
+  event_name: string;
+  date: string;
+  status: string;
+  seats: string[];
+};
+
 export type TicketDto = {
   id: number;
   title: string;
@@ -11,26 +21,36 @@ export type TicketDto = {
   is_past: boolean;
 };
 
-export type CreateOrderPayload = {
-  email: string;
-  first_name?: string;
-  last_name?: string;
-  event_title: string;
-  venue_name: string;
-  event_date?: string;
-  event_time?: string;
-  seats: string[];
-  total_price: number;
+type CreateOrderPayload = {
+  event_instance_id: number;
+  seat_ids: number[];
 };
 
-export const fetchMyTickets = async (email: string): Promise<TicketDto[]> => {
-  const response = await apiClient.get<TicketDto[]>('/tickets/', {
-    params: { email },
+export const fetchMyTickets = async (): Promise<TicketDto[]> => {
+  const response = await apiClient.get<BackendOrderDto[]>('/user-order/');
+
+  return response.data.map((order) => {
+    const dt = new Date(order.date);
+
+    return {
+      id: order.id,
+      title: order.event_name,
+      venue: 'Unknown venue', // TODO This should ideally come from the backend
+      date: dt.toLocaleDateString(),
+      time: dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      seats: order.seats,
+      status: order.status,
+      is_past: dt.getTime() < Date.now(),
+    };
   });
-  return response.data;
 };
 
-export const createOrder = async (payload: CreateOrderPayload): Promise<{ order_id: number }> => {
-  const response = await apiClient.post<{ order_id: number }>('/orders/', payload);
+export const createOrder = async (
+  payload: CreateOrderPayload
+): Promise<{ order_id: number; message: string }> => {
+  const response = await apiClient.post<{ order_id: number; message: string }>(
+    '/book-seats/',
+    payload
+  );
   return response.data;
 };

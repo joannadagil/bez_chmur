@@ -10,6 +10,14 @@ interface HeaderProps {
   onSearchChange: (query: string) => void;
 }
 
+const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+
+const displayName =
+  currentUser.companyName ||
+  [currentUser.firstName, currentUser.lastName].filter(Boolean).join(' ') ||
+  currentUser.email?.split('@')[0] ||
+  'User';
+
 const Header: React.FC<HeaderProps> = ({ activeFilter, onFilterChange, onSearchChange }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const navigate = useNavigate();
@@ -70,7 +78,9 @@ const Header: React.FC<HeaderProps> = ({ activeFilter, onFilterChange, onSearchC
                 <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center border border-white/10">
                   <User size={14} />
                 </div>
-                <span className="text-[10px] font-black uppercase tracking-widest">{currentUser.firstName || 'John'}</span>
+                <span className="text-[10px] font-black uppercase tracking-widest">
+                  {displayName}
+                </span>
                 <ChevronDown size={12} className={`transition-transform duration-300 ${isProfileOpen ? 'rotate-180' : ''}`} />
               </div>
 
@@ -108,6 +118,8 @@ const Header: React.FC<HeaderProps> = ({ activeFilter, onFilterChange, onSearchC
                   <button
                     className="profile-menu-item flex w-full items-center gap-3 p-3 hover:bg-red-50 text-red-600 rounded-xl text-[11px] font-black uppercase tracking-wider"
                     onClick={() => {
+                      localStorage.removeItem('access');
+                      localStorage.removeItem('refresh');
                       localStorage.removeItem('isLoggedIn');
                       localStorage.removeItem('currentUser');
                       setIsProfileOpen(false);

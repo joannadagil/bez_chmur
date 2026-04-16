@@ -20,14 +20,8 @@ const MyTickets = () => {
     let ignore = false;
 
     const loadTickets = async () => {
-      if (!currentUser?.email) {
-        setError('You need to be logged in to view tickets.');
-        setLoading(false);
-        return;
-      }
-
       try {
-        const data = await fetchMyTickets(currentUser.email);
+        const data = await fetchMyTickets();
         if (!ignore) {
           setTickets(data);
           setError('');
@@ -47,7 +41,7 @@ const MyTickets = () => {
     return () => {
       ignore = true;
     };
-  }, [currentUser?.email]);
+  }, []);
 
   const allTickets = useMemo(
     () =>
@@ -94,6 +88,8 @@ const MyTickets = () => {
       icon: LogOut,
       danger: true,
       onClick: () => {
+        localStorage.removeItem('access');
+        localStorage.removeItem('refresh');
         localStorage.removeItem('isLoggedIn');
         localStorage.removeItem('currentUser');
         navigate('/login');
