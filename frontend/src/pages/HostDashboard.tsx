@@ -142,6 +142,8 @@ const HostDashboard = () => {
                       <button
                         className="profile-menu-item flex w-full items-center gap-3 p-3 hover:bg-red-50 text-red-600 rounded-xl text-[11px] font-black uppercase tracking-wider"
                         onClick={() => {
+                          localStorage.removeItem('access');
+                          localStorage.removeItem('refresh');
                           localStorage.removeItem('isLoggedIn');
                           localStorage.removeItem('currentUser');
                           setIsProfileOpen(false);

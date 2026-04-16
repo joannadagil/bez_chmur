@@ -17,16 +17,8 @@ const TicketView = () => {
     let ignore = false;
 
     const loadTicket = async () => {
-      if (!currentUser?.email) {
-        if (!ignore) {
-          setError('You need to be logged in to view this ticket.');
-          setLoading(false);
-        }
-        return;
-      }
-
       try {
-        const data = await fetchMyTickets(currentUser.email);
+        const data = await fetchMyTickets();
         const selected = data.find((item) => String(item.id) === String(id));
         if (!ignore) {
           if (!selected) {
@@ -53,7 +45,7 @@ const TicketView = () => {
     return () => {
       ignore = true;
     };
-  }, [currentUser?.email, id]);
+  }, [id]);
 
   const displayName = useMemo(() => {
     if (currentUser?.companyName) return currentUser.companyName;

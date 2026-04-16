@@ -576,15 +576,15 @@ ALTER TABLE public.django_session OWNER TO myuser;
 --
 
 COPY public.api_event (id, name, description, category_id, image_url) FROM stdin;
-1	Dune: Part Two		1	https://www.superherotoystore.com/cdn/shop/articles/dune-part-two-2024-5k-rl-3840x2400_1600x.jpg?v=1709290352
-2	Romeo and Juliet		2	https://cdn.svvoice.com/wp-content/uploads/2019/06/18020648/3-Balcony-credit-Jay-Yamada-Copy.jpg
-3	AI & Society - Open Lecture		3	https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=500&auto=format&fit=crop
-4	La La Land - City of Stars		1	https://occ-0-8407-2219.1.nflxso.net/dnm/api/v6/6AYY37jfdO6hpXcMjf9Yu5cnmO0/AAAABe0k0-UurHVbx9fm2hTVfoTVYElSw7GWMcvc1JAfGPsqraunVJBWewzMWxs8GmB4an5YQM1BPv3Y37wubHYKAJZ50hBn0oEfpX-m.jpg?r=ada
-5	Beetlejuice The Musical		2	https://beetlejuicethemusical.com.au/wp-content/uploads/2025/06/beetlejuice-title.jpg
-6	Moulin Rouge! The Musical		2	https://aws-tiqets-cdn.imgix.net/images/content/af800c2a213a46b28e696d9efae8fcba.jpg?auto=format%2Ccompress&fit=crop&q=70&w=600&s=61daa83f62dc8edda6220caaa0ea0639
-7	Poor Things		1	https://disney.images.edge.bamgrid.com/ripcut-delivery/v2/variant/disney/019b2681-dd36-726b-acb2-b16a5872d0b6/compose?aspectRatio=1.78&format=webp&width=1200
-8	Phantom of the Opera		2	https://d28054jbxkgsih.cloudfront.net/uploads/_fullCroppedImage/CML_Production-Page-Banner_1920x1080_3_AW.jpg?v=1764185437
-9	The Secret Life of Trees		3	https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?auto=format&fit=crop&q=80&w=800
+1	Dune: Part Two	Paul Atreides joins the Fremen on Arrakis and rises toward a dangerous destiny shaped by prophecy, war, and the struggle for power.	1	https://www.superherotoystore.com/cdn/shop/articles/dune-part-two-2024-5k-rl-3840x2400_1600x.jpg?v=1709290352
+2	Romeo and Juliet	A tragic love story about two young lovers from rival families whose secret romance leads to heartbreak, conflict, and one of theatres most famous endings.	2	https://cdn.svvoice.com/wp-content/uploads/2019/06/18020648/3-Balcony-credit-Jay-Yamada-Copy.jpg
+3	AI & Society - Open Lecture	An open lecture exploring how artificial intelligence shapes modern society, from work and education to ethics, creativity, and public policy.	3	https://images.unsplash.com/photo-1518770660439-4636190af475?q=80&w=500&auto=format&fit=crop
+4	La La Land - City of Stars	A vibrant musical film about love, ambition, and sacrifice as two artists in Los Angeles chase their dreams while navigating their relationship.	1	https://occ-0-8407-2219.1.nflxso.net/dnm/api/v6/6AYY37jfdO6hpXcMjf9Yu5cnmO0/AAAABe0k0-UurHVbx9fm2hTVfoTVYElSw7GWMcvc1JAfGPsqraunVJBWewzMWxs8GmB4an5YQM1BPv3Y37wubHYKAJZ50hBn0oEfpX-m.jpg?r=ada
+5	Beetlejuice The Musical	A chaotic and darkly funny musical in which a mischievous ghost causes havoc while the living and the dead collide in spectacular fashion.	2	https://beetlejuicethemusical.com.au/wp-content/uploads/2025/06/beetlejuice-title.jpg
+6	Moulin Rouge! The Musical	A dazzling stage musical of romance, spectacle, and heartbreak set in bohemian Paris, where passion and performance collide under the lights of the Moulin Rouge.	2	https://aws-tiqets-cdn.imgix.net/images/content/af800c2a213a46b28e696d9efae8fcba.jpg?auto=format%2Ccompress&fit=crop&q=70&w=600&s=61daa83f62dc8edda6220caaa0ea0639
+7	Poor Things	A surreal and visually bold story of self-discovery, freedom, and transformation following a young woman reborn into an unusual new life.	1	https://disney.images.edge.bamgrid.com/ripcut-delivery/v2/variant/disney/019b2681-dd36-726b-acb2-b16a5872d0b6/compose?aspectRatio=1.78&format=webp&width=1200
+8	Phantom of the Opera	A gothic musical about obsession, genius, and love beneath the Paris Opera, where a mysterious masked figure haunts the stage and its stars.	2	https://d28054jbxkgsih.cloudfront.net/uploads/_fullCroppedImage/CML_Production-Page-Banner_1920x1080_3_AW.jpg?v=1764185437
+9	The Secret Life of Trees	A reflective lecture on the hidden systems of forests, exploring how trees communicate, adapt, and shape the ecosystems around them.	3	https://images.unsplash.com/photo-1542273917363-3b1817f69a2d?auto=format&fit=crop&q=80&w=800
 \.
 
 
@@ -604,16 +604,18 @@ COPY public.api_eventcategory (id, name) FROM stdin;
 --
 
 COPY public.api_eventinstance (id, "time", event_id, venue_id) FROM stdin;
-1	2026-04-01 15:38:28.712633+00	1	1
-2	2026-04-01 15:38:28.893536+00	2	2
-3	2026-04-01 15:38:29.074387+00	3	3
-4	2026-04-01 15:38:29.251441+00	4	4
-5	2026-04-01 15:38:29.430544+00	5	5
-6	2026-04-01 15:38:29.610706+00	6	6
-7	2026-04-01 15:38:29.792693+00	7	7
-8	2026-04-01 15:38:29.969906+00	8	8
-9	2026-04-01 15:38:30.146909+00	9	9
+1	2026-05-01 15:38:28.712633+00	1	1
+2	2026-05-01 15:38:28.893536+00	2	2
+3	2026-05-01 15:38:29.074387+00	3	3
+4	2026-05-01 15:38:29.251441+00	4	4
+5	2026-05-01 15:38:29.430544+00	5	5
+6	2026-05-01 15:38:29.610706+00	6	6
+7	2026-05-01 15:38:29.792693+00	7	7
+8	2026-05-01 15:38:29.969906+00	8	8
+9	2026-05-01 15:38:30.146909+00	9	9
 \.
+
+
 
 
 --

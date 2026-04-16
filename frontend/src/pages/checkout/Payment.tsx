@@ -24,11 +24,11 @@ export const Payment: React.FC = () => {
     const timer = setInterval(() => setTimeLeft(prev => prev - 1), 1000);
     return () => clearInterval(timer);
   }, [timeLeft]);
-useEffect(() => {
-  if (booking.seats.length === 0) {
-    navigate('/');
-  }
-}, [booking, navigate]);
+  useEffect(() => {
+    if (booking.seats.length === 0) {
+      navigate('/');
+    }
+  }, [booking, navigate]);
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
@@ -110,9 +110,8 @@ const handlePayment = async (e: React.FormEvent) => {
     
     if (!validateForm()) return;
 
-    const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-    if (!currentUser?.email) {
-      setSubmissionError('You need to be logged in before completing payment.');
+    if (!booking.eventInstanceId || booking.seatIds.length === 0) {
+      setSubmissionError('Missing booking details. Please reselect your seats.');
       return;
     }
 
@@ -121,24 +120,18 @@ const handlePayment = async (e: React.FormEvent) => {
 
     try {
       await createOrder({
-        email: currentUser.email,
-        first_name: currentUser.firstName || '',
-        last_name: currentUser.lastName || '',
-        event_title: booking.eventTitle,
-        venue_name: booking.selectedVenue,
-        event_date: booking.date,
-        event_time: booking.time,
-        seats: booking.seats,
-        total_price: booking.totalPrice,
+        event_instance_id: booking.eventInstanceId,
+        seat_ids: booking.seatIds,
       });
 
-      setIsProcessing(false);
       navigate('/checkout/success');
     } catch {
-      setIsProcessing(false);
       setSubmissionError('Could not complete payment right now. Please try again.');
+    } finally {
+      setIsProcessing(false);
     }
   };
+
   const getInputClass = (fieldName: string) => `
     w-full bg-[#fcfbff] border-2 rounded-2xl p-4.5 text-sm font-bold shadow-sm transition-all outline-none
     ${errors[fieldName] ? 'border-red-400 focus:border-red-400' : 'border-gray-50 focus:border-[#3a0e23]'}
