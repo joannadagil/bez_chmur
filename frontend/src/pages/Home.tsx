@@ -66,12 +66,14 @@ const uniqueEvents = events.reduce((acc: EventFromDB[], current) => {
 
       <main className="max-w-[1600px] mx-auto p-10 space-y-12">
         
-        <div className="flex items-center gap-4 px-4 animate-in fade-in slide-in-from-left-4 duration-700">
-          <div className="w-4 h-4 rounded-full bg-[#d3265b] shadow-[0_0_15px_rgba(211,38,91,0.4)] animate-pulse"></div>
-          <p className="text-3xl font-black text-[#3a0e23] uppercase tracking-tighter italic leading-none">
-            {filteredEvents.length} {activeFilter === 'ALL EVENTS' ? 'upcoming' : activeFilter.toLowerCase()} events
-          </p>
-        </div>
+<div className="flex items-center gap-4 px-4 animate-in fade-in slide-in-from-left-4 duration-700">
+  <div className="w-4 h-4 rounded-full bg-[#d3265b] shadow-[0_0_15px_rgba(211,38,91,0.4)] animate-pulse"></div>
+  <p className="text-3xl font-black text-[#3a0e23] uppercase tracking-tighter italic leading-none">
+    {filteredEvents.length}{' '}
+    {activeFilter === 'ALL EVENTS' ? 'upcoming' : activeFilter.toLowerCase()}{' '}
+    {filteredEvents.length === 1 ? 'event' : 'events'}
+  </p>
+</div>
 
         {filteredEvents.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-8 gap-y-12 pb-20">
