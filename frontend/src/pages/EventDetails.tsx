@@ -239,21 +239,31 @@ const EventDetails = () => {
         </div>
       )}
 
-      <div className="relative h-[260px] bg-gradient-to-r from-[#ffafbd] via-[#ffbcc7] to-[#fcfbff] border-b border-[#f0bcc7]">
-        <div className="max-w-[1100px] mx-auto px-8 h-full flex items-center gap-10 relative">
-          <div className="relative w-[160px] h-[230px] flex-shrink-0 z-20 shadow-2xl transition-transform duration-500 hover:scale-105 cursor-pointer group">
+
+      <div className="relative min-h-[350px] w-full overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <img 
+            src={selectedEvent.image_url} 
+            className="w-full h-full object-cover blur-sm brightness-50 scale-105" 
+            alt=""
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-[#fcfbff] via-transparent to-black/20"></div>
+        </div>
+
+        <div className="max-w-[1100px] mx-auto px-8 h-full min-h-[350px] flex flex-col md:flex-row items-end md:items-center gap-10 relative z-10 pb-10 md:pb-0">
+          <div className="relative w-[220px] md:w-[280px] shrink-0 shadow-2xl transition-transform duration-500 hover:scale-105 cursor-pointer group">
             <img
               src={selectedEvent.image_url}
-              className="w-full h-full object-cover rounded-xl border-[4px] border-white transition-all group-hover:border-[#ffafbd]"
+              className="w-full h-auto rounded-2xl border-[4px] border-white shadow-2xl transition-all group-hover:border-[#ffafbd]"
               alt={selectedEvent.title}
             />
           </div>
 
-          <div className="space-y-4 pt-4">
-            <h1 className="text-5xl font-black text-white tracking-tighter drop-shadow-lg leading-tight uppercase">
+          <div className="space-y-6 flex-1 text-white pb-6">
+            <h1 className="text-5xl md:text-7xl font-black tracking-tighter drop-shadow-2xl leading-tight uppercase">
               {eventTitle}
             </h1>
-            <div className="flex gap-2.5">
+            <div className="flex flex-wrap gap-3">
               {[
                 selectedEvent.type,
                 Number(selectedEvent.price) > 0 ? `$${selectedEvent.price}` : 'Free',
@@ -261,7 +271,7 @@ const EventDetails = () => {
               ].map((tag) => (
                 <span
                   key={tag}
-                  className="bg-[#2d6a7a] text-white px-5 py-2 rounded-full font-bold text-[10px] uppercase tracking-widest shadow-md transition-transform hover:-translate-y-0.5"
+                  className="bg-white/20 backdrop-blur-md text-white border border-white/30 px-6 py-2.5 rounded-full font-bold text-[11px] uppercase tracking-widest shadow-lg"
                 >
                   {tag}
                 </span>
@@ -270,6 +280,7 @@ const EventDetails = () => {
           </div>
         </div>
       </div>
+
 
       <main className="max-w-[1100px] mx-auto px-8 py-12 flex flex-col md:grid md:grid-cols-12 gap-12">
         <div className="md:col-span-8 space-y-12">

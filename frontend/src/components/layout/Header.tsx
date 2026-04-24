@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, Settings, LogOut, Ticket, ChevronDown, User, Bell } from 'lucide-react';
 import logo from '../../assets/logo_white.png';
+import tape from '../../assets/tape.png';
 import ThemeToggle from './ThemeToggle';
 
 interface HeaderProps {
@@ -26,9 +27,14 @@ const Header: React.FC<HeaderProps> = ({ activeFilter, onFilterChange, onSearchC
   const filters = ['ALL EVENTS', 'CINEMA', 'THEATRE', 'LECTURE HALL'];
 
   return (
-    <header className="flex flex-col md:flex-row h-auto md:h-[320px] overflow-hidden shadow-2xl w-full">
+    <header className="flex flex-col md:flex-row h-auto md:h-[320px] hadow-2xl w-full relative z-[100]">
       <div className="flex-grow bg-gradient-to-br from-[#f27690] to-[#ffbb9c] p-10 flex flex-col justify-between relative">
-        <div className="space-y-4">
+        <img 
+          src={tape} 
+          alt=""
+          className="absolute right-0 bottom-0 h-full w-auto object-contain pointer-events-none select-none tape-visual" 
+        />
+        <div className="space-y-4 relative z-10">
           <h1 className="text-5xl lg:text-6xl font-black text-[#d3265b] tracking-tighter italic drop-shadow-sm leading-none uppercase">
             FIND YOUR NEXT EVENT
           </h1>
@@ -53,13 +59,13 @@ const Header: React.FC<HeaderProps> = ({ activeFilter, onFilterChange, onSearchC
           ))}
         </div>
       </div>
-      <div className="w-full md:w-[420px] bg-gradient-to-b from-[#d3265b] to-[#a11d45] p-10 text-white flex flex-col relative shadow-inner overflow-hidden">
+      <div className="w-full md:w-[420px] bg-gradient-to-b from-[#d3265b] to-[#a11d45] p-10 text-white flex flex-col relative shadow-inner">
         
 
         <div className="absolute top-[20%] right-[-10%] w-[200px] h-[200px] bg-white/5 rounded-full blur-[50px] pointer-events-none"></div>
         <div className="absolute inset-0 opacity-[0.02] mix-blend-overlay pointer-events-none" style={{ backgroundImage: `url("https://www.transparenttextures.com/patterns/stardust.png")` }}></div>
 
-        <div className="relative z-10 flex justify-between items-center mb-10">
+        <div className="relative z-20 flex justify-between items-center mb-10">
           <img 
             src={logo} 
             alt="getAroom Logo" 
@@ -144,9 +150,9 @@ const Header: React.FC<HeaderProps> = ({ activeFilter, onFilterChange, onSearchC
           <div className="relative group">
             <input 
               type="text" 
-              placeholder="Movie, theatre, city..." 
+              placeholder="Movies, plays or venues..." 
               onChange={(e) => onSearchChange(e.target.value)} 
-              className="w-full bg-white/5 border border-white/10 rounded-2xl text-white placeholder-white/20 px-5 py-4 outline-none focus:bg-white/10 focus:border-white/30 transition-all font-bold text-base shadow-inner"
+              className="w-full bg-white/25 border border-white/40 rounded-2xl text-white placeholder-white/50 px-5 py-4 outline-none focus:bg-white/20 focus:border-white/40 transition-all font-bold text-base shadow-inner"
             />
             <Search className="absolute right-5 top-1/2 -translate-y-1/2 w-5 h-5 opacity-20 group-focus-within:opacity-100 transition-opacity" />
           </div>

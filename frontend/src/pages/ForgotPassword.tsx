@@ -31,7 +31,6 @@ const ForgotPassword = () => {
 
     setIsLoading(true);
 
-    // Simulate password reset request
     setTimeout(() => {
       setIsLoading(false);
       setIsSuccess(true);
@@ -40,19 +39,14 @@ const ForgotPassword = () => {
 
   if (isSuccess) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-[#f05258] to-[#ff66c4] flex items-center justify-center p-4" style={{ fontFamily: 'TT Firs Neue, sans-serif' }}>
+      <div className="min-h-screen bg-gradient-to-br from-[#f27690] via-[#ffbb9c] to-[#fff2c4] flex items-center justify-center p-4" style={{ fontFamily: 'TT Firs Neue, sans-serif' }}>
         <div className="w-full max-w-md">
-          {/* Logo */}
           <div className="text-center mb-8">
             <div className="flex justify-center mb-6">
-              <img src={authLogo} alt="getAroom Logo" className="w-250 h-30" />
+              <img src={authLogo} alt="getAroom Logo" className="w-250 h-30 object-contain cursor-pointer" />
             </div>
-            {/* <h1 className="text-4xl font-black text-[#d3265b] uppercase tracking-tighter italic mb-2" style={{ fontFamily: 'Placard Next, sans-serif' }}>
-              find or or create your next event
-            </h1> */}
           </div>
 
-          {/* Success Message */}
           <div className="bg-white rounded-3xl shadow-2xl p-8 text-center">
             <div className="w-16 h-16 bg-green-100 rounded-full mx-auto mb-6 flex items-center justify-center">
               <CheckCircle className="w-8 h-8 text-green-600" />
@@ -96,22 +90,17 @@ const ForgotPassword = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#f27690] via-[#ffbb9c] to-[#fff2c4] flex items-center justify-center p-4" style={{ fontFamily: 'TT Firs Neue, sans-serif' }}>
       <div className="w-full max-w-md">
-        {/* Logo */}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-6">
             <img
               src={authLogo}
               alt="getAroom Logo"
-              className="w-24 h-24 object-contain cursor-pointer"
+              className="w-250 h-30 object-contain cursor-pointer"
               onClick={() => navigate(isLoggedIn ? '/home' : '/login')}
             />
           </div>
-          <h1 className="text-4xl font-black text-[#d3265b] uppercase tracking-tighter italic mb-2" style={{ fontFamily: 'Placard Next, sans-serif' }}>
-            find/create your next event
-          </h1>
         </div>
 
-        {/* Forgot Password Form */}
         <div className="bg-white rounded-3xl shadow-2xl p-8">
           <h2 className="text-2xl font-black text-[#d3265b] uppercase tracking-tighter mb-6 text-center" style={{ fontFamily: 'TT Firs Neue, sans-serif' }}>
             Forgot your password?
