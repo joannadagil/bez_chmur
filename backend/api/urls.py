@@ -16,7 +16,8 @@ from .views import (
 )
 
 urlpatterns = [
-    path('event-instances/', EventListView.as_view()), 
+    path('event-instances/', EventListView.as_view()),
+    path('host-events/', EventListView.as_view()),
     path('event-instances/<int:pk>/seats/', EventInstanceSeatsListView.as_view()),
     path('venues/', VenueListCreateView.as_view()),
     path('events/', EventListCreateView.as_view()),
