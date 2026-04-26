@@ -12,18 +12,13 @@ from .models import (
     Group,
     )
 
-class EventSerializer(serializers.ModelSerializer):
+class EventReadSerializer(serializers.ModelSerializer):
     title = serializers.CharField(source='event.name', read_only=True)
     image_url = serializers.CharField(source='event.image_url', read_only=True)
     venue_name = serializers.CharField(source='venue.name', read_only=True)
     type = serializers.CharField(source='event.category.name', read_only=True)
     description = serializers.CharField(source='event.description', read_only=True)
     
-   
-    event = serializers.PrimaryKeyRelatedField(queryset=Event.objects.all(), write_only=True)
-    venue = serializers.PrimaryKeyRelatedField(queryset=Venue.objects.all(), write_only=True)
-    
-
     price = serializers.SerializerMethodField()
     seatsLeft = serializers.SerializerMethodField()
 
@@ -45,6 +40,45 @@ class EventSerializer(serializers.ModelSerializer):
             order__status__in=['pending', 'paid']
         ).count()
         return total_seats - occupied_seats
+    
+class EventCreateSerializer(serializers.ModelSerializer):
+    event_name = serializers.CharField(write_only=True)
+    event_description = serializers.CharField(write_only=True, required=False, allow_blank=True)
+    event_image_url = serializers.URLField(write_only=True, required=False, allow_null=True)
+    category = serializers.PrimaryKeyRelatedField(queryset=EventCategory.objects.all(), write_only=True)
+    
+    venue_name = serializers.CharField(write_only=True)
+    venue_rows = serializers.IntegerField(write_only=True)
+    venue_seats_per_row = serializers.IntegerField(write_only=True)
+    
+    time = serializers.DateTimeField()
+
+    class Meta:
+        model = EventInstance
+        fields = [
+            'event_name', 'event_description', 'event_image_url', 'category',
+            'venue_name', 'venue_rows', 'venue_seats_per_row', 'time'
+        ]
+
+    def create(self, validated_data):
+        event = Event.objects.create(
+            name=validated_data.pop('event_name'),
+            description=validated_data.pop('event_description', ''),
+            image_url=validated_data.pop('event_image_url', None),
+            category=validated_data.pop('category')
+        )
+        
+        venue = Venue.objects.create(
+            name=validated_data.pop('venue_name'),
+            rows=validated_data.pop('venue_rows'),
+            seats_per_row=validated_data.pop('venue_seats_per_row')
+        )
+        
+        return EventInstance.objects.create(
+            event=event,
+            venue=venue,
+            time=validated_data.pop('time')
+        )
     
 class VenueSerializer(serializers.ModelSerializer):
     class Meta:

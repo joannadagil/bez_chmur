@@ -19,17 +19,27 @@ from .serializers import (
     VenueSerializer,
     EventModelSerializer,
     EventCategorySerializer,
-    EventSerializer,
     EventSeatSerializer,
     UserOrderSerializer,
     UserSerializer,
     RegisterSerializer,
+    EventCreateSerializer,
+    EventReadSerializer,
     )
 
 
 class EventListView(generics.ListCreateAPIView):
     queryset = EventInstance.objects.select_related('event', 'venue', 'event__category').all()
-    serializer_class = EventSerializer
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return EventCreateSerializer
+        return EventReadSerializer
+
+    def get_permissions(self):
+        if self.request.method == 'POST':
+            return [permissions.IsAuthenticated()]
+        return [permissions.AllowAny()]
    
 
 class VenueListCreateView(generics.ListCreateAPIView):
