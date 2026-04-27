@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Search, Settings, LogOut, Ticket, ChevronDown, User, Bell } from 'lucide-react';
-import logo from '../../assets/logo_white.png';
+import logo from '../../assets/logo_white_1.png';
 import tape from '../../assets/tape.png';
 import ThemeToggle from './ThemeToggle';
 
