@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Plus, Building2, ChevronDown, Settings, LogOut, Bell } from 'lucide-react';
 import { EventCard } from '../components/events/EventCard';
 import { fetchHostEvents, type HostEventDto } from '../api/hostEvents';
-import logo from '../assets/logo_white.png';
+import logo from '../assets/logo_white_1.png';
 import ThemeToggle from '../components/layout/ThemeToggle';
 
 const HostDashboard = () => {

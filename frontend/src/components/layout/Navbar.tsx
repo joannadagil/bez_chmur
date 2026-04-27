@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { User, LogOut, Settings, Ticket, ChevronLeft, Building2, Bell } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
-import logo_white from '../../assets/logo_white.png';
+import logo_white_1 from '../../assets/logo_white_1.png';
 import ThemeToggle from './ThemeToggle';
 
 interface NavbarProps {
@@ -53,7 +53,7 @@ const Navbar: React.FC<NavbarProps> = ({ hideTicketsLink = false, logoLink, user
 
         <Link to={finalLogoLink} className="flex items-center gap-2 no-underline group">
           <img
-            src={logo_white}
+            src={logo_white_1}
             alt="getAroom Logo"
             className="w-22 h-12 object-contain group-hover:scale-110 transition-transform"
           />
