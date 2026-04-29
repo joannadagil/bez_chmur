@@ -22,17 +22,16 @@ export type HostEventDto = {
 
 export type CreateHostEventPayload = {
   email: string;
-  first_name?: string;
-  last_name?: string;
-  title: string;
+  event_name: string;
   description?: string;
-  event_type: 'Cinema' | 'Theatre' | 'Lecture';
-  image_url?: string;
+  category: 'Cinema' | 'Theatre' | 'Lecture';
+  event_image_url?: string;
   date_from: string;
   date_to: string;
   venue_name: string;
   venue_rows: number;
   venue_seats_per_row: number;
+  time: string;
   schedule: ShowScheduleDay[];
   removed_seats: string[];
   seat_assignments: Record<string, 'vip' | 'area1' | 'area2' | 'handicap'>;

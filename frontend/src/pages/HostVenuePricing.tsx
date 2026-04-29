@@ -350,12 +350,10 @@ const HostVenuePricing = () => {
     try {
       const created = await createHostEvent({
         email: currentUser.email,
-        first_name: currentUser.firstName || '',
-        last_name: currentUser.lastName || '',
-        title: booking.eventTitle,
+        event_name: booking.eventTitle,
         description: '',
-        event_type: eventType,
-        image_url: booking.eventImageUrl || '',
+        category: eventType,
+        event_image_url: booking.eventImageUrl || '',
         date_from: booking.date,
         date_to: booking.dateTo || booking.date,
         venue_name: selectedVenue.name,
@@ -364,6 +362,7 @@ const HostVenuePricing = () => {
         schedule: booking.showSchedule,
         removed_seats: Array.from(removedSeats),
         seat_assignments: seatAssignments,
+        time: new Date().toISOString(),
         prices: {
           vip: Number(prices.vip) || 0,
           area1: Number(prices.area1) || 0,

@@ -46,7 +46,11 @@ class EventCreateSerializer(serializers.ModelSerializer):
     event_name = serializers.CharField(write_only=True)
     event_description = serializers.CharField(write_only=True, required=False, allow_blank=True)
     event_image_url = serializers.URLField(write_only=True, required=False, allow_null=True)
-    category = serializers.PrimaryKeyRelatedField(queryset=EventCategory.objects.all(), write_only=True)
+    category = serializers.SlugRelatedField(
+        slug_field='name', 
+        queryset=EventCategory.objects.all(), 
+        write_only=True
+    )
     
     venue_name = serializers.CharField(write_only=True)
     venue_rows = serializers.IntegerField(write_only=True)
@@ -57,7 +61,7 @@ class EventCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = EventInstance
         fields = [
-            'event_name', 'event_description', 'event_image_url', 'category',
+            'id', 'event_name', 'event_description', 'event_image_url', 'category',
             'venue_name', 'venue_rows', 'venue_seats_per_row', 'time'
         ]
 

@@ -15,11 +15,13 @@ from .views import (
     RegisterView,
     PaymantCreateView,
     OrderView,
+    EventDetailView,
 )
 
 urlpatterns = [
     path('event-instances/', EventListView.as_view()),
     path('host-events/', EventListView.as_view()),
+    path('host-events/<int:pk>/', EventDetailView.as_view()),
     path('event-instances/<int:pk>/seats/', EventInstanceSeatsListView.as_view()),
     path('venues/', VenueListCreateView.as_view()),
     path('payments/', PaymantCreateView.as_view()),
