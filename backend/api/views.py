@@ -12,7 +12,8 @@ from .models import (
     EventSeat,
     OrderSeat,
     Order,
-    User
+    User,
+    Payment
     )
 
 from .serializers import (
@@ -25,6 +26,8 @@ from .serializers import (
     RegisterSerializer,
     EventCreateSerializer,
     EventReadSerializer,
+    PaymentSerializer,
+    OrderSerializer,
     )
 
 
@@ -46,6 +49,14 @@ class VenueListCreateView(generics.ListCreateAPIView):
     queryset = Venue.objects.all()
     serializer_class = VenueSerializer
 
+class PaymantCreateView(generics.ListCreateAPIView):
+    queryset = Payment.objects.all()
+    serializer_class = PaymentSerializer
+
+class OrderView(generics.ListCreateAPIView):
+    queryset = Order.objects.all()
+    serializer_class = OrderSerializer
+    
 class EventListCreateView(generics.ListCreateAPIView):
     queryset = Event.objects.all()
     serializer_class = EventModelSerializer

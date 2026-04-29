@@ -10,6 +10,7 @@ from .models import (
     Order,
     User,
     Group,
+    Payment,
     )
 
 class EventReadSerializer(serializers.ModelSerializer):
@@ -176,3 +177,25 @@ class RegisterSerializer(serializers.ModelSerializer):
         user.groups.add(group)
         
         return user
+    
+
+class PaymentSerializer(serializers.ModelSerializer):
+    order = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Payment
+        fields = ['id', 'order', 'stripe_session_id', 'status', 'order']
+        
+    def get_order(self, obj):
+        return obj.status
+    
+class OrderSerializer(serializers.ModelSerializer):
+    user = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Order
+        fields = ['id', 'eventinstance', 'user', 'status']
+        
+    def get_user(self, obj):
+        return obj.user.email
+        
