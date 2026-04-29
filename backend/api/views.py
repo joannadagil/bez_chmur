@@ -43,7 +43,10 @@ class EventListView(generics.ListCreateAPIView):
         if self.request.method == 'POST':
             return [permissions.IsAuthenticated()]
         return [permissions.AllowAny()]
-   
+
+class EventDetailView(generics.RetrieveAPIView):
+    queryset = EventInstance.objects.all()
+    serializer_class = EventReadSerializer
 
 class VenueListCreateView(generics.ListCreateAPIView):
     queryset = Venue.objects.all()
