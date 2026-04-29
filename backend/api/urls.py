@@ -13,6 +13,8 @@ from .views import (
     UserOrdersListView,
     UserListView,
     RegisterView,
+    PaymantCreateView,
+    OrderView,
 )
 
 urlpatterns = [
@@ -20,6 +22,8 @@ urlpatterns = [
     path('host-events/', EventListView.as_view()),
     path('event-instances/<int:pk>/seats/', EventInstanceSeatsListView.as_view()),
     path('venues/', VenueListCreateView.as_view()),
+    path('payments/', PaymantCreateView.as_view()),
+    path('orders/', OrderView.as_view()),
     path('events/', EventListCreateView.as_view()),
     path('categories/', EventCategoryListCreateView.as_view()),
     path('book-seats/', BookSeatsView.as_view()),
