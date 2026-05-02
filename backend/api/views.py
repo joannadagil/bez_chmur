@@ -1,8 +1,11 @@
+import stripe
+from django.conf import settings
 from rest_framework import views, status, permissions, generics
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.db import transaction
 
+stripe.api_key = settings.STRIPE_SECRET_KEY
 
 from .models import (
     Venue,
@@ -13,7 +16,8 @@ from .models import (
     OrderSeat,
     Order,
     User,
-    Payment
+    Payment,
+    Seat
     )
 
 from .serializers import (
@@ -137,3 +141,70 @@ class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = RegisterSerializer
     permission_classes = [permissions.AllowAny]
+
+
+
+@api_view(['POST'])
+def create_checkout_session(request):
+    data = request.data
+    total_price = data.get('total_price') 
+
+    stripe_amount = int(float(total_price) * 100)
+
+    try:
+        session = stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            line_items=[{
+                'price_data': {
+                    'currency': 'usd', 
+                    'product_data': {
+                        'name': 'Bilety na wydarzenie',
+                    },
+                    'unit_amount': stripe_amount, 
+                },
+                'quantity': 1,
+            }],
+            mode='payment',
+            success_url="http://localhost:5173/success?session_id={CHECKOUT_SESSION_ID}",
+            cancel_url="http://localhost:5173/cancel",
+        )
+        return Response({'url': session.url})
+    except Exception as e:
+        return Response({'error': str(e)}, status=500)
+
+@api_view(['GET'])
+def get_session_details(request):
+    stripe.api_key = settings.STRIPE_SECRET_KEY
+    session_id = request.GET.get('session_id')
+    
+    if not session_id:
+        return Response({'error': 'No session ID provided'}, status=400)
+
+    try:
+        session = stripe.checkout.Session.retrieve(session_id)
+
+        meta = getattr(session, 'metadata', {})
+        if meta is None:
+            meta = {}
+
+        event_title = meta.get('event_title', 'Bilet')
+        venue_name = meta.get('venue_name', 'Sala')
+        event_date = meta.get('event_date', '')
+        event_time = meta.get('event_time', '')
+        seats_raw = meta.get('seats_info', '')
+        seats_list = seats_raw.split(', ') if seats_raw else []
+
+        return Response({
+            'eventTitle': event_title,
+            'selectedVenue': venue_name,
+            'date': event_date,
+            'time': event_time,
+            'seats': seats_list
+        }, status=200)
+
+    except Exception as e:
+        import traceback
+        print("--- FULL ERROR START ---")
+        print(traceback.format_exc())
+        print("--- FULL ERROR END ---")
+        return Response({'error': f"Server error: {str(e)}"}, status=400)
