@@ -57,7 +57,7 @@ const filteredEvents = uniqueEvents.filter((event: any) => {
   if (loading) {
     return (
       <div className="bg-[#f5f5dc] min-h-screen flex items-center justify-center">
-        <div className="text-[#d3265b] font-black animate-bounce">LOADING CINEMA...</div>
+        <div className="text-[#d3265b] font-black animate-bounce">LOADING EVENTS...</div>
       </div>
     );
   }

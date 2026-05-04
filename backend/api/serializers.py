@@ -116,6 +116,12 @@ class EventCreateSerializer(serializers.ModelSerializer):
     venue_seats_per_row = serializers.IntegerField(write_only=True)
     
     time = serializers.DateTimeField()
+    times = serializers.ListField(
+        child=serializers.DateTimeField(),
+        write_only=True,
+        required=False,
+        allow_empty=True,
+    )
     
     prices = serializers.DictField(child=serializers.DecimalField(max_digits=10, decimal_places=2), write_only=True)
     seatAssignments = serializers.DictField(child=serializers.CharField(), write_only=True)
@@ -126,7 +132,7 @@ class EventCreateSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'event', 'venue', 'event_name', 'event_description', 'event_image_url', 'category',
             'venue_name', 'venue_rows', 'venue_seats_per_row', 'time',
-            'prices', 'seatAssignments', 'ticket_price',
+            'times', 'prices', 'seatAssignments', 'ticket_price',
         ]
         read_only_fields = ['event', 'venue']
 
@@ -134,6 +140,10 @@ class EventCreateSerializer(serializers.ModelSerializer):
         prices_data = validated_data.pop('prices')
         assignments_data = validated_data.pop('seatAssignments')
         ticket_price = validated_data.pop('ticket_price', None)
+        primary_time = validated_data.pop('time')
+        times_data = validated_data.pop('times', [])
+
+        all_times = sorted(set([primary_time, *times_data]))
         
         event = Event.objects.create(
             name=validated_data.pop('event_name'),
@@ -148,13 +158,17 @@ class EventCreateSerializer(serializers.ModelSerializer):
             seats_per_row=validated_data.pop('venue_seats_per_row')
         )
         
-        instance = EventInstance.objects.create(
-            event=event,
-            venue=venue,
-            time=validated_data.pop('time'),
-            host=self.context['request'].user,
-            ticket_price=ticket_price or 0,
-        )
+        instances = [
+            EventInstance.objects.create(
+                event=event,
+                venue=venue,
+                time=showing_time,
+                host=self.context['request'].user,
+                ticket_price=ticket_price or 0,
+            )
+            for showing_time in all_times
+        ]
+        instance = instances[0]
         
         category_objects = {}
         for cat_name, price in prices_data.items():
@@ -172,11 +186,12 @@ class EventCreateSerializer(serializers.ModelSerializer):
             
             cat_name = assignments_data.get(seat_key)
             if cat_name and cat_name in category_objects:
-                EventSeat.objects.create(
-                    seat=seat,
-                    event_instance=instance,
-                    seat_category=category_objects[cat_name]
-                )
+                for current_instance in instances:
+                    EventSeat.objects.create(
+                        seat=seat,
+                        event_instance=current_instance,
+                        seat_category=category_objects[cat_name]
+                    )
 
         return instance
     

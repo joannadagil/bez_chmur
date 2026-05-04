@@ -39,6 +39,7 @@ export type CreateHostEventPayload = {
   venue_rows: number;
   venue_seats_per_row: number;
   time: string;
+  times?: string[];
   prices: Record<string, number | string>;       
   seatAssignments: Record<string, string>;
   ticket_price?: number;

@@ -244,7 +244,7 @@ const SeatSelection = () => {
               <div className="w-3/4 h-1.5 bg-gray-200 rounded-full mb-20 relative shadow-sm">
                 <div className="absolute inset-0 bg-gradient-to-b from-gray-300/20 to-transparent blur-xl -bottom-12"></div>
                 <span className="absolute -bottom-8 left-1/2 -translate-x-1/2 text-[9px] font-black text-gray-300 uppercase tracking-[0.5em]">
-                  Screen Area
+                  Stage
                 </span>
               </div>
             )}
@@ -302,7 +302,7 @@ const SeatSelection = () => {
                           const row = String(rowNumber);
 
                           return (
-                            <div key={row} className="flex items-center gap-5 justify-start min-w-max">
+                            <div key={row} className="flex items-center gap-5 justify-center min-w-max mx-auto">
                               <span className="text-[10px] font-black text-gray-300 w-4">{row}</span>
 
                               <div className="flex items-center gap-2 flex-nowrap">

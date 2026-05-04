@@ -52,7 +52,7 @@ class EventListView(generics.ListCreateAPIView):
             qs = qs.filter(event_id=event_id)
         if self.request.method == 'GET':
             cutoff = timezone.now() + timedelta(hours=1)
-            qs = qs.filter(time__gt=cutoff)
+            qs = qs.filter(time__gte=cutoff)
         return qs.order_by('time')
 
     def get_serializer_class(self):
@@ -79,7 +79,7 @@ class HostEventListView(generics.ListCreateAPIView):
             qs = qs.filter(event_id=event_id)
         if self.request.method == 'GET':
             cutoff = timezone.now() + timedelta(hours=1)
-            qs = qs.filter(time__gt=cutoff)
+            qs = qs.filter(time__gte=cutoff)
         return qs.order_by('time')
 
     def get_serializer_class(self):
@@ -99,7 +99,7 @@ class HostEventDetailView(generics.RetrieveAPIView):
             'event', 'venue', 'event__category', 'host'
         ).filter(host=self.request.user)
         cutoff = timezone.now() + timedelta(hours=1)
-        return qs.filter(time__gt=cutoff)
+        return qs.filter(time__gte=cutoff)
 
 
 @api_view(['GET'])
@@ -268,7 +268,7 @@ def create_checkout_session(request):
             user = request.user
             event_instance = EventInstance.objects.get(id=event_instance_id)
             cutoff = timezone.now() + timedelta(hours=1)
-            if event_instance.time <= cutoff:
+            if event_instance.time < cutoff:
                 return Response({'error': 'This showing is no longer available for purchase'}, status=400)
 
             has_assigned_seats = EventSeat.objects.filter(event_instance=event_instance).exists()

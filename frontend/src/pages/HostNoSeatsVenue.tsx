@@ -103,6 +103,8 @@ const HostNoSeatsVenue = () => {
     const firstTime = firstDay?.times?.[0] ?? booking.time ?? '19:00';
     const eventDate = booking.date || new Date().toISOString().slice(0, 10);
     const eventDateTime = `${eventDate}T${firstTime}:00`;
+    const scheduledTimes = (booking.showSchedule || [])
+      .flatMap((day) => day.times.map((time) => `${day.date}T${time}:00`));
 
     try {
       const created = await createHostEvent({
@@ -115,6 +117,7 @@ const HostNoSeatsVenue = () => {
         venue_rows: 1,
         venue_seats_per_row: Number(totalTickets),
         time: eventDateTime,
+        times: scheduledTimes,
         prices: {},
         seatAssignments: {},
         ticket_price: Number(ticketPrice),
