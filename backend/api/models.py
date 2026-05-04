@@ -36,6 +36,7 @@ class Event(models.Model):
 class EventInstance(models.Model):
     venue = models.ForeignKey(Venue, on_delete=models.CASCADE)
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
+    host = models.ForeignKey(User, on_delete=models.CASCADE, related_name='hosted_event_instances', null=True, blank=True)
     time = models.DateTimeField()
 
     def __str__(self):

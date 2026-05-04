@@ -19,15 +19,16 @@ from .views import (
     OrderView,
     EventDetailView,
     stripe_webhook,
-
+    HostEventListView,
+    HostEventDetailView,
 )
 
 urlpatterns = [
     path('event-instances/', EventListView.as_view()),
-    path('host-events/', EventListView.as_view()),
+    path('host-events/', HostEventListView.as_view()),
     path('create-checkout-session/', create_checkout_session, name='create-checkout-session'),
     path('stripe/webhook/', stripe_webhook),
-    path('host-events/<int:pk>/', EventDetailView.as_view()),
+    path('host-events/<int:pk>/', HostEventDetailView.as_view()),
     path('event-instances/<int:pk>/seats/', EventInstanceSeatsListView.as_view()),
     path('session-details/', get_session_details, name='session-details'),
     path('venues/', VenueListCreateView.as_view()),

@@ -21,21 +21,14 @@ export type HostEventDto = {
 };
 
 export type CreateHostEventPayload = {
-  email: string;
   event_name: string;
-  description?: string;
+  event_description?: string;
   category: 'Cinema' | 'Theatre' | 'Lecture';
   event_image_url?: string;
-  date_from: string;
-  date_to: string;
   venue_name: string;
   venue_rows: number;
   venue_seats_per_row: number;
   time: string;
-  schedule: ShowScheduleDay[];
-  removed_seats: string[];
-  seat_assignments: Record<string, 'vip' | 'area1' | 'area2' | 'handicap'>;
-  prices: Record<'vip' | 'area1' | 'area2' | 'handicap', number>;
 };
 
 export const fetchHostEvents = async (email: string): Promise<HostEventDto[]> => {
