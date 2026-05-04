@@ -348,27 +348,20 @@ const HostVenuePricing = () => {
           : 'Cinema';
 
     try {
+      const firstDay = booking.showSchedule?.[0];
+      const firstTime = firstDay?.times?.[0] || '19:00';
+      const eventDate = booking.date;
+      const eventDateTime = `${eventDate}T${firstTime}:00`;
+
       const created = await createHostEvent({
-        email: currentUser.email,
         event_name: booking.eventTitle,
-        description: '',
+        event_description: booking.eventTitle,
         category: eventType,
         event_image_url: booking.eventImageUrl || '',
-        date_from: booking.date,
-        date_to: booking.dateTo || booking.date,
         venue_name: selectedVenue.name,
         venue_rows: layout.rows.length,
         venue_seats_per_row: layout.seatsPerRow,
-        schedule: booking.showSchedule,
-        removed_seats: Array.from(removedSeats),
-        seat_assignments: seatAssignments,
-        time: new Date().toISOString(),
-        prices: {
-          vip: Number(prices.vip) || 0,
-          area1: Number(prices.area1) || 0,
-          area2: Number(prices.area2) || 0,
-          handicap: Number(prices.handicap) || 0,
-        },
+        time: eventDateTime,
       });
 
       navigate(`/host-dashboard/event/${created.id}`);

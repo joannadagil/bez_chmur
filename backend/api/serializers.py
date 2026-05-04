@@ -82,7 +82,8 @@ class EventCreateSerializer(serializers.ModelSerializer):
         return EventInstance.objects.create(
             event=event,
             venue=venue,
-            time=validated_data.pop('time')
+            time=validated_data.pop('time'),
+            host=self.context['request'].user,
         )
     
 class VenueSerializer(serializers.ModelSerializer):

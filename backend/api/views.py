@@ -51,10 +51,33 @@ class EventListView(generics.ListCreateAPIView):
         if self.request.method == 'POST':
             return [permissions.IsAuthenticated()]
         return [permissions.AllowAny()]
-
+    
 class EventDetailView(generics.RetrieveAPIView):
     queryset = EventInstance.objects.all()
     serializer_class = EventReadSerializer
+
+class HostEventListView(generics.ListCreateAPIView):
+    def get_queryset(self):
+        return EventInstance.objects.select_related(
+            'event', 'venue', 'event__category', 'host'
+        ).filter(host=self.request.user)
+
+    def get_serializer_class(self):
+        if self.request.method == 'POST':
+            return EventCreateSerializer
+        return EventReadSerializer
+
+    def get_permissions(self):
+        return [permissions.IsAuthenticated()]
+    
+class HostEventDetailView(generics.RetrieveAPIView):
+    serializer_class = EventReadSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return EventInstance.objects.select_related(
+            'event', 'venue', 'event__category', 'host'
+        ).filter(host=self.request.user)
 
 class VenueListCreateView(generics.ListCreateAPIView):
     queryset = Venue.objects.all()
