@@ -11,8 +11,33 @@ from .models import (
     User,
     Group,
     Payment,
+    Seat,
     )
 
+class SeatCategoryShortSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SeatCategory
+        fields = ['name', 'price']
+        
+class EventSeatSerializer(serializers.ModelSerializer):
+    row = serializers.CharField(source='seat.row', read_only=True)
+    number = serializers.IntegerField(source='seat.number', read_only=True)
+    if_exist = serializers.BooleanField(source='seat.if_exist', read_only=True)
+    
+    is_reserved = serializers.SerializerMethodField()
+
+    seat_category = SeatCategoryShortSerializer(read_only=True)
+    
+    class Meta:
+        model = EventSeat
+        fields = ['id', 'row', 'number', 'is_reserved', 'if_exist', 'seat_category']
+
+    def get_is_reserved(self, obj):
+        return OrderSeat.objects.filter(
+            event_seat=obj,
+            order__status__in=['pending', 'paid']
+        ).exists()
+        
 class EventReadSerializer(serializers.ModelSerializer):
     title = serializers.CharField(source='event.name', read_only=True)
     image_url = serializers.CharField(source='event.image_url', read_only=True)
@@ -22,10 +47,14 @@ class EventReadSerializer(serializers.ModelSerializer):
     
     price = serializers.SerializerMethodField()
     seatsLeft = serializers.SerializerMethodField()
+    
+    seats = EventSeatSerializer(source='eventseat_set', many=True, read_only=True)
 
     class Meta:
         model = EventInstance
-        fields = ['id', 'title', 'venue_name', 'description', 'type', 'price', 'seatsLeft', 'image_url', 'event', 'venue', 'time']
+        fields = ['id', 'title', 'venue_name', 'description', 'type', 
+                  'price', 'seatsLeft', 'image_url', 'event', 'venue', 'time',
+                  'seats']
 
     def get_price(self, obj):
         prices = EventSeat.objects.filter(event_instance=obj).values_list('seat_category__price', flat=True)
@@ -57,15 +86,22 @@ class EventCreateSerializer(serializers.ModelSerializer):
     venue_seats_per_row = serializers.IntegerField(write_only=True)
     
     time = serializers.DateTimeField()
+    
+    prices = serializers.DictField(child=serializers.DecimalField(max_digits=10, decimal_places=2), write_only=True)
+    seatAssignments = serializers.DictField(child=serializers.CharField(), write_only=True)
 
     class Meta:
         model = EventInstance
         fields = [
             'id', 'event_name', 'event_description', 'event_image_url', 'category',
-            'venue_name', 'venue_rows', 'venue_seats_per_row', 'time'
+            'venue_name', 'venue_rows', 'venue_seats_per_row', 'time',
+            'prices', 'seatAssignments',
         ]
 
     def create(self, validated_data):
+        prices_data = validated_data.pop('prices')
+        assignments_data = validated_data.pop('seatAssignments')
+        
         event = Event.objects.create(
             name=validated_data.pop('event_name'),
             description=validated_data.pop('event_description', ''),
@@ -79,12 +115,36 @@ class EventCreateSerializer(serializers.ModelSerializer):
             seats_per_row=validated_data.pop('venue_seats_per_row')
         )
         
-        return EventInstance.objects.create(
+        instance = EventInstance.objects.create(
             event=event,
             venue=venue,
             time=validated_data.pop('time'),
             host=self.context['request'].user,
         )
+        
+        category_objects = {}
+        for cat_name, price in prices_data.items():
+            sc = SeatCategory.objects.create(
+                name=f"{cat_name.upper()} for {event.name}",
+                price=price
+            )
+            category_objects[cat_name] = sc
+
+        all_seats = Seat.objects.filter(venue=venue)
+        
+        for seat in all_seats:
+            row_label = venue.name
+            seat_key = f"{chr(64 + seat.row)}{seat.number}" 
+            
+            cat_name = assignments_data.get(seat_key)
+            if cat_name and cat_name in category_objects:
+                EventSeat.objects.create(
+                    seat=seat,
+                    event_instance=instance,
+                    seat_category=category_objects[cat_name]
+                )
+
+        return instance
     
 class VenueSerializer(serializers.ModelSerializer):
     class Meta:
@@ -111,30 +171,6 @@ class EventModelSerializer(serializers.ModelSerializer):
     class Meta:
         model = Event
         fields = ['id', 'name', 'description', 'category', 'image_url']
-
-class SeatCategoryShortSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = SeatCategory
-        fields = ['name', 'price']
-        
-class EventSeatSerializer(serializers.ModelSerializer):
-    row = serializers.CharField(source='seat.row', read_only=True)
-    number = serializers.IntegerField(source='seat.number', read_only=True)
-    if_exist = serializers.BooleanField(source='seat.if_exist', read_only=True)
-    
-    is_reserved = serializers.SerializerMethodField()
-
-    seat_category = SeatCategoryShortSerializer(read_only=True)
-    
-    class Meta:
-        model = EventSeat
-        fields = ['id', 'row', 'number', 'is_reserved', 'if_exist', 'seat_category']
-
-    def get_is_reserved(self, obj):
-        return OrderSeat.objects.filter(
-            event_seat=obj,
-            order__status__in=['pending', 'paid']
-        ).exists()
         
 class UserOrderSerializer(serializers.ModelSerializer):
     user_email = serializers.CharField(source='user.email', read_only=True)

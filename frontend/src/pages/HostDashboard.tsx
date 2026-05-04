@@ -212,7 +212,7 @@ const HostDashboard = () => {
                     type: event.type,
                     price: event.price > 0 ? event.price : 'Free',
                     seatsLeft: event.seatsLeft,
-                    imageUrl: event.imageUrl,
+                    imageUrl: event.image_url,
                   }}
                   detailsPathBase="/host-dashboard/event"
                   ctaLabel="Manage"

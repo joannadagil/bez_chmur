@@ -148,7 +148,7 @@ const HostEventDetails = () => {
         <div className="max-w-[1100px] mx-auto px-8 h-full flex items-center gap-10 relative">
           <div className={`relative ${posterFrameClass} flex-shrink-0 z-20 shadow-2xl transition-all duration-500 hover:scale-105 cursor-pointer group`}>
             <img
-              src={event.imageUrl}
+              src={event.image_url}
               alt={event.title}
               onLoad={(event) => {
                 const { naturalWidth, naturalHeight } = event.currentTarget;
