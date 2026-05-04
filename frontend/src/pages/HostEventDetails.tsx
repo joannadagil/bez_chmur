@@ -129,7 +129,7 @@ const HostEventDetails = () => {
         <aside className="md:col-span-7 relative">
           <div className="bg-[#e7e6f0] p-7 rounded-[30px] border border-gray-200/50 shadow-sm sticky top-28">
             <h2 className="text-lg font-black mb-7 text-[#3a0e23] uppercase tracking-tighter italic">Dates and tickets</h2>
-            <div className="space-y-4 max-h-[480px] overflow-y-auto pr-1">
+            <div className="space-y-4 pr-1">
               {eventGroup.map((showing) => (
                 <div key={showing.id} className="rounded-2xl bg-white p-4 border border-gray-100 shadow-sm">
                   <div className="grid grid-cols-1 gap-3">
@@ -138,7 +138,7 @@ const HostEventDetails = () => {
                     </span>
                     <div className="flex items-center justify-between gap-3">
                       <span className="text-sm font-black text-[#3a0e23] uppercase tracking-[0.08em]">
-                        {showing.soldTickets ?? 0} sold / {showing.seatsLeft} left
+                        {showing.seatsLeft} unsold ({showing.soldTickets ?? 0} sold)
                       </span>
                       {showing.seats.length > 0 && (
                         <button

@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { Calendar, MapPin, QrCode, Armchair, ArrowLeft } from 'lucide-react';
+import { Calendar, MapPin, Armchair, ArrowLeft } from 'lucide-react';
+import { QRCodeSVG } from 'qrcode.react';
 import Navbar from '../components/layout/Navbar';
 import { fetchMyTickets, type TicketDto } from '../api/tickets';
 
@@ -51,6 +52,22 @@ const TicketView = () => {
     if (currentUser?.companyName) return currentUser.companyName;
     return [currentUser?.firstName, currentUser?.lastName].filter(Boolean).join(' ') || 'Guest';
   }, [currentUser?.companyName, currentUser?.firstName, currentUser?.lastName]);
+
+  const qrValue = useMemo(() => {
+    if (!ticket) return '';
+
+    return JSON.stringify({
+      provider: 'getAroom',
+      ticket_id: ticket.id,
+      event: ticket.title,
+      venue: ticket.venue,
+      date: ticket.date,
+      time: ticket.time,
+      seats: ticket.seats,
+      status: ticket.status,
+      holder: displayName,
+    });
+  }, [ticket, displayName]);
 
   return (
     <div className="min-h-screen bg-[#e5e7eb] font-sans text-[#1a0b1a]">
@@ -122,10 +139,17 @@ const TicketView = () => {
               <div className="md:w-[250px] shrink-0">
                 <div className="rounded-2xl border-2 border-dashed border-[#3a0e23]/20 bg-[#fffdf8] p-5 text-center space-y-3">
                   <p className="text-[10px] font-black uppercase tracking-[0.18em] text-[#a56d7d]">Scan at entrance</p>
-                  <div className="mx-auto h-[150px] w-[150px] rounded-xl bg-[#3a0e23] text-white flex flex-col items-center justify-center gap-2">
-                    <QrCode size={62} />
-                    <span className="text-[9px] font-black uppercase tracking-[0.18em]">#{ticket.id}</span>
+                  <div className="mx-auto rounded-xl bg-white p-3 border border-[#3a0e23]/10 inline-flex items-center justify-center">
+                    <QRCodeSVG
+                      value={qrValue}
+                      size={150}
+                      level="M"
+                      includeMargin
+                      bgColor="#ffffff"
+                      fgColor="#2a0a1a"
+                    />
                   </div>
+                  <span className="block text-[9px] font-black uppercase tracking-[0.18em] text-[#3a0e23]">Ticket #{ticket.id}</span>
                   <p className="text-[10px] font-black uppercase tracking-[0.16em] text-[#3a0e23]">Status: {ticket.status}</p>
                 </div>
               </div>

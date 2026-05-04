@@ -348,10 +348,11 @@ const HostVenuePricing = () => {
           : 'Cinema';
 
     try {
-      const firstDay = booking.showSchedule?.[0];
-      const firstTime = firstDay?.times?.[0] || '19:00';
-      const eventDate = booking.date;
-      const eventDateTime = `${eventDate}T${firstTime}:00`;
+      const scheduledTimes = (booking.showSchedule || [])
+        .flatMap((day) => day.times.map((time) => `${day.date}T${time}:00`));
+
+      const fallbackTime = `${booking.date}T${booking.time || '19:00'}:00`;
+      const eventDateTime = scheduledTimes[0] || fallbackTime;
 
       const created = await createHostEvent({
         event_name: booking.eventTitle,
@@ -362,6 +363,7 @@ const HostVenuePricing = () => {
         venue_rows: layout.rows.length,
         venue_seats_per_row: layout.seatsPerRow,
         time: eventDateTime,
+        times: scheduledTimes,
         prices: prices,           
         seatAssignments: seatAssignments,
       });
