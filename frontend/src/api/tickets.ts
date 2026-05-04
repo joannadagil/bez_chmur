@@ -22,10 +22,6 @@ export type TicketDto = {
   is_past: boolean;
 };
 
-type CreateOrderPayload = {
-  event_instance_id: number;
-  seat_ids: number[];
-};
 
 export const fetchMyTickets = async (): Promise<TicketDto[]> => {
   const response = await apiClient.get<BackendOrderDto[]>('/user-order/');
@@ -44,14 +40,4 @@ export const fetchMyTickets = async (): Promise<TicketDto[]> => {
       is_past: dt.getTime() < Date.now(),
     };
   });
-};
-
-export const createOrder = async (
-  payload: CreateOrderPayload
-): Promise<{ order_id: number; message: string }> => {
-  const response = await apiClient.post<{ order_id: number; message: string }>(
-    '/book-seats/',
-    payload
-  );
-  return response.data;
 };

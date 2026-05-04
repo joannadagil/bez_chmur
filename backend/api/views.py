@@ -77,7 +77,6 @@ class EventCategoryListCreateView(generics.ListCreateAPIView):
     serializer_class = EventCategorySerializer
     
 class UserListView(generics.ListCreateAPIView):
-    username = User.objects.all()
     serializer_class = UserSerializer
     
     def get_queryset(self):
@@ -100,50 +99,83 @@ class EventInstanceSeatsListView(generics.ListAPIView):
         instance_id = self.kwargs['pk']
         return EventSeat.objects.filter(event_instance_id=instance_id).select_related('seat', 'seat_category')
 
+
+# TODO: ten endpoint może zniknąć, ale możemy go też zostawić jako stary endpoint testowy
+# Legacy endpoint kept for manual/testing flows.
+# Main purchase flow goes through Stripe checkout session.
 class BookSeatsView(views.APIView):
-    # TODO: add authentification
-    #permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
-        
         user = request.user
-        
-        # TODO: remove
-        from django.contrib.auth.models import User
-        if not user.is_authenticated:
-            user = User.objects.first()
-        if not user:
-            return Response({"error": "No users in database"}, status=400)
-        #
-        
         event_instance_id = request.data.get('event_instance_id')
         seat_ids = request.data.get('seat_ids', [])
 
+        if not event_instance_id:
+            return Response(
+                {"error": "Missing event_instance_id"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
         if not seat_ids:
-            return Response({"error": "No seats selected"}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": "No seats selected"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
         try:
             with transaction.atomic():
                 event_instance = EventInstance.objects.get(id=event_instance_id)
+
+                event_seats = list(
+                    EventSeat.objects.filter(
+                        id__in=seat_ids,
+                        event_instance=event_instance
+                    )
+                )
+
+                if len(event_seats) != len(seat_ids):
+                    return Response(
+                        {"error": "Some selected seats do not exist for this event instance"},
+                        status=status.HTTP_400_BAD_REQUEST
+                    )
+
+                for event_seat in event_seats:
+                    if OrderSeat.objects.filter(
+                        event_seat=event_seat,
+                        order__status__in=['pending', 'paid']
+                    ).exists():
+                        return Response(
+                            {"error": f"Seat {event_seat.id} already taken"},
+                            status=status.HTTP_400_BAD_REQUEST
+                        )
+
                 order = Order.objects.create(
-                    user=user, 
-                    eventinstance=event_instance, 
+                    user=user,
+                    eventinstance=event_instance,
                     status="pending"
                 )
 
-                for s_id in seat_ids:
-                    event_seat = EventSeat.objects.get(id=s_id)
-                    
-                    if OrderSeat.objects.filter(event_seat=event_seat, order__status__in=['pending', 'paid']).exists():
-                        raise ValueError(f"Seat {s_id} already taken")
-
+                for event_seat in event_seats:
                     OrderSeat.objects.create(order=order, event_seat=event_seat)
 
-                return Response({"order_id": order.id, "message": "Seats reserved"}, status=status.HTTP_201_CREATED)
+                return Response(
+                    {"order_id": order.id, "message": "Seats reserved"},
+                    status=status.HTTP_201_CREATED
+                )
 
+        except EventInstance.DoesNotExist:
+            return Response(
+                {"error": "Event instance not found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
         except Exception as e:
-            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"error": str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
         
+
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = RegisterSerializer
@@ -261,8 +293,6 @@ def stripe_webhook(request):
     payload = request.body
     sig_header = request.META.get('HTTP_STRIPE_SIGNATURE')
     endpoint_secret = settings.STRIPE_WEBHOOK_SECRET
-
-    print("WEBHOOK HIT")
 
     try:
         event = stripe.Webhook.construct_event(payload, sig_header, endpoint_secret)

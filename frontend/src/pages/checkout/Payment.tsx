@@ -3,7 +3,6 @@ import { Lock, ShieldCheck, Clock, Loader2,AlertCircle } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../../components/layout/Navbar';
 import { useBooking } from '../../context/BookingContext';
-import { createOrder } from '../../api/tickets';
 import { apiClient } from '../../api/client';
 
 export const Payment: React.FC = () => {
