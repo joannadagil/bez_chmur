@@ -76,7 +76,7 @@ const AppLayout = () => {
         <Route path="/host-dashboard/event/:id" element={<ProtectedRoute><HostEventDetails /></ProtectedRoute>} />
         <Route path="/host-dashboard/event/:id/room-outline" element={<ProtectedRoute><HostRoomOutline /></ProtectedRoute>} />
         <Route path="/event/:id" element={<ProtectedRoute><EventDetails /></ProtectedRoute>} />
-        <Route path="/success" element={<ProtectedRoute><SuccessPage /></ProtectedRoute>} />
+        <Route path="/checkout/success" element={<ProtectedRoute><SuccessPage /></ProtectedRoute>} />
         <Route path="/checkout/payment" element={<ProtectedRoute><Payment /></ProtectedRoute>} />
         <Route path="/checkout/:id" element={<ProtectedRoute><SeatSelection /></ProtectedRoute>} />
         <Route path="/my-tickets" element={<ProtectedRoute><MyTickets /></ProtectedRoute>} />
