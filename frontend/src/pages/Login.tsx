@@ -12,7 +12,7 @@ const MOCK_HOST_USER = {
   lastName: '',
   companyName: 'Host Demo Company',
   accountType: 'host' as const,
-  email: 'host@getaroom.com',
+  email: 'host9999@getaroom.com',
   password: 'HostDemo123!',
   createdAt: new Date().toISOString(),
 };

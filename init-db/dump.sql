@@ -2611,6 +2611,8 @@ COPY public.auth_permission (id, name, content_type_id, codename) FROM stdin;
 COPY public.auth_user (id, password, last_login, is_superuser, username, first_name, last_name, email, is_staff, is_active, date_joined) FROM stdin;
 1	pbkdf2_sha256$1200000$aJKLfE1cLzyetufckF6pnV$Y1YAZ/6w0MNXfG37E0XEpPIj2c5yMMGW3snfGP5Du1M=	2026-04-10 10:02:05+00	t	root	root	root	root@root.com	t	t	2026-03-31 15:38:44+00
 3	pbkdf2_sha256$1200000$T6LzhEuLAerLmh2Lq3ttk3$ULJv3csC/M922u3hBijD7UNuDnLX0rokapCDek8qZhw=	\N	f	slisichik2004@gmail.com	Semion	Lisichik	slisichik2004@gmail.com	f	t	2026-04-10 11:19:20.383739+00
+4	pbkdf2_sha256$1200000$Xj8Nh35IoPXHkKhjuOIudS$lKp9QTUotgNHc7lQWuOfucOyv2D1BCgaWSQo9jm3FJM=	\N	f	john.doe@example.com	John	Doe	john.doe@example.com	f	t	2026-05-04 05:20:40+00
+5	pbkdf2_sha256$1200000$w8P8uME6dDWasoZBUiwrPU$e/Vhz0B6/PPgLjB7/49i94MQxWs6h/WDMze8notQqJk=	\N	f	host9999@getaroom.com	Host	Demo	host9999@getaroom.com	f	t	2026-05-04 05:21:55+00
 \.
 
 
