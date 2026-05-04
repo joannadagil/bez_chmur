@@ -21,10 +21,12 @@ from .views import (
     stripe_webhook,
     HostEventListView,
     HostEventDetailView,
+    current_user_role,
 )
 
 urlpatterns = [
     path('event-instances/', EventListView.as_view()),
+    path('event-instances/<int:pk>/', EventDetailView.as_view()),
     path('host-events/', HostEventListView.as_view()),
     path('create-checkout-session/', create_checkout_session, name='create-checkout-session'),
     path('stripe/webhook/', stripe_webhook),
@@ -40,6 +42,7 @@ urlpatterns = [
     path('user-order/', UserOrdersListView.as_view()),
     path('users/', UserListView.as_view()),
     path('register/', RegisterView.as_view()),
+    path('me-role/', current_user_role, name='current-user-role'),
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
 ]

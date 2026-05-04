@@ -1,4 +1,5 @@
 import stripe
+from datetime import timedelta
 from django.conf import settings
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -8,6 +9,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from django.db import transaction
+from django.db.models import Sum
+from django.utils import timezone
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
@@ -42,6 +45,16 @@ from .serializers import (
 class EventListView(generics.ListCreateAPIView):
     queryset = EventInstance.objects.select_related('event', 'venue', 'event__category').all()
 
+    def get_queryset(self):
+        qs = EventInstance.objects.select_related('event', 'venue', 'event__category').filter(host__isnull=False)
+        event_id = self.request.query_params.get('event')
+        if event_id:
+            qs = qs.filter(event_id=event_id)
+        if self.request.method == 'GET':
+            cutoff = timezone.now() + timedelta(hours=1)
+            qs = qs.filter(time__gt=cutoff)
+        return qs.order_by('time')
+
     def get_serializer_class(self):
         if self.request.method == 'POST':
             return EventCreateSerializer
@@ -58,9 +71,16 @@ class EventDetailView(generics.RetrieveAPIView):
 
 class HostEventListView(generics.ListCreateAPIView):
     def get_queryset(self):
-        return EventInstance.objects.select_related(
+        qs = EventInstance.objects.select_related(
             'event', 'venue', 'event__category', 'host'
         ).filter(host=self.request.user)
+        event_id = self.request.query_params.get('event')
+        if event_id:
+            qs = qs.filter(event_id=event_id)
+        if self.request.method == 'GET':
+            cutoff = timezone.now() + timedelta(hours=1)
+            qs = qs.filter(time__gt=cutoff)
+        return qs.order_by('time')
 
     def get_serializer_class(self):
         if self.request.method == 'POST':
@@ -75,9 +95,24 @@ class HostEventDetailView(generics.RetrieveAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return EventInstance.objects.select_related(
+        qs = EventInstance.objects.select_related(
             'event', 'venue', 'event__category', 'host'
         ).filter(host=self.request.user)
+        cutoff = timezone.now() + timedelta(hours=1)
+        return qs.filter(time__gt=cutoff)
+
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def current_user_role(request):
+    user = request.user
+    is_host = user.groups.filter(name='Host').exists()
+    return Response({
+        'email': user.email,
+        'accountType': 'host' if is_host else 'customer',
+        'first_name': user.first_name,
+        'last_name': user.last_name,
+    })
 
 class VenueListCreateView(generics.ListCreateAPIView):
     queryset = Venue.objects.all()
@@ -212,12 +247,13 @@ def create_checkout_session(request):
     event_instance_id = data.get('event_instance_id')
     seat_ids = data.get('seat_ids', [])
     total_price = data.get('total_price') 
+    try:
+        quantity = int(data.get('quantity', 1) or 1)
+    except (TypeError, ValueError):
+        return Response({'error': 'Invalid quantity'}, status=400)
 
     if not event_instance_id:
         return Response({'error': 'Missing event_instance_id'}, status=400)
-    
-    if not seat_ids:
-        return Response({'error': 'No seats selected'}, status=400)
     
     if total_price in [None, '']:
         return Response({'error': 'Missing total_price'}, status=400)
@@ -231,32 +267,60 @@ def create_checkout_session(request):
         with transaction.atomic():
             user = request.user
             event_instance = EventInstance.objects.get(id=event_instance_id)
+            cutoff = timezone.now() + timedelta(hours=1)
+            if event_instance.time <= cutoff:
+                return Response({'error': 'This showing is no longer available for purchase'}, status=400)
 
-            event_seats = list(
-                EventSeat.objects.filter(
-                    id__in=seat_ids,
-                    event_instance=event_instance
-                ).select_related('seat')
-            )
+            has_assigned_seats = EventSeat.objects.filter(event_instance=event_instance).exists()
+            is_no_seats = not has_assigned_seats
 
-            if len(event_seats) != len(seat_ids):
-                return Response({'error': 'Some selected seats do not exist'}, status=400)
+            if is_no_seats:
+                if quantity <= 0:
+                    return Response({'error': 'Quantity must be at least 1'}, status=400)
 
-            for event_seat in event_seats:
-                already_taken = OrderSeat.objects.filter(
-                    event_seat=event_seat,
-                    order__status__in=['pending', 'paid']
-                ).exists()
-                if already_taken:
-                    return Response(
-                        {'error': f'Seat {event_seat.id} is already taken'},
-                        status=400
-                    )
+                capacity = event_instance.venue.rows * event_instance.venue.seats_per_row
+                already_reserved = Order.objects.filter(
+                    eventinstance=event_instance,
+                    status__in=['pending', 'paid']
+                ).aggregate(total=Sum('quantity'))['total'] or 0
+
+                if quantity > max(capacity - already_reserved, 0):
+                    return Response({'error': 'Not enough tickets left for this event'}, status=400)
+
+                event_seats = []
+                seat_labels = []
+            else:
+                if not seat_ids:
+                    return Response({'error': 'No seats selected'}, status=400)
+
+                event_seats = list(
+                    EventSeat.objects.filter(
+                        id__in=seat_ids,
+                        event_instance=event_instance
+                    ).select_related('seat')
+                )
+                if len(event_seats) != len(seat_ids):
+                    return Response({'error': 'Some selected seats do not exist'}, status=400)
+                for event_seat in event_seats:
+                    already_taken = OrderSeat.objects.filter(
+                        event_seat=event_seat,
+                        order__status__in=['pending', 'paid']
+                    ).exists()
+                    if already_taken:
+                        return Response(
+                            {'error': f'Seat {event_seat.id} is already taken'},
+                            status=400
+                        )
+                seat_labels = [
+                    f"{event_seat.seat.row}{event_seat.seat.number}"
+                    for event_seat in event_seats
+                ]
 
             order = Order.objects.create(
                 user=user,
                 eventinstance=event_instance,
                 status='pending',
+                quantity=quantity if is_no_seats else len(event_seats),
             )
 
             for event_seat in event_seats:
@@ -266,11 +330,6 @@ def create_checkout_session(request):
                 order=order,
                 status='pending',
             )
-
-            seat_labels = [
-                f"{event_seat.seat.row}{event_seat.seat.number}"
-                for event_seat in event_seats
-            ]
 
             session = stripe.checkout.Session.create(
                 payment_method_types=['card'],
@@ -282,7 +341,7 @@ def create_checkout_session(request):
                         },
                         'unit_amount': stripe_amount,
                     },
-                    'quantity': 1,
+                    'quantity': quantity if is_no_seats else 1,
                 }],
                 mode='payment',
                 success_url='http://localhost:5173/checkout/success?session_id={CHECKOUT_SESSION_ID}',
@@ -295,7 +354,7 @@ def create_checkout_session(request):
                     'venue_name': event_instance.venue.name,
                     'event_date': event_instance.time.date().isoformat(),
                     'event_time': event_instance.time.strftime('%H:%M'),
-                    'seats_info': ', '.join(seat_labels),
+                    'seats_info': ', '.join(seat_labels) if seat_labels else f'{quantity} general admission',
                     'user_id': str(user.id),
                 },
             )

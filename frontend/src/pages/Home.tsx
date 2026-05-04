@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import Header from '../components/layout/Header';
 import { EventCard } from '../components/events/EventCard';
 import { apiClient } from '../api/client';
 
 interface EventFromDB {
   id: number;
+  event: number;
   title: string;
   venue_name: string;
   type: string;
@@ -33,7 +34,7 @@ const [events, setEvents] = useState<EventFromDB[]>([]);
     fetchEvents();
   }, []);
 const uniqueEvents = events.reduce((acc: EventFromDB[], current) => {
-  const x = acc.find(item => item.title === current.title);
+  const x = acc.find(item => item.event === current.event);
   if (!x) {
     return acc.concat([current]);
   } else {
@@ -88,7 +89,7 @@ const filteredEvents = uniqueEvents.filter((event: any) => {
               >
                 <EventCard
                   event={{
-                    id: String(event.id),
+                    id: String(event.event),
                     title: event.title,
                     venue: event.venue_name,
                     type: event.type,

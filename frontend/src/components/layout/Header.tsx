@@ -14,13 +14,13 @@ interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({ activeFilter, onFilterChange, onSearchChange }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const navigate = useNavigate();
-  
+
   const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
   const displayName =
-  currentUser.companyName ||
-  [currentUser.firstName, currentUser.lastName].filter(Boolean).join(' ') ||
-  currentUser.email?.split('@')[0] ||
-  'User';
+    currentUser.companyName ||
+    [currentUser.firstName, currentUser.lastName].filter(Boolean).join(' ') ||
+    currentUser.email?.split('@')[0] ||
+    'User';
 
   const filters = ['ALL EVENTS', 'CINEMA', 'THEATRE', 'LECTURE HALL'];
 

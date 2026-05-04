@@ -1,4 +1,5 @@
 from rest_framework import serializers
+from django.db.models import Sum
 from .models import (
     EventInstance, 
     EventSeat, 
@@ -47,29 +48,58 @@ class EventReadSerializer(serializers.ModelSerializer):
     
     price = serializers.SerializerMethodField()
     seatsLeft = serializers.SerializerMethodField()
+    soldTickets = serializers.SerializerMethodField()
     
     seats = EventSeatSerializer(source='eventseat_set', many=True, read_only=True)
 
     class Meta:
         model = EventInstance
         fields = ['id', 'title', 'venue_name', 'description', 'type', 
-                  'price', 'seatsLeft', 'image_url', 'event', 'venue', 'time',
-                  'seats']
+                  'price', 'seatsLeft', 'soldTickets', 'image_url', 'event', 'venue', 'time',
+                  'seats', 'venue_rows', 'venue_seats_per_row']
+
+    venue_rows = serializers.IntegerField(source='venue.rows', read_only=True)
+    venue_seats_per_row = serializers.IntegerField(source='venue.seats_per_row', read_only=True)
 
     def get_price(self, obj):
         prices = EventSeat.objects.filter(event_instance=obj).values_list('seat_category__price', flat=True)
         if not prices:
+            if obj.ticket_price and obj.ticket_price > 0:
+                return float(obj.ticket_price)
             return "Free"
         min_price = min(prices)
         return float(min_price) if min_price > 0 else "Free"
 
     def get_seatsLeft(self, obj):
-        total_seats = EventSeat.objects.filter(event_instance=obj).count()
+        total_assigned_seats = EventSeat.objects.filter(event_instance=obj).count()
+        if total_assigned_seats == 0:
+            capacity = obj.venue.rows * obj.venue.seats_per_row
+            sold = Order.objects.filter(
+                eventinstance=obj,
+                status__in=['pending', 'paid']
+            ).aggregate(total=Sum('quantity'))['total'] or 0
+            return max(capacity - sold, 0)
+
         occupied_seats = OrderSeat.objects.filter(
             event_seat__event_instance=obj,
             order__status__in=['pending', 'paid']
         ).count()
-        return total_seats - occupied_seats
+        return total_assigned_seats - occupied_seats
+
+    def get_soldTickets(self, obj):
+        total_assigned_seats = EventSeat.objects.filter(event_instance=obj).count()
+        if total_assigned_seats == 0:
+            sold = Order.objects.filter(
+                eventinstance=obj,
+                status__in=['pending', 'paid']
+            ).aggregate(total=Sum('quantity'))['total'] or 0
+            return int(sold)
+
+        occupied_seats = OrderSeat.objects.filter(
+            event_seat__event_instance=obj,
+            order__status__in=['pending', 'paid']
+        ).count()
+        return int(occupied_seats)
     
 class EventCreateSerializer(serializers.ModelSerializer):
     event_name = serializers.CharField(write_only=True)
@@ -89,18 +119,21 @@ class EventCreateSerializer(serializers.ModelSerializer):
     
     prices = serializers.DictField(child=serializers.DecimalField(max_digits=10, decimal_places=2), write_only=True)
     seatAssignments = serializers.DictField(child=serializers.CharField(), write_only=True)
+    ticket_price = serializers.DecimalField(max_digits=10, decimal_places=2, write_only=True, required=False, allow_null=True)
 
     class Meta:
         model = EventInstance
         fields = [
-            'id', 'event_name', 'event_description', 'event_image_url', 'category',
+            'id', 'event', 'venue', 'event_name', 'event_description', 'event_image_url', 'category',
             'venue_name', 'venue_rows', 'venue_seats_per_row', 'time',
-            'prices', 'seatAssignments',
+            'prices', 'seatAssignments', 'ticket_price',
         ]
+        read_only_fields = ['event', 'venue']
 
     def create(self, validated_data):
         prices_data = validated_data.pop('prices')
         assignments_data = validated_data.pop('seatAssignments')
+        ticket_price = validated_data.pop('ticket_price', None)
         
         event = Event.objects.create(
             name=validated_data.pop('event_name'),
@@ -120,6 +153,7 @@ class EventCreateSerializer(serializers.ModelSerializer):
             venue=venue,
             time=validated_data.pop('time'),
             host=self.context['request'].user,
+            ticket_price=ticket_price or 0,
         )
         
         category_objects = {}
@@ -181,10 +215,11 @@ class UserOrderSerializer(serializers.ModelSerializer):
     date = serializers.DateTimeField(source='eventinstance.time', read_only=True)
     
     seats = serializers.SerializerMethodField()
+    quantity = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Order
-        fields = ['id', 'user_email', 'user_full_name', 'event_name', 'venue_name', 'date', 'status', 'seats']
+        fields = ['id', 'user_email', 'user_full_name', 'event_name', 'venue_name', 'date', 'status', 'seats', 'quantity']
         
     def get_user_full_name(self, obj):
         full_name = f"{obj.user.first_name} {obj.user.last_name}".strip()

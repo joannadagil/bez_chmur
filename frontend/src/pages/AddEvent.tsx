@@ -312,7 +312,7 @@ const AddEvent = () => {
                         onClick={() => setCategory(option)}
                         className={`rounded-full px-6 py-3 font-black uppercase tracking-[0.18em] transition ${
                           category === option
-                            ? `${isDark ? 'text-black' : 'text-white'} bg-[#d3265b] ring-4 ring-[#d3265b]/25 scale-[1.03]`
+                            ? `text-white bg-[#d3265b] ring-4 ring-[#d3265b]/25 scale-[1.03]`
                             : 'text-[#000000] bg-[#d8d8d8] hover:bg-[#c9c9c9]'
                         }`}
                       >
