@@ -140,13 +140,14 @@ class UserOrderSerializer(serializers.ModelSerializer):
     user_full_name = serializers.SerializerMethodField()
     
     event_name = serializers.CharField(source='eventinstance.event.name', read_only=True)
+    venue_name = serializers.CharField(source='eventinstance.venue.name', read_only=True)
     date = serializers.DateTimeField(source='eventinstance.time', read_only=True)
     
     seats = serializers.SerializerMethodField()
 
     class Meta:
         model = Order
-        fields = ['id', 'user_email', 'user_full_name', 'event_name', 'date', 'status', 'seats']
+        fields = ['id', 'user_email', 'user_full_name', 'event_name', 'venue_name', 'date', 'status', 'seats']
         
     def get_user_full_name(self, obj):
         full_name = f"{obj.user.first_name} {obj.user.last_name}".strip()

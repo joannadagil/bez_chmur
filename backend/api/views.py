@@ -89,6 +89,9 @@ class UserOrdersListView(generics.ListAPIView):
     
     def get_queryset(self):
         return Order.objects.filter(user=self.request.user)
+        # TODO: not sure of the convention, but if we want only paid orders, we could 
+        # # return Order.objects.filter(user=self.request.user, status='paid')
+    
     
 class EventInstanceSeatsListView(generics.ListAPIView):
     serializer_class = EventSeatSerializer

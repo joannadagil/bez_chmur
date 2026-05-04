@@ -40,15 +40,19 @@ const uniqueEvents = events.reduce((acc: EventFromDB[], current) => {
     return acc;
   }
 }, []);
-  const filteredEvents = uniqueEvents.filter((event: any) => {
-    const categoryMatch = activeFilter === 'ALL EVENTS' || 
-      event.type.toUpperCase() === activeFilter; // Porównujemy typ z bazy z filtrem
+const filteredEvents = uniqueEvents.filter((event: any) => {
+  const normalizedType = event.type.trim().toUpperCase();
 
-    const searchMatch = event.title.toLowerCase().includes(searchQuery.toLowerCase());
+  const categoryMatch =
+    activeFilter === 'ALL EVENTS' ||
+    (activeFilter === 'CINEMA' && normalizedType === 'CINEMA') ||
+    (activeFilter === 'THEATRE' && normalizedType === 'THEATRE') ||
+    (activeFilter === 'LECTURE HALL' && normalizedType === 'LECTURE');
 
-    return categoryMatch && searchMatch;
-  });
+  const searchMatch = event.title.toLowerCase().includes(searchQuery.toLowerCase());
 
+  return categoryMatch && searchMatch;
+});
   if (loading) {
     return (
       <div className="bg-[#f5f5dc] min-h-screen flex items-center justify-center">

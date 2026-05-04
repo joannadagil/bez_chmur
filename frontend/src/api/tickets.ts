@@ -5,6 +5,7 @@ type BackendOrderDto = {
   user_email: string;
   user_full_name: string;
   event_name: string;
+  venue_name: string;
   date: string;
   status: string;
   seats: string[];
@@ -35,7 +36,7 @@ export const fetchMyTickets = async (): Promise<TicketDto[]> => {
     return {
       id: order.id,
       title: order.event_name,
-      venue: 'Unknown venue', // TODO This should ideally come from the backend
+      venue: order.venue_name,
       date: dt.toLocaleDateString(),
       time: dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
       seats: order.seats,
