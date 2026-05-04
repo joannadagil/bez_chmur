@@ -1,23 +1,33 @@
 import axios from 'axios';
 import { apiClient } from './client';
 
-export type ShowScheduleDay = {
-  date: string;
-  times: string[];
+export type SeatDto = {
+  id: number;
+  row: string;
+  number: number;
+  is_reserved: boolean;
+  if_exist: boolean;
+  seat_category: { name: string; price: string } | null;
 };
 
 export type HostEventDto = {
   id: number;
+  event: number;
   title: string;
-  venue: string;
+  /** venue integer ID from backend */
+  venue: number;
+  /** venue display name from backend */
+  venue_name: string;
   type: 'Cinema' | 'Theatre' | 'Lecture';
-  price: number;
+  price: number | string;
   seatsLeft: number;
-  image_url: string;
-  schedule: ShowScheduleDay[];
-  removedSeats: string[];
-  seatAssignments: Record<string, 'vip' | 'area1' | 'area2' | 'handicap'>;
-  prices: Record<'vip' | 'area1' | 'area2' | 'handicap', number>;
+  soldTickets: number;
+  image_url: string | null;
+  description: string;
+  time: string;
+  seats: SeatDto[];
+  venue_rows: number;
+  venue_seats_per_row: number;
 };
 
 export type CreateHostEventPayload = {
@@ -31,10 +41,16 @@ export type CreateHostEventPayload = {
   time: string;
   prices: Record<string, number | string>;       
   seatAssignments: Record<string, string>;
+  ticket_price?: number;
 };
 
 export const fetchHostEvents = async (email: string): Promise<HostEventDto[]> => {
   const response = await apiClient.get<HostEventDto[]>('/host-events/', { params: { email } });
+  return response.data;
+};
+
+export const fetchHostEventShowings = async (eventId: string, email: string): Promise<HostEventDto[]> => {
+  const response = await apiClient.get<HostEventDto[]>('/host-events/', { params: { email, event: eventId } });
   return response.data;
 };
 

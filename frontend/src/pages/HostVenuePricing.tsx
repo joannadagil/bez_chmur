@@ -366,7 +366,7 @@ const HostVenuePricing = () => {
         seatAssignments: seatAssignments,
       });
 
-      navigate(`/host-dashboard/event/${created.id}`);
+      navigate(`/host-dashboard/event/${created.event}`);
     } catch (error) {
       setErrors([error instanceof Error ? error.message : 'Could not save this event to backend. Please try again.']);
     }

@@ -44,17 +44,27 @@ const HostDashboard = () => {
     };
   }, [currentUser?.email]);
 
-  const filteredEvents = useMemo(() => hostEvents.filter(event => {
+  const groupedEvents = useMemo(() => {
+    const map = new Map<number, HostEventDto>();
+    for (const event of hostEvents) {
+      if (!map.has(event.event)) {
+        map.set(event.event, event);
+      }
+    }
+    return Array.from(map.values());
+  }, [hostEvents]);
+
+  const filteredEvents = useMemo(() => groupedEvents.filter(event => {
     const categoryMatch = activeFilter === 'ALL EVENTS' ||
       (activeFilter === 'CINEMA' && event.type === 'Cinema') ||
       (activeFilter === 'THEATRE' && event.type === 'Theatre') ||
       (activeFilter === 'LECTURE HALL' && event.type === 'Lecture');
 
     const searchMatch = event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      event.venue.toLowerCase().includes(searchQuery.toLowerCase());
+      event.venue_name.toLowerCase().includes(searchQuery.toLowerCase());
 
     return categoryMatch && searchMatch;
-  }), [hostEvents, activeFilter, searchQuery]);
+  }), [groupedEvents, activeFilter, searchQuery]);
 
   const filters = ['ALL EVENTS', 'CINEMA', 'THEATRE', 'LECTURE HALL'];
 
@@ -182,7 +192,7 @@ const HostDashboard = () => {
         <div className="flex items-center gap-4 px-4 animate-in fade-in slide-in-from-left-4 duration-700">
           <div className="w-4 h-4 rounded-full bg-[#d3265b] shadow-[0_0_15px_rgba(211,38,91,0.4)] animate-pulse"></div>
           <p className="text-3xl font-black text-[#3a0e23] uppercase tracking-tighter italic leading-none">
-            {filteredEvents.length} active events
+            {filteredEvents.length} active {filteredEvents.length === 1 ? 'event' : 'events'}
           </p>
         </div>
 
@@ -206,13 +216,13 @@ const HostDashboard = () => {
               <div key={event.id} className="transform transition-all duration-500 hover:-translate-y-3 hover:rotate-[0.5deg]">
                 <EventCard
                   event={{
-                    id: String(event.id),
+                    id: String(event.event),
                     title: event.title,
-                    venue: event.venue,
+                    venue: event.venue_name,
                     type: event.type,
-                    price: event.price > 0 ? event.price : 'Free',
+                    price: Number(event.price) > 0 ? event.price : 'Free',
                     seatsLeft: event.seatsLeft,
-                    imageUrl: event.image_url,
+                    imageUrl: event.image_url ?? '',
                   }}
                   detailsPathBase="/host-dashboard/event"
                   ctaLabel="Manage"

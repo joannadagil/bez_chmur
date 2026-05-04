@@ -38,6 +38,7 @@ class EventInstance(models.Model):
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
     host = models.ForeignKey(User, on_delete=models.CASCADE, related_name='hosted_event_instances', null=True, blank=True)
     time = models.DateTimeField()
+    ticket_price = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
 
     def __str__(self):
         return f"{self.event.name} at {self.time}"
@@ -85,6 +86,7 @@ class Order(models.Model):
     eventinstance = models.ForeignKey(EventInstance, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default="pending")
+    quantity = models.IntegerField(default=1)
 
     def __str__(self):
         return f"Order {self.id}"

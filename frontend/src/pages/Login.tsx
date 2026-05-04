@@ -12,12 +12,10 @@ const MOCK_HOST_USER = {
   lastName: '',
   companyName: 'Host Demo Company',
   accountType: 'host' as const,
-  email: 'host9999@getaroom.com',
+  email: 'hostdemo@getaroom.com',
   password: 'HostDemo123!',
   createdAt: new Date().toISOString(),
 };
-
-const HOST_EMAILS = new Set([MOCK_HOST_USER.email.toLowerCase()]);
 
 const Login = () => {
   const [formData, setFormData] = useState({
@@ -81,10 +79,22 @@ const Login = () => {
     localStorage.setItem('refresh', refresh);
     localStorage.setItem('isLoggedIn', 'true');
 
-    const currentUser = {
+    let currentUser = {
       email,
       accountType: fallbackAccountType,
     };
+
+    try {
+      const profile = await apiClient.get('/me-role/', {
+        headers: { Authorization: `Bearer ${access}` },
+      });
+      currentUser = {
+        email: profile.data?.email || email,
+        accountType: profile.data?.accountType || fallbackAccountType,
+      };
+    } catch {
+      // Keep fallback role if profile endpoint fails.
+    }
 
     localStorage.setItem('currentUser', JSON.stringify(currentUser));
 
@@ -99,11 +109,10 @@ const Login = () => {
     setErrors({});
 
     try {
-      const isHost = HOST_EMAILS.has(formData.email.toLowerCase());
       const currentUser = await loginWithBackend(
         formData.email,
         formData.password,
-        isHost ? 'host' : 'customer'
+        'customer'
       );
 
       navigate(currentUser.accountType === 'host' ? '/host-dashboard' : '/home');
@@ -141,7 +150,15 @@ const Login = () => {
     setErrors({});
 
     try {
-      await loginWithBackend(MOCK_HOST_USER.email, MOCK_HOST_USER.password, 'host');
+      const currentUser = await loginWithBackend(MOCK_HOST_USER.email, MOCK_HOST_USER.password, 'host');
+      if (currentUser.accountType !== 'host') {
+        localStorage.removeItem('access');
+        localStorage.removeItem('refresh');
+        localStorage.removeItem('isLoggedIn');
+        localStorage.removeItem('currentUser');
+        setErrors({ email: 'Host demo account is not configured as a host in backend.' });
+        return;
+      }
       navigate('/host-dashboard');
     } catch (error: any) {
       if (error?.response?.status === 401) {

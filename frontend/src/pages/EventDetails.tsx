@@ -8,6 +8,7 @@ import { apiClient } from '../api/client';
 
 type EventInstanceDto = {
   id: number;
+  event: number;
   title: string;
   venue_name: string;
   type: string;
@@ -16,11 +17,6 @@ type EventInstanceDto = {
   image_url: string;
   description: string;
   time: string;
-};
-
-type DateOption = {
-  iso: string;
-  label: string;
 };
 
 const formatDateLabel = (isoDate: string) => {
@@ -61,12 +57,13 @@ const EventDetails = () => {
 
     const fetchInstances = async () => {
       try {
-        const response = await apiClient.get<EventInstanceDto[]>('/event-instances/');
+        const response = await apiClient.get<EventInstanceDto[]>('/event-instances/', {
+          params: { event: id },
+        });
         const allInstances = response.data;
 
-        const matchingInstances = allInstances.filter(
-          (event) => String(event.id) === String(id)
-        );
+        const matchingInstances = allInstances
+          .sort((a, b) => new Date(a.time).getTime() - new Date(b.time).getTime());
 
         if (!ignore) {
           if (matchingInstances.length === 0) {
@@ -176,7 +173,7 @@ const EventDetails = () => {
     setIsRedirecting(true);
 
     updateBooking({
-      eventId: String(selectedEvent.id),
+      eventId: String(selectedEvent.event),
       eventInstanceId: selectedInstance.id,
       eventTitle: selectedEvent.title,
       eventCategory: selectedEvent.type,

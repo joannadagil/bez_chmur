@@ -16,8 +16,8 @@ import VenueSelection from './pages/VenueSelection';
 import HostSeatRemoval from './pages/HostSeatRemoval';
 import HostVenuePricing from './pages/HostVenuePricing';
 import HostNoSeatsVenue from './pages/HostNoSeatsVenue';
-import HostEventDetails from './pages/HostEventDetails';
-import HostRoomOutline from './pages/HostRoomOutline';
+import HostEventDetails from './pages/HostEventDetails.tsx';
+import HostRoomOutline from './pages/HostRoomOutline.tsx';
 import { Payment } from './pages/checkout/Payment';
 import SuccessPage from './pages/checkout/SuccessPage';
 import ThemeToggle from './components/layout/ThemeToggle';
@@ -32,6 +32,20 @@ import { useLocation } from 'react-router-dom';
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
   return isLoggedIn ? <>{children}</> : <Navigate to="/login" replace />;
+};
+
+const HostOnlyRoute = ({ children }: { children: React.ReactNode }) => {
+  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+  const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+  if (!isLoggedIn) return <Navigate to="/login" replace />;
+  return currentUser.accountType === 'host' ? <>{children}</> : <Navigate to="/home" replace />;
+};
+
+const CustomerOnlyRoute = ({ children }: { children: React.ReactNode }) => {
+  const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+  const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+  if (!isLoggedIn) return <Navigate to="/login" replace />;
+  return currentUser.accountType === 'host' ? <Navigate to="/host-dashboard" replace /> : <>{children}</>;
 };
 
 const AppLayout = () => {
@@ -60,27 +74,27 @@ const AppLayout = () => {
         <Route path="/forgot-password" element={<ForgotPassword />} />
 
         {/* Protected Routes */}
-        <Route path="/home" element={<ProtectedRoute><Home /></ProtectedRoute>} />
+        <Route path="/home" element={<CustomerOnlyRoute><Home /></CustomerOnlyRoute>} />
         <Route path="/role-selection" element={<ProtectedRoute><RoleSelection /></ProtectedRoute>} />
         <Route path="/profile" element={<ProtectedRoute><CustomerProfile /></ProtectedRoute>} />
         <Route path="/company-profile" element={<ProtectedRoute><CompanyProfile /></ProtectedRoute>} />
         <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
         <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
         <Route path="/host-onboarding" element={<ProtectedRoute><HostOnboarding /></ProtectedRoute>} />
-        <Route path="/host-dashboard" element={<ProtectedRoute><HostDashboard /></ProtectedRoute>} />
-        <Route path="/host-dashboard/add-event" element={<ProtectedRoute><AddEvent /></ProtectedRoute>} />
-        <Route path="/host-dashboard/add-event/venue" element={<ProtectedRoute><VenueSelection /></ProtectedRoute>} />
-        <Route path="/host-dashboard/add-event/venue/:id/seating" element={<ProtectedRoute><HostSeatRemoval /></ProtectedRoute>} />
-        <Route path="/host-dashboard/add-event/venue/:id/pricing" element={<ProtectedRoute><HostVenuePricing /></ProtectedRoute>} />
-        <Route path="/host-dashboard/add-event/venue/:id/configure-no-seats" element={<ProtectedRoute><HostNoSeatsVenue /></ProtectedRoute>} />
-        <Route path="/host-dashboard/event/:id" element={<ProtectedRoute><HostEventDetails /></ProtectedRoute>} />
-        <Route path="/host-dashboard/event/:id/room-outline" element={<ProtectedRoute><HostRoomOutline /></ProtectedRoute>} />
-        <Route path="/event/:id" element={<ProtectedRoute><EventDetails /></ProtectedRoute>} />
-        <Route path="/checkout/success" element={<ProtectedRoute><SuccessPage /></ProtectedRoute>} />
-        <Route path="/checkout/payment" element={<ProtectedRoute><Payment /></ProtectedRoute>} />
-        <Route path="/checkout/:id" element={<ProtectedRoute><SeatSelection /></ProtectedRoute>} />
-        <Route path="/my-tickets" element={<ProtectedRoute><MyTickets /></ProtectedRoute>} />
-        <Route path="/my-tickets/:id" element={<ProtectedRoute><TicketView /></ProtectedRoute>} />
+        <Route path="/host-dashboard" element={<HostOnlyRoute><HostDashboard /></HostOnlyRoute>} />
+        <Route path="/host-dashboard/add-event" element={<HostOnlyRoute><AddEvent /></HostOnlyRoute>} />
+        <Route path="/host-dashboard/add-event/venue" element={<HostOnlyRoute><VenueSelection /></HostOnlyRoute>} />
+        <Route path="/host-dashboard/add-event/venue/:id/seating" element={<HostOnlyRoute><HostSeatRemoval /></HostOnlyRoute>} />
+        <Route path="/host-dashboard/add-event/venue/:id/pricing" element={<HostOnlyRoute><HostVenuePricing /></HostOnlyRoute>} />
+        <Route path="/host-dashboard/add-event/venue/:id/configure-no-seats" element={<HostOnlyRoute><HostNoSeatsVenue /></HostOnlyRoute>} />
+        <Route path="/host-dashboard/event/:id" element={<HostOnlyRoute><HostEventDetails /></HostOnlyRoute>} />
+        <Route path="/host-dashboard/event/:id/room-outline" element={<HostOnlyRoute><HostRoomOutline /></HostOnlyRoute>} />
+        <Route path="/event/:id" element={<CustomerOnlyRoute><EventDetails /></CustomerOnlyRoute>} />
+        <Route path="/checkout/success" element={<CustomerOnlyRoute><SuccessPage /></CustomerOnlyRoute>} />
+        <Route path="/checkout/payment" element={<CustomerOnlyRoute><Payment /></CustomerOnlyRoute>} />
+        <Route path="/checkout/:id" element={<CustomerOnlyRoute><SeatSelection /></CustomerOnlyRoute>} />
+        <Route path="/my-tickets" element={<CustomerOnlyRoute><MyTickets /></CustomerOnlyRoute>} />
+        <Route path="/my-tickets/:id" element={<CustomerOnlyRoute><TicketView /></CustomerOnlyRoute>} />
       </Routes>
     </div>
   );
