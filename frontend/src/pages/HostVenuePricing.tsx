@@ -362,6 +362,8 @@ const HostVenuePricing = () => {
         venue_rows: layout.rows.length,
         venue_seats_per_row: layout.seatsPerRow,
         time: eventDateTime,
+        prices: prices,           
+        seatAssignments: seatAssignments,
       });
 
       navigate(`/host-dashboard/event/${created.id}`);

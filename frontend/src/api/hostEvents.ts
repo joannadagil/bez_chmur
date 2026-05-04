@@ -13,7 +13,7 @@ export type HostEventDto = {
   type: 'Cinema' | 'Theatre' | 'Lecture';
   price: number;
   seatsLeft: number;
-  imageUrl: string;
+  image_url: string;
   schedule: ShowScheduleDay[];
   removedSeats: string[];
   seatAssignments: Record<string, 'vip' | 'area1' | 'area2' | 'handicap'>;
@@ -29,6 +29,8 @@ export type CreateHostEventPayload = {
   venue_rows: number;
   venue_seats_per_row: number;
   time: string;
+  prices: Record<string, number | string>;       
+  seatAssignments: Record<string, string>;
 };
 
 export const fetchHostEvents = async (email: string): Promise<HostEventDto[]> => {
