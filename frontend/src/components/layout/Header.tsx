@@ -11,18 +11,16 @@ interface HeaderProps {
   onSearchChange: (query: string) => void;
 }
 
-const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
-
-const displayName =
+const Header: React.FC<HeaderProps> = ({ activeFilter, onFilterChange, onSearchChange }) => {
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const navigate = useNavigate();
+  
+  const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
+  const displayName =
   currentUser.companyName ||
   [currentUser.firstName, currentUser.lastName].filter(Boolean).join(' ') ||
   currentUser.email?.split('@')[0] ||
   'User';
-
-const Header: React.FC<HeaderProps> = ({ activeFilter, onFilterChange, onSearchChange }) => {
-  const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const navigate = useNavigate();
-  const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
 
   const filters = ['ALL EVENTS', 'CINEMA', 'THEATRE', 'LECTURE HALL'];
 
