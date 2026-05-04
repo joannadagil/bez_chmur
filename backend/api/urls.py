@@ -18,6 +18,7 @@ from .views import (
     PaymantCreateView,
     OrderView,
     EventDetailView,
+    stripe_webhook,
 
 )
 
@@ -25,9 +26,10 @@ urlpatterns = [
     path('event-instances/', EventListView.as_view()),
     path('host-events/', EventListView.as_view()),
     path('create-checkout-session/', create_checkout_session, name='create-checkout-session'),
+    path('stripe/webhook/', stripe_webhook),
     path('host-events/<int:pk>/', EventDetailView.as_view()),
     path('event-instances/<int:pk>/seats/', EventInstanceSeatsListView.as_view()),
-    path('get-session-details/', get_session_details, name='session-details'),
+    path('session-details/', get_session_details, name='session-details'),
     path('venues/', VenueListCreateView.as_view()),
     path('payments/', PaymantCreateView.as_view()),
     path('orders/', OrderView.as_view()),
