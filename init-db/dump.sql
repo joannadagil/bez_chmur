@@ -2819,7 +2819,7 @@ SELECT pg_catalog.setval('public.auth_user_groups_id_seq', 1, true);
 -- Name: auth_user_id_seq; Type: SEQUENCE SET; Schema: public; Owner: myuser
 --
 
-SELECT pg_catalog.setval('public.auth_user_id_seq', 3, true);
+SELECT pg_catalog.setval('public.auth_user_id_seq', (SELECT COALESCE(MAX(id), 1) FROM public.auth_user), true);
 
 
 --
