@@ -51,9 +51,6 @@ export const EventCard: React.FC<EventCardProps> = ({
               {event.type}
             </span>
 
-            <span className="text-[10px] opacity-40 uppercase font-bold tracking-tighter">
-              {event.seatsLeft !== undefined ? `${event.seatsLeft} left` : ''}
-            </span>
           </div>
 
           <div className="space-y-0.5">
@@ -67,7 +64,7 @@ export const EventCard: React.FC<EventCardProps> = ({
 
           <div className="pt-2 flex justify-between items-center border-t border-white/5">
             <span className="text-lg font-black text-[#f27690]">
-              {Number(event.price) > 0 ? `$${event.price}` : 'FREE'}
+              FROM {Number(event.price) > 0 ? `$${event.price}` : 'FREE'}
             </span>
 
             <button

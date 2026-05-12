@@ -354,11 +354,15 @@ const SeatSelection = () => {
                                       }
                                       title={`${seatLabel} · $${seat.seat_category?.price ?? 0}`}
                                     >
-                                      {!isTaken && (
-                                        <span className="absolute -top-8 left-1/2 -translate-x-1/2 bg-[#3a0e23] text-white text-[8px] px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none font-bold z-20 whitespace-nowrap">
-                                          {seatLabel}
+                                  {!isTaken && (
+                                      <span className="absolute -top-10 left-1/2 -translate-x-1/2 bg-[#3a0e23] text-white text-[10px] px-2 py-1.5 rounded shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none font-bold z-20 whitespace-nowrap flex flex-col items-center">
+                                        <span>{seatLabel}</span>
+                                        <span className="text-[#ffafbd] text-[9px] border-t border-white/20 mt-1 pt-1">
+                                          ${Number(seat.seat_category?.price || 0).toFixed(2)}
                                         </span>
-                                      )}
+                                        <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-[#3a0e23] rotate-45"></div>
+                                      </span>
+                                    )}
                                     </button>
                                   );
                                 })}
