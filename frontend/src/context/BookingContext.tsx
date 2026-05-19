@@ -1,6 +1,9 @@
 import { createContext, useContext, useState } from 'react';
 import type { ReactNode } from 'react';
 
+/**
+ * Booking state shared across event details, seat selection, and checkout pages.
+ */
 interface BookingData {
   eventId: string;
   eventInstanceId: number | null;
@@ -51,6 +54,9 @@ const initialBooking: BookingData = {
 
 const BookingContext = createContext<BookingContextType | undefined>(undefined);
 
+/**
+ * Provides mutable booking state for the current checkout flow.
+ */
 export const BookingProvider = ({ children }: { children: ReactNode }) => {
   const [booking, setBooking] = useState<BookingData>(initialBooking);
 
@@ -67,6 +73,11 @@ export const BookingProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
+/**
+ * Access the current booking context.
+ *
+ * @throws When used outside `BookingProvider`.
+ */
 export const useBooking = () => {
   const context = useContext(BookingContext);
   if (!context) throw new Error('useBooking must be used within a BookingProvider');

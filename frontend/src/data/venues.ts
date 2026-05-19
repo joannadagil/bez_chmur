@@ -1,3 +1,6 @@
+/**
+ * Venue option used by host setup flows and local seating configuration.
+ */
 export interface VenueData {
   id: string;
   name: string;
@@ -11,10 +14,16 @@ export interface VenueData {
   busyRanges: { start: string; end: string }[];
 }
 
+/**
+ * Create alphabetic row labels for a seated venue layout.
+ */
 const createRowLabels = (count: number) => {
   return Array.from({ length: count }, (_, idx) => String.fromCharCode(65 + idx));
 };
 
+/**
+ * Built-in venue templates available during host event setup.
+ */
 export const venues: VenueData[] = [
   {
     id: '1',

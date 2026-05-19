@@ -11,6 +11,9 @@ type BackendOrderDto = {
   seats: string[];
 };
 
+/**
+ * Ticket shape consumed by customer ticket screens.
+ */
 export type TicketDto = {
   id: number;
   title: string;
@@ -23,6 +26,9 @@ export type TicketDto = {
 };
 
 
+/**
+ * Fetch the current user's orders and normalize backend order data into tickets.
+ */
 export const fetchMyTickets = async (): Promise<TicketDto[]> => {
   const response = await apiClient.get<BackendOrderDto[]>('/user-order/');
 

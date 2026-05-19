@@ -1,5 +1,8 @@
 import Navbar from '../components/layout/Navbar';
 
+/**
+ * Placeholder settings page for account preferences.
+ */
 const Settings = () => {
   const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
   const isHost = currentUser.accountType === 'host' || currentUser.email === 'host@getaroom.com';

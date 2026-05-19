@@ -7,6 +7,9 @@ import { venues } from '../data/venues';
 
 type GridPoint = { rowIndex: number; seatIndex: number };
 
+/**
+ * Host configuration page for excluding unusable seats from a venue layout.
+ */
 const HostSeatRemoval = () => {
   const navigate = useNavigate();
   const { id: venueId } = useParams();

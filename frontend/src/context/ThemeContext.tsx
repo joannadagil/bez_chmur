@@ -14,6 +14,9 @@ const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
 const THEME_STORAGE_KEY = 'themeMode';
 
+/**
+ * Resolve the first theme from storage or the user's system preference.
+ */
 const getInitialTheme = (): Theme => {
   const savedTheme = localStorage.getItem(THEME_STORAGE_KEY);
   if (savedTheme === 'light' || savedTheme === 'dark') {
@@ -24,6 +27,9 @@ const getInitialTheme = (): Theme => {
   return prefersDark ? 'dark' : 'light';
 };
 
+/**
+ * Applies the active theme to the document and exposes theme controls.
+ */
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   const [theme, setThemeState] = useState<Theme>(getInitialTheme);
 
@@ -42,6 +48,11 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
   return <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>;
 };
 
+/**
+ * Access the active theme context.
+ *
+ * @throws When used outside `ThemeProvider`.
+ */
 export const useTheme = () => {
   const context = useContext(ThemeContext);
   if (!context) {

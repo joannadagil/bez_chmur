@@ -5,6 +5,9 @@ import Navbar from '../../components/layout/Navbar';
 import { useBooking } from '../../context/BookingContext';
 import { apiClient } from '../../api/client';
 
+/**
+ * Checkout payment page that starts Stripe checkout for the current booking.
+ */
 export const Payment: React.FC = () => {
   const navigate = useNavigate();
   const { booking } = useBooking();
@@ -46,7 +49,7 @@ const handlePayment = async (e: React.FormEvent) => {
     const response = await apiClient.post('/create-checkout-session/', {
       event_instance_id: booking.eventInstanceId,
       seat_ids: booking.seatIds,
-      total_price: booking.totalPrice, 
+      total_price: booking.totalPrice,
     });
 
     const { url } = response.data;
@@ -59,7 +62,7 @@ const handlePayment = async (e: React.FormEvent) => {
     }
   } catch (err: any) {
     console.error('Payment Error:', err.response?.data || err.message);
-    
+
     const errorMsg = err.response?.data?.error || 'Payment system is temporarily unavailable.';
     setSubmissionError(errorMsg);
     setIsProcessing(false);
@@ -69,7 +72,7 @@ const handlePayment = async (e: React.FormEvent) => {
  return (
     <div className="min-h-screen bg-[#f0f2f5] font-sans text-[#1a0b1a] animate-in fade-in duration-700">
       <Navbar />
-      
+
       <main className="max-w-5xl mx-auto pt-6 pb-12 px-8">
         <div className="mb-8 bg-white border border-white rounded-[22px] py-4 px-6 flex items-center justify-center gap-3 shadow-sm">
           <Clock size={16} className="text-orange-400" />
@@ -135,14 +138,14 @@ const handlePayment = async (e: React.FormEvent) => {
       </li>
     </ul>
 
-    <button 
+    <button
       onClick={handlePayment}
       disabled={isProcessing}
       className="w-full bg-[#3a0e23] hover:bg-black text-white font-black py-5 rounded-2xl transition-all shadow-xl active:scale-95 mt-4 uppercase text-[12px] tracking-[0.2em] flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed"
     >
       {isProcessing ? (
         <>
-          <Loader2 className="w-4 h-4 animate-spin" /> 
+          <Loader2 className="w-4 h-4 animate-spin" />
           Connecting to Stripe...
         </>
       ) : (

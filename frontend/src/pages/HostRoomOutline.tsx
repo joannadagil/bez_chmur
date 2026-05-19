@@ -10,6 +10,9 @@ const shortCategoryName = (name: string) => {
   return idx >= 0 ? name.slice(0, idx) : name;
 };
 
+/**
+ * Build a stable category-to-color map for the host seat outline legend.
+ */
 function buildCategoryColors(seats: SeatDto[]): Record<string, string> {
   const names = [...new Set(seats.map((s) => s.seat_category?.name).filter(Boolean) as string[])];
   return Object.fromEntries(names.map((name, i) => [name, PALETTE[i % PALETTE.length]]));
@@ -22,6 +25,9 @@ const splitSeatSections = (seatsPerRow: number) => {
   return [left, center, right];
 };
 
+/**
+ * Host room outline page for reviewing event seats and pricing categories.
+ */
 const HostRoomOutline = () => {
   const { id } = useParams();
   const navigate = useNavigate();

@@ -2,6 +2,9 @@ import { venues } from './venues';
 
 export type HostCategory = 'vip' | 'area1' | 'area2' | 'handicap';
 
+/**
+ * Saved seat-pricing configuration for a host-managed venue.
+ */
 export type HostRoomConfig = {
   eventId: string;
   eventCategory: string;
@@ -55,6 +58,9 @@ const writeConfigs = (configs: HostRoomConfig[]) => {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(configs));
 };
 
+/**
+ * Persist a host room configuration, replacing any previous config for the event.
+ */
 export const saveHostRoomConfig = (config: HostRoomConfig) => {
   const configs = parseConfigs();
   const existingIndex = configs.findIndex((item) => item.eventId === config.eventId);
@@ -66,6 +72,9 @@ export const saveHostRoomConfig = (config: HostRoomConfig) => {
   writeConfigs(configs);
 };
 
+/**
+ * Load a host room configuration or synthesize a default seated venue config.
+ */
 export const getHostRoomConfig = (eventId: string): HostRoomConfig | null => {
   const configs = parseConfigs();
   const fromStorage = configs.find((item) => item.eventId === eventId);

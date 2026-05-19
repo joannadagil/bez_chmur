@@ -1,5 +1,8 @@
 import Navbar from '../components/layout/Navbar';
 
+/**
+ * Placeholder notifications page for account messages.
+ */
 const Notifications = () => {
   const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
   const isHost = currentUser.accountType === 'host' || currentUser.email === 'host@getaroom.com';

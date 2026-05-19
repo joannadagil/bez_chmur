@@ -43,9 +43,13 @@ from .serializers import (
 
 
 class EventListView(generics.ListCreateAPIView):
+    """List public upcoming event instances or create a hosted event setup."""
+
     queryset = EventInstance.objects.select_related('event', 'venue', 'event__category').all()
 
     def get_queryset(self):
+        """Return upcoming hosted events, optionally filtered by event id."""
+
         qs = EventInstance.objects.select_related('event', 'venue', 'event__category').filter(host__isnull=False)
         event_id = self.request.query_params.get('event')
         if event_id:
@@ -56,21 +60,31 @@ class EventListView(generics.ListCreateAPIView):
         return qs.order_by('time')
 
     def get_serializer_class(self):
+        """Use write serializer for creation and read serializer for listing."""
+
         if self.request.method == 'POST':
             return EventCreateSerializer
         return EventReadSerializer
 
     def get_permissions(self):
+        """Require authentication for creation and allow anonymous reads."""
+
         if self.request.method == 'POST':
             return [permissions.IsAuthenticated()]
         return [permissions.AllowAny()]
-    
+
 class EventDetailView(generics.RetrieveAPIView):
+    """Retrieve one public event instance."""
+
     queryset = EventInstance.objects.all()
     serializer_class = EventReadSerializer
 
 class HostEventListView(generics.ListCreateAPIView):
+    """List or create event instances owned by the authenticated host."""
+
     def get_queryset(self):
+        """Return the host's upcoming showings, optionally filtered by event id."""
+
         qs = EventInstance.objects.select_related(
             'event', 'venue', 'event__category', 'host'
         ).filter(host=self.request.user)
@@ -83,18 +97,26 @@ class HostEventListView(generics.ListCreateAPIView):
         return qs.order_by('time')
 
     def get_serializer_class(self):
+        """Use write serializer for creation and read serializer for listing."""
+
         if self.request.method == 'POST':
             return EventCreateSerializer
         return EventReadSerializer
 
     def get_permissions(self):
+        """Require an authenticated user for every host event operation."""
+
         return [permissions.IsAuthenticated()]
-    
+
 class HostEventDetailView(generics.RetrieveAPIView):
+    """Retrieve a single upcoming event instance for the authenticated host."""
+
     serializer_class = EventReadSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
+        """Limit detail access to future showings owned by the request user."""
+
         qs = EventInstance.objects.select_related(
             'event', 'venue', 'event__category', 'host'
         ).filter(host=self.request.user)
@@ -105,6 +127,8 @@ class HostEventDetailView(generics.RetrieveAPIView):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def current_user_role(request):
+    """Return profile basics and whether the current user is a host."""
+
     user = request.user
     is_host = user.groups.filter(name='Host').exists()
     return Response({
@@ -115,45 +139,67 @@ def current_user_role(request):
     })
 
 class VenueListCreateView(generics.ListCreateAPIView):
+    """List or create venue layouts."""
+
     queryset = Venue.objects.all()
     serializer_class = VenueSerializer
 
 class PaymantCreateView(generics.ListCreateAPIView):
+    """List or create payment records for administrative flows."""
+
     queryset = Payment.objects.all()
     serializer_class = PaymentSerializer
 
 class OrderView(generics.ListCreateAPIView):
+    """List or create orders for administrative flows."""
+
     queryset = Order.objects.all()
     serializer_class = OrderSerializer
-    
+
 class EventListCreateView(generics.ListCreateAPIView):
+    """List or create reusable event definitions."""
+
     queryset = Event.objects.all()
     serializer_class = EventModelSerializer
 
 class EventCategoryListCreateView(generics.ListCreateAPIView):
+    """List or create event categories."""
+
     queryset = EventCategory.objects.all()
     serializer_class = EventCategorySerializer
-    
+
 class UserListView(generics.ListCreateAPIView):
+    """List users for administrative screens."""
+
     serializer_class = UserSerializer
-    
+
     def get_queryset(self):
+        """Return newest users first."""
+
         return User.objects.order_by('-id')
-    
+
 class UserOrdersListView(generics.ListAPIView):
+    """List ticket orders belonging to the authenticated user."""
+
     serializer_class = UserOrderSerializer
     permission_classes = [permissions.IsAuthenticated]
-    
+
     def get_queryset(self):
+        """Return all orders owned by the request user."""
+
         return Order.objects.filter(user=self.request.user)
-        # TODO: not sure of the convention, but if we want only paid orders, we could 
+        # TODO: not sure of the convention, but if we want only paid orders, we could
         # # return Order.objects.filter(user=self.request.user, status='paid')
-    
-    
+
+
 class EventInstanceSeatsListView(generics.ListAPIView):
+    """List event-specific seats with reservation status."""
+
     serializer_class = EventSeatSerializer
 
     def get_queryset(self):
+        """Return seats assigned to the event instance id from the route."""
+
         instance_id = self.kwargs['pk']
         return EventSeat.objects.filter(event_instance_id=instance_id).select_related('seat', 'seat_category')
 
@@ -162,9 +208,13 @@ class EventInstanceSeatsListView(generics.ListAPIView):
 # Legacy endpoint kept for manual/testing flows.
 # Main purchase flow goes through Stripe checkout session.
 class BookSeatsView(views.APIView):
+    """Legacy endpoint that reserves selected seats without Stripe checkout."""
+
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
+        """Create a pending order after validating event and seat availability."""
+
         user = request.user
         event_instance_id = request.data.get('event_instance_id')
         seat_ids = request.data.get('seat_ids', [])
@@ -232,9 +282,11 @@ class BookSeatsView(views.APIView):
                 {"error": str(e)},
                 status=status.HTTP_400_BAD_REQUEST
             )
-        
+
 
 class RegisterView(generics.CreateAPIView):
+    """Register a new customer or host account."""
+
     queryset = User.objects.all()
     serializer_class = RegisterSerializer
     permission_classes = [permissions.AllowAny]
@@ -244,10 +296,12 @@ class RegisterView(generics.CreateAPIView):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def create_checkout_session(request):
+    """Reserve tickets and create a Stripe Checkout session for payment."""
+
     data = request.data
     event_instance_id = data.get('event_instance_id')
     seat_ids = data.get('seat_ids', [])
-    total_price = data.get('total_price') 
+    total_price = data.get('total_price')
     try:
         quantity = int(data.get('quantity', 1) or 1)
     except (TypeError, ValueError):
@@ -255,10 +309,10 @@ def create_checkout_session(request):
 
     if not event_instance_id:
         return Response({'error': 'Missing event_instance_id'}, status=400)
-    
+
     if total_price in [None, '']:
         return Response({'error': 'Missing total_price'}, status=400)
-    
+
     try:
         stripe_amount = int(float(total_price) * 100)
     except (TypeError, ValueError):
@@ -369,10 +423,12 @@ def create_checkout_session(request):
         return Response({'error': 'Event instance not found'}, status=404)
     except Exception as e:
         return Response({'error': str(e)}, status=500)
-    
+
 @csrf_exempt
 @require_POST
 def stripe_webhook(request):
+    """Handle Stripe Checkout completion and expiration events."""
+
     payload = request.body
     sig_header = request.META.get('HTTP_STRIPE_SIGNATURE')
     endpoint_secret = settings.STRIPE_WEBHOOK_SECRET
@@ -434,11 +490,13 @@ def stripe_webhook(request):
         print(traceback.format_exc())
         print("--- WEBHOOK ERROR END ---")
         return HttpResponse(status=500)
-    
+
 
 
 @api_view(['GET'])
 def get_session_details(request):
+    """Return checkout confirmation details for a Stripe session id."""
+
     session_id = request.GET.get('session_id')
 
     if not session_id:

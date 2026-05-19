@@ -19,6 +19,9 @@ interface EventCardProps {
   ctaLabel?: string;
 }
 
+/**
+ * Compact event summary card for browsing and selecting an event.
+ */
 export const EventCard: React.FC<EventCardProps> = ({
   event,
   detailsPathBase = '/event',

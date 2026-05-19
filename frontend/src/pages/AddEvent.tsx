@@ -54,6 +54,9 @@ const parseTime = (time: string) => {
   return { hour: h ?? 0, minute: m ?? 0 };
 };
 
+/**
+ * Host form for creating events, showings, venue layout, and pricing.
+ */
 const AddEvent = () => {
   const navigate = useNavigate();
   const { updateBooking } = useBooking();

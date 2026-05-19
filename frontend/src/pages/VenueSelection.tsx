@@ -7,6 +7,9 @@ import { useBooking } from '../context/BookingContext';
 import { venues } from '../data/venues';
 import type { VenueData } from '../data/venues';
 
+/**
+ * Host venue selection and layout page used during event setup.
+ */
 const VenueSelection = () => {
   const navigate = useNavigate();
   const { booking, updateBooking } = useBooking();
@@ -16,7 +19,7 @@ const VenueSelection = () => {
   const [selectedVenue, setSelectedVenue] = useState<string | null>(null);
   const [showFilterDropdown, setShowFilterDropdown] = useState(false);
   const [showSortDropdown, setShowSortDropdown] = useState(false);
-  
+
   const filterRef = useRef<HTMLDivElement>(null);
   const sortRef = useRef<HTMLDivElement>(null);
 
@@ -37,7 +40,7 @@ const VenueSelection = () => {
   const filteredVenues = venues.filter(venue => {
     const matchesSearch = venue.name.toLowerCase().includes(searchTerm.toLowerCase());
     let matchesFilter = false;
-    
+
     if (filterType === 'all') {
       matchesFilter = true;
     } else if (filterType === 'seated') {
@@ -49,7 +52,7 @@ const VenueSelection = () => {
     } else if (filterType === 'small') {
       matchesFilter = venue.type === 'seated' && !!venue.size && venue.size <= 100;
     }
-    
+
     return matchesSearch && matchesFilter;
   });
 
@@ -116,7 +119,7 @@ const VenueSelection = () => {
     <div className="min-h-screen bg-[#f5f5dc] font-sans selection:bg-[#ffbcc7] selection:text-[#3a0e23]">
       <Navbar hideTicketsLink logoLink="/host-dashboard" userName="Company Name" />
 
-   
+
 
       {/* Main Content */}
       <div className="px-6 md:px-12 py-12">
@@ -210,7 +213,7 @@ const VenueSelection = () => {
 
               {filterType !== 'all' && (
                 <span className="px-4 py-2 text-sm text-[#3a0e23] font-semibold capitalize bg-[#ffbcc7] rounded-full">
-                  {filterType === 'seated' ? 'Seated' : 
+                  {filterType === 'seated' ? 'Seated' :
                    filterType === 'no-seats' ? 'No Seats' :
                    filterType === 'large' ? 'Large (≥500)' :
                    filterType === 'small' ? 'Small (≤100)' : filterType}

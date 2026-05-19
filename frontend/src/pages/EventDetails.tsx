@@ -38,6 +38,9 @@ const formatTimeLabel = (isoDatetime: string) => {
   });
 };
 
+/**
+ * Public event detail page that prepares booking state before checkout.
+ */
 const EventDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -239,9 +242,9 @@ const EventDetails = () => {
 
       <div className="relative min-h-[350px] w-full overflow-hidden">
         <div className="absolute inset-0 z-0">
-          <img 
-            src={selectedEvent.image_url} 
-            className="w-full h-full object-cover blur-sm brightness-50 scale-105" 
+          <img
+            src={selectedEvent.image_url}
+            className="w-full h-full object-cover blur-sm brightness-50 scale-105"
             alt=""
           />
           <div className="absolute inset-0 bg-gradient-to-t from-[#fcfbff] via-transparent to-black/20"></div>

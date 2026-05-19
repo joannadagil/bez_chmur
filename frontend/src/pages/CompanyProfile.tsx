@@ -1,5 +1,8 @@
 import Navbar from '../components/layout/Navbar';
 
+/**
+ * Static company profile page for host-facing account information.
+ */
 const CompanyProfile = () => {
   const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
   const companyName = currentUser.companyName || 'Demo Company';

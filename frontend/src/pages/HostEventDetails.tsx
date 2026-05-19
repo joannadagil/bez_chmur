@@ -3,6 +3,9 @@ import { useNavigate, useParams } from 'react-router-dom';
 import Navbar from '../components/layout/Navbar';
 import { fetchHostEventShowings, type HostEventDto } from '../api/hostEvents';
 
+/**
+ * Host detail page for a single event instance and its seat map.
+ */
 const HostEventDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();

@@ -6,6 +6,9 @@ import { Ticket, Settings, Bell, LogOut, Clapperboard, Theater, MapPin, QrCode, 
 import { fetchMyTickets, type TicketDto } from '../api/tickets';
 import { useTheme } from '../context/ThemeContext';
 
+/**
+ * Customer page listing current and past purchased tickets.
+ */
 const MyTickets = () => {
   const navigate = useNavigate();
   const { isDark } = useTheme();
@@ -103,7 +106,7 @@ const MyTickets = () => {
 
       <main className="max-w-[1200px] mx-auto px-8 py-10">
         <div className="flex flex-col md:grid md:grid-cols-12 gap-10">
-          
+
           <aside className="md:col-span-3 space-y-6">
             <div className="bg-[#3a0e23] p-8 rounded-[35px] text-white text-center shadow-2xl border border-white/5">
               <div className="w-16 h-16 mx-auto mb-4">
@@ -117,7 +120,7 @@ const MyTickets = () => {
 
             <nav className="bg-[#3a0e23] overflow-hidden rounded-[35px] shadow-2xl flex flex-col border border-white/5">
               {sidebarItems.map((item) => (
-                <button 
+                <button
                   key={item.label}
                   type="button"
                   onClick={item.onClick}
@@ -138,10 +141,10 @@ const MyTickets = () => {
                 <h1 className="text-3xl font-black uppercase tracking-tighter text-[#3a0e23]">Tickets</h1>
                 <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Manage your bookings</p>
               </div>
-              
+
               <div className="flex gap-1 bg-black/5 p-1 rounded-xl">
                 {['upcoming', 'past'].map((tab) => (
-                  <button 
+                  <button
                     key={tab}
                     onClick={() => setActiveTab(tab as any)}
                     className={`px-6 py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all
@@ -169,8 +172,8 @@ const MyTickets = () => {
               )}
 
               {filteredTickets.map((ticket) => (
-                <div 
-                  key={ticket.id} 
+                <div
+                  key={ticket.id}
                   className={`group relative bg-white p-6 rounded-[35px] shadow-xl border-2 border-transparent flex flex-col md:flex-row items-center gap-8 transition-all hover:border-white/50 hover:shadow-2xl
                     ${ticket.isPast ? 'opacity-50 grayscale' : ''}`}
                 >
@@ -188,12 +191,12 @@ const MyTickets = () => {
                         {ticket.status}
                       </span>
                     </div>
-                    
+
                     <div className="flex flex-wrap justify-center md:justify-start items-center gap-y-2 gap-x-5 text-[10px] text-gray-400 font-black uppercase tracking-widest">
                       <div className="flex items-center gap-1.5"><MapPin size={12} className="text-[#ff3366]" /> {ticket.venue}</div>
                       <div className="flex items-center gap-1.5"><Calendar size={12} /> {ticket.date}</div>
                     </div>
-                    
+
                     <div className="flex justify-center md:justify-start gap-2 mt-4">
                       {ticket.seats.map(s => (
                         <span key={s} className="bg-[#3a0e23] text-white text-[9px] px-3 py-1 rounded-lg font-black uppercase tracking-tighter">

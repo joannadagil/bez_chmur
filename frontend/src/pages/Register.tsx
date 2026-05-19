@@ -6,6 +6,9 @@ import { apiClient } from '../api/client';
 import logo_white from '../assets/logo_white.png';
 import { useTheme } from '../context/ThemeContext';
 
+/**
+ * Registration page for creating customer or host accounts.
+ */
 const Register = () => {
   const [formData, setFormData] = useState({
     firstName: '',
@@ -135,10 +138,10 @@ const Register = () => {
         {/* Logo */}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-6">
-            <img 
-              src={authLogo} 
-              alt="getAroom Logo" 
-              className="w-250 h-30 object-contain cursor-pointer" 
+            <img
+              src={authLogo}
+              alt="getAroom Logo"
+              className="w-250 h-30 object-contain cursor-pointer"
               onClick={() => navigate('/')}
             />
           </div>

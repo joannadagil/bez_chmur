@@ -2,6 +2,9 @@ import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import logo from '../assets/logo.png';
 
+/**
+ * Entry page that routes visitors toward customer or host flows.
+ */
 const Landing = () => {
   const navigate = useNavigate();
   const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';

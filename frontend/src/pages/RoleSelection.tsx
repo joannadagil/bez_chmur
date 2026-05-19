@@ -3,6 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { Users, Building2, ArrowRight } from 'lucide-react';
 import logo from '../assets/logo.png';
 
+/**
+ * Role selection page that chooses customer or host registration flow.
+ */
 const RoleSelection = () => {
   const [selectedRole, setSelectedRole] = useState<'customer' | 'host' | null>(null);
   const [companyName, setCompanyName] = useState('');

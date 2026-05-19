@@ -5,6 +5,9 @@ import logo from '../assets/logo.png';
 import logo_white from '../assets/logo_white.png';
 import { useTheme } from '../context/ThemeContext';
 
+/**
+ * Password recovery request page.
+ */
 const ForgotPassword = () => {
   const navigate = useNavigate();
   const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';

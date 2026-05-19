@@ -27,6 +27,9 @@ const CATEGORY_META: Record<Category, { label: string; color: string }> = {
   handicap: { label: 'HANDICAP / ENTRY', color: '#fbb035' },
 };
 
+/**
+ * Host configuration page for assigning seating categories and ticket prices.
+ */
 const HostVenuePricing = () => {
   const navigate = useNavigate();
   const { id: venueId } = useParams();
@@ -364,7 +367,7 @@ const HostVenuePricing = () => {
         venue_seats_per_row: layout.seatsPerRow,
         time: eventDateTime,
         times: scheduledTimes,
-        prices: prices,           
+        prices: prices,
         seatAssignments: seatAssignments,
       });
 
@@ -555,7 +558,7 @@ const HostVenuePricing = () => {
                             const seatId = `${row}${seatIndex + 1}`;
                             const isRemoved = removedSeats.has(seatId);
                             if (isRemoved) return <div key={seatId} className="h-8 w-8" title={`${seatId} removed`} />;
-                            
+
                             const assignedCategory = seatAssignments[seatId];
                             const isPreview = previewSeatSet.has(seatId);
                             const previewCategory = isPreview ? selectedCategory : assignedCategory;

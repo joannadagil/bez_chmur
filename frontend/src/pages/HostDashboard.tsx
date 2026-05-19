@@ -6,6 +6,9 @@ import { fetchHostEvents, type HostEventDto } from '../api/hostEvents';
 import logo from '../assets/logo_white_1.png';
 import ThemeToggle from '../components/layout/ThemeToggle';
 
+/**
+ * Host dashboard showing upcoming events and sales summaries.
+ */
 const HostDashboard = () => {
   const navigate = useNavigate();
   const [activeFilter, setActiveFilter] = useState('ALL EVENTS');

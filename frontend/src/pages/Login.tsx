@@ -17,6 +17,9 @@ const MOCK_HOST_USER = {
   createdAt: new Date().toISOString(),
 };
 
+/**
+ * Login page that authenticates users and routes them by account type.
+ */
 const Login = () => {
   const [formData, setFormData] = useState({
     email: '',

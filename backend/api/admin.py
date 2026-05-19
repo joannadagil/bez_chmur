@@ -4,35 +4,39 @@ from django.contrib.auth.models import User
 
 # Register your models here.
 from .models import (
-    Venue, 
-    EventCategory, 
-    Event, 
-    EventInstance, 
-    Seat, 
-    SeatCategory, 
-    EventSeat, 
-    Order, 
-    OrderSeat, 
+    Venue,
+    EventCategory,
+    Event,
+    EventInstance,
+    Seat,
+    SeatCategory,
+    EventSeat,
+    Order,
+    OrderSeat,
     Payment,
     )
 
 admin.site.register([
-    Venue, 
-    Event, 
-    EventInstance, 
-    SeatCategory, 
-    Seat, 
-    EventSeat, 
-    Order, 
-    OrderSeat, 
-    Payment, 
+    Venue,
+    Event,
+    EventInstance,
+    SeatCategory,
+    Seat,
+    EventSeat,
+    Order,
+    OrderSeat,
+    Payment,
     EventCategory,
     ])
 
 class UserAdmin(BaseUserAdmin):
+    """Admin user listing that includes group membership."""
+
     list_display = ('username', 'email', 'get_groups', 'is_staff')
 
     def get_groups(self, obj):
+        """Return a comma-separated list of groups assigned to the user."""
+
         return ", ".join([group.name for group in obj.groups.all()])
     get_groups.short_description = 'Groups'
 

@@ -5,6 +5,9 @@ import { QRCodeSVG } from 'qrcode.react';
 import Navbar from '../components/layout/Navbar';
 import { fetchMyTickets, type TicketDto } from '../api/tickets';
 
+/**
+ * Ticket detail page that displays purchased ticket information.
+ */
 const TicketView = () => {
   const navigate = useNavigate();
   const { id } = useParams();

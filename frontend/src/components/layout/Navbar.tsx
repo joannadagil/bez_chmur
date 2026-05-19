@@ -10,6 +10,9 @@ interface NavbarProps {
   userName?: string;
 }
 
+/**
+ * Top navigation bar used across customer and host-facing routes.
+ */
 const Navbar: React.FC<NavbarProps> = ({ hideTicketsLink = false, logoLink, userName }) => {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const location = useLocation();

@@ -43,6 +43,9 @@ const normalizeCategory = (name?: string): Category => {
   return 'area1';
 };
 
+/**
+ * Customer seat-selection page for seated and general-admission checkout.
+ */
 const SeatSelection = () => {
   const navigate = useNavigate();
   const { booking, updateBooking } = useBooking();

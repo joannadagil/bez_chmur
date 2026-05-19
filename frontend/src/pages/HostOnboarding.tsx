@@ -1,6 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
+/**
+ * Introductory host onboarding page that starts event creation.
+ */
 const HostOnboarding = () => {
   const navigate = useNavigate();
   const [companyName, setCompanyName] = useState('');

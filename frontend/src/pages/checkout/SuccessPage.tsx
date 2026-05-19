@@ -15,6 +15,9 @@ type SessionDetails = {
   seats: string[];
 };
 
+/**
+ * Checkout confirmation page that loads Stripe session details.
+ */
 const SuccessPage: React.FC = () => {
   const navigate = useNavigate();
   const { resetBooking } = useBooking();

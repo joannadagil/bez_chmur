@@ -1,5 +1,8 @@
 // src/data/mockEvents.ts
 
+/**
+ * Event summary used by mock browsing data and local host-created events.
+ */
 export interface Event {
   id: string;
   title: string;
@@ -10,6 +13,9 @@ export interface Event {
   imageUrl: string;
 }
 
+/**
+ * Bundled event data used when backend-hosted events are not available.
+ */
 export const mockEvents: Event[] = [
   {
     id: '1',

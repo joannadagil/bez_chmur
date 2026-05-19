@@ -1,5 +1,8 @@
 import Navbar from '../components/layout/Navbar';
 
+/**
+ * Static customer profile page for account information.
+ */
 const CustomerProfile = () => {
   const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
 

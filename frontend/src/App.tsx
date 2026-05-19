@@ -29,11 +29,17 @@ import HostOnboarding from './pages/HostOnboarding';
 import { useLocation } from 'react-router-dom';
 
 
+/**
+ * Guards routes that require any authenticated user.
+ */
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
   return isLoggedIn ? <>{children}</> : <Navigate to="/login" replace />;
 };
 
+/**
+ * Guards routes that should only be available to host accounts.
+ */
 const HostOnlyRoute = ({ children }: { children: React.ReactNode }) => {
   const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
   const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
@@ -41,6 +47,9 @@ const HostOnlyRoute = ({ children }: { children: React.ReactNode }) => {
   return currentUser.accountType === 'host' ? <>{children}</> : <Navigate to="/home" replace />;
 };
 
+/**
+ * Guards routes that should only be available to customer accounts.
+ */
 const CustomerOnlyRoute = ({ children }: { children: React.ReactNode }) => {
   const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
   const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}');
@@ -48,6 +57,9 @@ const CustomerOnlyRoute = ({ children }: { children: React.ReactNode }) => {
   return currentUser.accountType === 'host' ? <Navigate to="/host-dashboard" replace /> : <>{children}</>;
 };
 
+/**
+ * Shared page shell that renders navigation and nested route content.
+ */
 const AppLayout = () => {
   const { pathname } = useLocation();
 
@@ -100,6 +112,9 @@ const AppLayout = () => {
   );
 };
 
+/**
+ * Root application router and provider composition.
+ */
 function App() {
   return (
     <BookingProvider>

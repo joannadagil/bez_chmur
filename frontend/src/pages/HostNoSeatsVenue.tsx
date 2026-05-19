@@ -14,6 +14,9 @@ const SAMPLE_LOCATIONS = [
   'Roosevelta 22, Poznan',
 ];
 
+/**
+ * Host venue setup page for general-admission events without individual seats.
+ */
 const HostNoSeatsVenue = () => {
   const navigate = useNavigate();
   const { id: venueId } = useParams();
