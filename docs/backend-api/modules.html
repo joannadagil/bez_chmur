@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>api &#8212; GetARoom  documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=5ecbeea2" />
+    <link rel="stylesheet" type="text/css" href="_static/basic.css?v=b08954a9" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=27fed22d" />
+    <script src="_static/documentation_options.js?v=5929fcd5"></script>
+    <script src="_static/doctools.js?v=fd6eb6e6"></script>
+    <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="api">
+<h1>api<a class="headerlink" href="#api" title="Link to this heading">¶</a></h1>
+<div class="toctree-wrapper compound">
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="api.html">api package</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api.html#subpackages">Subpackages</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api.management.html">api.management package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.management.html#subpackages">Subpackages</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.management.html#module-api.management">Module contents</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.migrations.html">api.migrations package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.migrations.html#submodules">Submodules</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.migrations.html#module-api.migrations.0001_initial">api.migrations.0001_initial module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.migrations.html#module-api.migrations.0002_eventcategory_event_category">api.migrations.0002_eventcategory_event_category module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.migrations.html#module-api.migrations.0003_delete_message">api.migrations.0003_delete_message module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.migrations.html#module-api.migrations.0004_venue_image_url">api.migrations.0004_venue_image_url module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.migrations.html#module-api.migrations.0005_remove_venue_image_url_event_image_url">api.migrations.0005_remove_venue_image_url_event_image_url module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.migrations.html#module-api.migrations.0006_alter_payment_stripe_session_id">api.migrations.0006_alter_payment_stripe_session_id module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.migrations.html#module-api.migrations.0007_rename_exist_seat_if_exist">api.migrations.0007_rename_exist_seat_if_exist module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.migrations.html#module-api.migrations.0008_auto_20260426_0604">api.migrations.0008_auto_20260426_0604 module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.migrations.html#module-api.migrations.0009_eventinstance_host">api.migrations.0009_eventinstance_host module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.migrations.html#module-api.migrations.0010_order_quantity_eventinstance_ticket_price">api.migrations.0010_order_quantity_eventinstance_ticket_price module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.migrations.html#module-api.migrations">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#submodules">Submodules</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#module-api.admin">api.admin module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.admin.UserAdmin"><code class="docutils literal notranslate"><span class="pre">UserAdmin</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.admin.UserAdmin.get_groups"><code class="docutils literal notranslate"><span class="pre">UserAdmin.get_groups()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.admin.UserAdmin.list_display"><code class="docutils literal notranslate"><span class="pre">UserAdmin.list_display</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.admin.UserAdmin.media"><code class="docutils literal notranslate"><span class="pre">UserAdmin.media</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#module-api.apps">api.apps module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.apps.ApiConfig"><code class="docutils literal notranslate"><span class="pre">ApiConfig</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.apps.ApiConfig.name"><code class="docutils literal notranslate"><span class="pre">ApiConfig.name</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#module-api.models">api.models module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.models.Event"><code class="docutils literal notranslate"><span class="pre">Event</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Event.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">Event.DoesNotExist</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Event.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">Event.MultipleObjectsReturned</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Event.NotUpdated"><code class="docutils literal notranslate"><span class="pre">Event.NotUpdated</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Event.category"><code class="docutils literal notranslate"><span class="pre">Event.category</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Event.category_id"><code class="docutils literal notranslate"><span class="pre">Event.category_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Event.description"><code class="docutils literal notranslate"><span class="pre">Event.description</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Event.eventinstance_set"><code class="docutils literal notranslate"><span class="pre">Event.eventinstance_set</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Event.id"><code class="docutils literal notranslate"><span class="pre">Event.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Event.image_url"><code class="docutils literal notranslate"><span class="pre">Event.image_url</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Event.name"><code class="docutils literal notranslate"><span class="pre">Event.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Event.objects"><code class="docutils literal notranslate"><span class="pre">Event.objects</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.models.EventCategory"><code class="docutils literal notranslate"><span class="pre">EventCategory</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.EventCategory.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">EventCategory.DoesNotExist</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.EventCategory.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">EventCategory.MultipleObjectsReturned</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.EventCategory.NotUpdated"><code class="docutils literal notranslate"><span class="pre">EventCategory.NotUpdated</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.EventCategory.event_set"><code class="docutils literal notranslate"><span class="pre">EventCategory.event_set</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.EventCategory.id"><code class="docutils literal notranslate"><span class="pre">EventCategory.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.EventCategory.name"><code class="docutils literal notranslate"><span class="pre">EventCategory.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.EventCategory.objects"><code class="docutils literal notranslate"><span class="pre">EventCategory.objects</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.models.EventInstance"><code class="docutils literal notranslate"><span class="pre">EventInstance</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.EventInstance.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">EventInstance.DoesNotExist</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.EventInstance.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">EventInstance.MultipleObjectsReturned</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.EventInstance.NotUpdated"><code class="docutils literal notranslate"><span class="pre">EventInstance.NotUpdated</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.EventInstance.event"><code class="docutils literal notranslate"><span class="pre">EventInstance.event</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.EventInstance.event_id"><code class="docutils literal notranslate"><span class="pre">EventInstance.event_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.EventInstance.eventseat_set"><code class="docutils literal notranslate"><span class="pre">EventInstance.eventseat_set</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.EventInstance.get_next_by_time"><code class="docutils literal notranslate"><span class="pre">EventInstance.get_next_by_time()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.EventInstance.get_previous_by_time"><code class="docutils literal notranslate"><span class="pre">EventInstance.get_previous_by_time()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.EventInstance.host"><code class="docutils literal notranslate"><span class="pre">EventInstance.host</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.EventInstance.host_id"><code class="docutils literal notranslate"><span class="pre">EventInstance.host_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.EventInstance.id"><code class="docutils literal notranslate"><span class="pre">EventInstance.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.EventInstance.objects"><code class="docutils literal notranslate"><span class="pre">EventInstance.objects</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.EventInstance.order_set"><code class="docutils literal notranslate"><span class="pre">EventInstance.order_set</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.EventInstance.ticket_price"><code class="docutils literal notranslate"><span class="pre">EventInstance.ticket_price</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.EventInstance.time"><code class="docutils literal notranslate"><span class="pre">EventInstance.time</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.EventInstance.venue"><code class="docutils literal notranslate"><span class="pre">EventInstance.venue</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.EventInstance.venue_id"><code class="docutils literal notranslate"><span class="pre">EventInstance.venue_id</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.models.EventSeat"><code class="docutils literal notranslate"><span class="pre">EventSeat</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.EventSeat.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">EventSeat.DoesNotExist</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.EventSeat.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">EventSeat.MultipleObjectsReturned</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.EventSeat.NotUpdated"><code class="docutils literal notranslate"><span class="pre">EventSeat.NotUpdated</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.EventSeat.event_instance"><code class="docutils literal notranslate"><span class="pre">EventSeat.event_instance</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.EventSeat.event_instance_id"><code class="docutils literal notranslate"><span class="pre">EventSeat.event_instance_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.EventSeat.id"><code class="docutils literal notranslate"><span class="pre">EventSeat.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.EventSeat.objects"><code class="docutils literal notranslate"><span class="pre">EventSeat.objects</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.EventSeat.orderseat_set"><code class="docutils literal notranslate"><span class="pre">EventSeat.orderseat_set</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.EventSeat.seat"><code class="docutils literal notranslate"><span class="pre">EventSeat.seat</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.EventSeat.seat_category"><code class="docutils literal notranslate"><span class="pre">EventSeat.seat_category</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.EventSeat.seat_category_id"><code class="docutils literal notranslate"><span class="pre">EventSeat.seat_category_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.EventSeat.seat_id"><code class="docutils literal notranslate"><span class="pre">EventSeat.seat_id</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.models.Order"><code class="docutils literal notranslate"><span class="pre">Order</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Order.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">Order.DoesNotExist</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Order.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">Order.MultipleObjectsReturned</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Order.NotUpdated"><code class="docutils literal notranslate"><span class="pre">Order.NotUpdated</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Order.STATUS_CHOICES"><code class="docutils literal notranslate"><span class="pre">Order.STATUS_CHOICES</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Order.eventinstance"><code class="docutils literal notranslate"><span class="pre">Order.eventinstance</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Order.eventinstance_id"><code class="docutils literal notranslate"><span class="pre">Order.eventinstance_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Order.get_status_display"><code class="docutils literal notranslate"><span class="pre">Order.get_status_display()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Order.id"><code class="docutils literal notranslate"><span class="pre">Order.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Order.objects"><code class="docutils literal notranslate"><span class="pre">Order.objects</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Order.orderseat_set"><code class="docutils literal notranslate"><span class="pre">Order.orderseat_set</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Order.payment"><code class="docutils literal notranslate"><span class="pre">Order.payment</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Order.quantity"><code class="docutils literal notranslate"><span class="pre">Order.quantity</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Order.status"><code class="docutils literal notranslate"><span class="pre">Order.status</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Order.user"><code class="docutils literal notranslate"><span class="pre">Order.user</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Order.user_id"><code class="docutils literal notranslate"><span class="pre">Order.user_id</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.models.OrderSeat"><code class="docutils literal notranslate"><span class="pre">OrderSeat</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.OrderSeat.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">OrderSeat.DoesNotExist</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.OrderSeat.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">OrderSeat.MultipleObjectsReturned</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.OrderSeat.NotUpdated"><code class="docutils literal notranslate"><span class="pre">OrderSeat.NotUpdated</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.OrderSeat.event_seat"><code class="docutils literal notranslate"><span class="pre">OrderSeat.event_seat</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.OrderSeat.event_seat_id"><code class="docutils literal notranslate"><span class="pre">OrderSeat.event_seat_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.OrderSeat.id"><code class="docutils literal notranslate"><span class="pre">OrderSeat.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.OrderSeat.objects"><code class="docutils literal notranslate"><span class="pre">OrderSeat.objects</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.OrderSeat.order"><code class="docutils literal notranslate"><span class="pre">OrderSeat.order</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.OrderSeat.order_id"><code class="docutils literal notranslate"><span class="pre">OrderSeat.order_id</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.models.Payment"><code class="docutils literal notranslate"><span class="pre">Payment</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Payment.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">Payment.DoesNotExist</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Payment.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">Payment.MultipleObjectsReturned</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Payment.NotUpdated"><code class="docutils literal notranslate"><span class="pre">Payment.NotUpdated</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Payment.STATUS_CHOICES"><code class="docutils literal notranslate"><span class="pre">Payment.STATUS_CHOICES</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Payment.get_status_display"><code class="docutils literal notranslate"><span class="pre">Payment.get_status_display()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Payment.id"><code class="docutils literal notranslate"><span class="pre">Payment.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Payment.objects"><code class="docutils literal notranslate"><span class="pre">Payment.objects</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Payment.order"><code class="docutils literal notranslate"><span class="pre">Payment.order</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Payment.order_id"><code class="docutils literal notranslate"><span class="pre">Payment.order_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Payment.status"><code class="docutils literal notranslate"><span class="pre">Payment.status</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Payment.stripe_session_id"><code class="docutils literal notranslate"><span class="pre">Payment.stripe_session_id</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.models.Seat"><code class="docutils literal notranslate"><span class="pre">Seat</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Seat.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">Seat.DoesNotExist</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Seat.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">Seat.MultipleObjectsReturned</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Seat.NotUpdated"><code class="docutils literal notranslate"><span class="pre">Seat.NotUpdated</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Seat.eventseat_set"><code class="docutils literal notranslate"><span class="pre">Seat.eventseat_set</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Seat.id"><code class="docutils literal notranslate"><span class="pre">Seat.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Seat.if_exist"><code class="docutils literal notranslate"><span class="pre">Seat.if_exist</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Seat.number"><code class="docutils literal notranslate"><span class="pre">Seat.number</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Seat.objects"><code class="docutils literal notranslate"><span class="pre">Seat.objects</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Seat.row"><code class="docutils literal notranslate"><span class="pre">Seat.row</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Seat.venue"><code class="docutils literal notranslate"><span class="pre">Seat.venue</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Seat.venue_id"><code class="docutils literal notranslate"><span class="pre">Seat.venue_id</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.models.SeatCategory"><code class="docutils literal notranslate"><span class="pre">SeatCategory</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.SeatCategory.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">SeatCategory.DoesNotExist</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.SeatCategory.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">SeatCategory.MultipleObjectsReturned</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.SeatCategory.NotUpdated"><code class="docutils literal notranslate"><span class="pre">SeatCategory.NotUpdated</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.SeatCategory.eventseat_set"><code class="docutils literal notranslate"><span class="pre">SeatCategory.eventseat_set</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.SeatCategory.id"><code class="docutils literal notranslate"><span class="pre">SeatCategory.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.SeatCategory.name"><code class="docutils literal notranslate"><span class="pre">SeatCategory.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.SeatCategory.objects"><code class="docutils literal notranslate"><span class="pre">SeatCategory.objects</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.SeatCategory.price"><code class="docutils literal notranslate"><span class="pre">SeatCategory.price</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.models.Venue"><code class="docutils literal notranslate"><span class="pre">Venue</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Venue.DoesNotExist"><code class="docutils literal notranslate"><span class="pre">Venue.DoesNotExist</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Venue.MultipleObjectsReturned"><code class="docutils literal notranslate"><span class="pre">Venue.MultipleObjectsReturned</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Venue.NotUpdated"><code class="docutils literal notranslate"><span class="pre">Venue.NotUpdated</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Venue.eventinstance_set"><code class="docutils literal notranslate"><span class="pre">Venue.eventinstance_set</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Venue.id"><code class="docutils literal notranslate"><span class="pre">Venue.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Venue.name"><code class="docutils literal notranslate"><span class="pre">Venue.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Venue.objects"><code class="docutils literal notranslate"><span class="pre">Venue.objects</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Venue.rows"><code class="docutils literal notranslate"><span class="pre">Venue.rows</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Venue.save"><code class="docutils literal notranslate"><span class="pre">Venue.save()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Venue.seat_set"><code class="docutils literal notranslate"><span class="pre">Venue.seat_set</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.models.Venue.seats_per_row"><code class="docutils literal notranslate"><span class="pre">Venue.seats_per_row</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#module-api.serializers">api.serializers module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.serializers.EventCategorySerializer"><code class="docutils literal notranslate"><span class="pre">EventCategorySerializer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.serializers.EventCategorySerializer.Meta"><code class="docutils literal notranslate"><span class="pre">EventCategorySerializer.Meta</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.serializers.EventCreateSerializer"><code class="docutils literal notranslate"><span class="pre">EventCreateSerializer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.serializers.EventCreateSerializer.Meta"><code class="docutils literal notranslate"><span class="pre">EventCreateSerializer.Meta</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.serializers.EventCreateSerializer.create"><code class="docutils literal notranslate"><span class="pre">EventCreateSerializer.create()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.serializers.EventModelSerializer"><code class="docutils literal notranslate"><span class="pre">EventModelSerializer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.serializers.EventModelSerializer.Meta"><code class="docutils literal notranslate"><span class="pre">EventModelSerializer.Meta</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.serializers.EventReadSerializer"><code class="docutils literal notranslate"><span class="pre">EventReadSerializer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.serializers.EventReadSerializer.Meta"><code class="docutils literal notranslate"><span class="pre">EventReadSerializer.Meta</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.serializers.EventReadSerializer.get_price"><code class="docutils literal notranslate"><span class="pre">EventReadSerializer.get_price()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.serializers.EventReadSerializer.get_seatsLeft"><code class="docutils literal notranslate"><span class="pre">EventReadSerializer.get_seatsLeft()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.serializers.EventReadSerializer.get_soldTickets"><code class="docutils literal notranslate"><span class="pre">EventReadSerializer.get_soldTickets()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.serializers.EventSeatSerializer"><code class="docutils literal notranslate"><span class="pre">EventSeatSerializer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.serializers.EventSeatSerializer.Meta"><code class="docutils literal notranslate"><span class="pre">EventSeatSerializer.Meta</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.serializers.EventSeatSerializer.get_is_reserved"><code class="docutils literal notranslate"><span class="pre">EventSeatSerializer.get_is_reserved()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.serializers.OrderSerializer"><code class="docutils literal notranslate"><span class="pre">OrderSerializer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.serializers.OrderSerializer.Meta"><code class="docutils literal notranslate"><span class="pre">OrderSerializer.Meta</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.serializers.OrderSerializer.get_user"><code class="docutils literal notranslate"><span class="pre">OrderSerializer.get_user()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.serializers.PaymentSerializer"><code class="docutils literal notranslate"><span class="pre">PaymentSerializer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.serializers.PaymentSerializer.Meta"><code class="docutils literal notranslate"><span class="pre">PaymentSerializer.Meta</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.serializers.PaymentSerializer.get_order"><code class="docutils literal notranslate"><span class="pre">PaymentSerializer.get_order()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.serializers.RegisterSerializer"><code class="docutils literal notranslate"><span class="pre">RegisterSerializer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.serializers.RegisterSerializer.Meta"><code class="docutils literal notranslate"><span class="pre">RegisterSerializer.Meta</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.serializers.RegisterSerializer.create"><code class="docutils literal notranslate"><span class="pre">RegisterSerializer.create()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.serializers.SeatCategoryShortSerializer"><code class="docutils literal notranslate"><span class="pre">SeatCategoryShortSerializer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.serializers.SeatCategoryShortSerializer.Meta"><code class="docutils literal notranslate"><span class="pre">SeatCategoryShortSerializer.Meta</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.serializers.UserOrderSerializer"><code class="docutils literal notranslate"><span class="pre">UserOrderSerializer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.serializers.UserOrderSerializer.Meta"><code class="docutils literal notranslate"><span class="pre">UserOrderSerializer.Meta</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.serializers.UserOrderSerializer.get_seats"><code class="docutils literal notranslate"><span class="pre">UserOrderSerializer.get_seats()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.serializers.UserOrderSerializer.get_user_full_name"><code class="docutils literal notranslate"><span class="pre">UserOrderSerializer.get_user_full_name()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.serializers.UserSerializer"><code class="docutils literal notranslate"><span class="pre">UserSerializer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.serializers.UserSerializer.Meta"><code class="docutils literal notranslate"><span class="pre">UserSerializer.Meta</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.serializers.VenueSerializer"><code class="docutils literal notranslate"><span class="pre">VenueSerializer</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.serializers.VenueSerializer.Meta"><code class="docutils literal notranslate"><span class="pre">VenueSerializer.Meta</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#module-api.tests">api.tests module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#module-api.urls">api.urls module</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#module-api.views">api.views module</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.views.BookSeatsView"><code class="docutils literal notranslate"><span class="pre">BookSeatsView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.views.BookSeatsView.permission_classes"><code class="docutils literal notranslate"><span class="pre">BookSeatsView.permission_classes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.views.BookSeatsView.post"><code class="docutils literal notranslate"><span class="pre">BookSeatsView.post()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.views.EventCategoryListCreateView"><code class="docutils literal notranslate"><span class="pre">EventCategoryListCreateView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.views.EventCategoryListCreateView.get_queryset"><code class="docutils literal notranslate"><span class="pre">EventCategoryListCreateView.get_queryset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.views.EventCategoryListCreateView.serializer_class"><code class="docutils literal notranslate"><span class="pre">EventCategoryListCreateView.serializer_class</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.views.EventDetailView"><code class="docutils literal notranslate"><span class="pre">EventDetailView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.views.EventDetailView.get_queryset"><code class="docutils literal notranslate"><span class="pre">EventDetailView.get_queryset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.views.EventDetailView.serializer_class"><code class="docutils literal notranslate"><span class="pre">EventDetailView.serializer_class</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.views.EventInstanceSeatsListView"><code class="docutils literal notranslate"><span class="pre">EventInstanceSeatsListView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.views.EventInstanceSeatsListView.get_queryset"><code class="docutils literal notranslate"><span class="pre">EventInstanceSeatsListView.get_queryset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.views.EventInstanceSeatsListView.serializer_class"><code class="docutils literal notranslate"><span class="pre">EventInstanceSeatsListView.serializer_class</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.views.EventListCreateView"><code class="docutils literal notranslate"><span class="pre">EventListCreateView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.views.EventListCreateView.get_queryset"><code class="docutils literal notranslate"><span class="pre">EventListCreateView.get_queryset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.views.EventListCreateView.serializer_class"><code class="docutils literal notranslate"><span class="pre">EventListCreateView.serializer_class</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.views.EventListView"><code class="docutils literal notranslate"><span class="pre">EventListView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.views.EventListView.get_permissions"><code class="docutils literal notranslate"><span class="pre">EventListView.get_permissions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.views.EventListView.get_queryset"><code class="docutils literal notranslate"><span class="pre">EventListView.get_queryset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.views.EventListView.get_serializer_class"><code class="docutils literal notranslate"><span class="pre">EventListView.get_serializer_class()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.views.HostEventDetailView"><code class="docutils literal notranslate"><span class="pre">HostEventDetailView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.views.HostEventDetailView.get_queryset"><code class="docutils literal notranslate"><span class="pre">HostEventDetailView.get_queryset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.views.HostEventDetailView.permission_classes"><code class="docutils literal notranslate"><span class="pre">HostEventDetailView.permission_classes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.views.HostEventDetailView.serializer_class"><code class="docutils literal notranslate"><span class="pre">HostEventDetailView.serializer_class</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.views.HostEventListView"><code class="docutils literal notranslate"><span class="pre">HostEventListView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.views.HostEventListView.get_permissions"><code class="docutils literal notranslate"><span class="pre">HostEventListView.get_permissions()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.views.HostEventListView.get_queryset"><code class="docutils literal notranslate"><span class="pre">HostEventListView.get_queryset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.views.HostEventListView.get_serializer_class"><code class="docutils literal notranslate"><span class="pre">HostEventListView.get_serializer_class()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.views.OrderView"><code class="docutils literal notranslate"><span class="pre">OrderView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.views.OrderView.get_queryset"><code class="docutils literal notranslate"><span class="pre">OrderView.get_queryset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.views.OrderView.serializer_class"><code class="docutils literal notranslate"><span class="pre">OrderView.serializer_class</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.views.PaymantCreateView"><code class="docutils literal notranslate"><span class="pre">PaymantCreateView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.views.PaymantCreateView.get_queryset"><code class="docutils literal notranslate"><span class="pre">PaymantCreateView.get_queryset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.views.PaymantCreateView.serializer_class"><code class="docutils literal notranslate"><span class="pre">PaymantCreateView.serializer_class</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.views.RegisterView"><code class="docutils literal notranslate"><span class="pre">RegisterView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.views.RegisterView.authentication_classes"><code class="docutils literal notranslate"><span class="pre">RegisterView.authentication_classes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.views.RegisterView.get_queryset"><code class="docutils literal notranslate"><span class="pre">RegisterView.get_queryset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.views.RegisterView.permission_classes"><code class="docutils literal notranslate"><span class="pre">RegisterView.permission_classes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.views.RegisterView.serializer_class"><code class="docutils literal notranslate"><span class="pre">RegisterView.serializer_class</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.views.UserListView"><code class="docutils literal notranslate"><span class="pre">UserListView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.views.UserListView.get_queryset"><code class="docutils literal notranslate"><span class="pre">UserListView.get_queryset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.views.UserListView.serializer_class"><code class="docutils literal notranslate"><span class="pre">UserListView.serializer_class</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.views.UserOrdersListView"><code class="docutils literal notranslate"><span class="pre">UserOrdersListView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.views.UserOrdersListView.get_queryset"><code class="docutils literal notranslate"><span class="pre">UserOrdersListView.get_queryset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.views.UserOrdersListView.permission_classes"><code class="docutils literal notranslate"><span class="pre">UserOrdersListView.permission_classes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.views.UserOrdersListView.serializer_class"><code class="docutils literal notranslate"><span class="pre">UserOrdersListView.serializer_class</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.views.VenueListCreateView"><code class="docutils literal notranslate"><span class="pre">VenueListCreateView</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.views.VenueListCreateView.get_queryset"><code class="docutils literal notranslate"><span class="pre">VenueListCreateView.get_queryset()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api.html#api.views.VenueListCreateView.serializer_class"><code class="docutils literal notranslate"><span class="pre">VenueListCreateView.serializer_class</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.views.create_checkout_session"><code class="docutils literal notranslate"><span class="pre">create_checkout_session()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.views.current_user_role"><code class="docutils literal notranslate"><span class="pre">current_user_role()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.views.get_session_details"><code class="docutils literal notranslate"><span class="pre">get_session_details()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api.html#api.views.stripe_webhook"><code class="docutils literal notranslate"><span class="pre">stripe_webhook()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api.html#module-api">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="Main">
+        <div class="sphinxsidebarwrapper">
+<h1 class="logo"><a href="index.html">GetARoom</a></h1>
+
+
+
+
+
+
+
+
+
+<search id="searchbox" style="display: none" role="search">
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" placeholder="Search"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script><h3>Navigation</h3>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+  </ul></li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2026, Marta Czarnecka, Joanna Dagil, Weronika Kłujszo, Semion Lisichik.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 9.1.0</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 1.0.0</a>
+      
+      |
+      <a href="_sources/modules.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

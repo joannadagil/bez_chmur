@@ -45,8 +45,6 @@ from .serializers import (
 class EventListView(generics.ListCreateAPIView):
     """List public upcoming event instances or create a hosted event setup."""
 
-    queryset = EventInstance.objects.select_related('event', 'venue', 'event__category').all()
-
     def get_queryset(self):
         """Return upcoming hosted events, optionally filtered by event id."""
 
@@ -76,8 +74,12 @@ class EventListView(generics.ListCreateAPIView):
 class EventDetailView(generics.RetrieveAPIView):
     """Retrieve one public event instance."""
 
-    queryset = EventInstance.objects.all()
     serializer_class = EventReadSerializer
+
+    def get_queryset(self):
+        """Return all event instances for public detail lookups."""
+
+        return EventInstance.objects.all()
 
 class HostEventListView(generics.ListCreateAPIView):
     """List or create event instances owned by the authenticated host."""
@@ -141,32 +143,52 @@ def current_user_role(request):
 class VenueListCreateView(generics.ListCreateAPIView):
     """List or create venue layouts."""
 
-    queryset = Venue.objects.all()
     serializer_class = VenueSerializer
+
+    def get_queryset(self):
+        """Return all venues."""
+
+        return Venue.objects.all()
 
 class PaymantCreateView(generics.ListCreateAPIView):
     """List or create payment records for administrative flows."""
 
-    queryset = Payment.objects.all()
     serializer_class = PaymentSerializer
 
+    def get_queryset(self):
+        """Return all payments."""
+
+        return Payment.objects.all()
+    
 class OrderView(generics.ListCreateAPIView):
     """List or create orders for administrative flows."""
 
-    queryset = Order.objects.all()
     serializer_class = OrderSerializer
+
+    def get_queryset(self):
+        """Return all orders."""
+
+        return Order.objects.all()
 
 class EventListCreateView(generics.ListCreateAPIView):
     """List or create reusable event definitions."""
 
-    queryset = Event.objects.all()
     serializer_class = EventModelSerializer
+
+    def get_queryset(self):
+        """Return all event definitions."""
+
+        return Event.objects.all()
 
 class EventCategoryListCreateView(generics.ListCreateAPIView):
     """List or create event categories."""
 
-    queryset = EventCategory.objects.all()
     serializer_class = EventCategorySerializer
+
+    def get_queryset(self):
+        """Return all event categories."""
+
+        return EventCategory.objects.all()
 
 class UserListView(generics.ListCreateAPIView):
     """List users for administrative screens."""
@@ -287,10 +309,14 @@ class BookSeatsView(views.APIView):
 class RegisterView(generics.CreateAPIView):
     """Register a new customer or host account."""
 
-    queryset = User.objects.all()
     serializer_class = RegisterSerializer
     permission_classes = [permissions.AllowAny]
     authentication_classes = []
+
+    def get_queryset(self):
+        """Return all users for create view metadata and tooling."""
+
+        return User.objects.all()
 
 
 @api_view(['POST'])
