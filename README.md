@@ -14,7 +14,7 @@ The project was developed as a full-stack student assignment and has since been 
 - Event catalogue with filtering by venue, date, and event type
 - Interactive cinema-style seat map with area-based pricing tiers
 - Temporary seat reservation with automatic expiry
-- Mock payment flow via Stripe Checkout (test mode — no real charges)
+- Mock payment flow via Stripe Checkout (test mode - no real charges)
 - Event creation with custom venue layout, showings, and scheduling rules (hosts)
 - Order history and booking confirmation (customers)
 - Dark mode
