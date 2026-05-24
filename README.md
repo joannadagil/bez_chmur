@@ -1,6 +1,6 @@
 # GetARoom
 
-**GetARoom** (repository: `bez_chmur`, default branch: `fix/checkout-fixes`) is a web application for browsing and creating events and reserving seats in venues such as cinemas, theatres, and lecture halls.
+**GetARoom** (repository: `bez_chmur`, default branch: `fix/checkout-fixes`, post-migration branch: `cloud-migration`) is a web application for browsing and creating events and reserving seats in venues such as cinemas, theatres, and lecture halls.
 
 The project was developed as a full-stack student assignment and has since been migrated to a cloud environment at [get-a-room.pl](https://get-a-room.pl/) hosted on AWS.
 
