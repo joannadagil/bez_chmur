@@ -7,7 +7,7 @@
 
 **GetARoom** (repository: `bez_chmur`, default branch: `fix/checkout-fixes`) is a web application for browsing and creating events and reserving seats in venues such as cinemas, theatres, and lecture halls. Users are split into two account versions - host and customer and can view upcoming events (cusotmers can view all upcoming events while hosts only see the ones created by them), temporarily hold seats, 'buy' tickets through completing a mock payment flow powered by Stripe Checkout (customers), create new events in either pre-prepared seated halls or no-seats venues and choose areas and prices (hosts).
 
-The project was developed as a full-stack student assignment and has since been migrated to a cloud environment at **get-a-room.pl** hosted on AWS.
+The project was developed as a full-stack student assignment and has since been migrated to a cloud environment at [get-a-room.pl](https://get-a-room.pl/) hosted on AWS.
 
 ---
 
@@ -46,6 +46,31 @@ The project was developed as a full-stack student assignment and has since been 
 - Dark-mode
 - Event creation mode allowing for custom venue outline (seat removal feature), event title, description, poster graphic, number of showings per event and their respective dates and starting hours (there must be at least one hour break between the end of one showing till the beggining of the next one during a day)
 - Venue-holding system (if a certain venue is occupied on at least one of the dates planned, it will be blocked in venue choosing)
+
+---
+
+## User flows
+
+### Customer
+
+1. Login, forgot-password or register --> 2.
+2. Customer dashboard with host-made events to choose from --> 3.
+3. Event details page with event title, poster, description, and all available upcoming dates and starting hours (upcoming = within 1 hour or more) --> 4.
+4. Seat outline view with seats to choose from --> 5.
+5. Confirm & pay --> mockup Stripe Checkout --> 2.
+
+All tickets (pending, paid and past) can be seen in 'My Tickets' segment in the cutomer's profile (visible after clicking on profile picture icon).
+
+### Host
+
+1. Login, forgot-password or register (registration requires additional information - NIP, company name, company address) --> 2.
+2. Host dashboard with the events made by this host account --> 3./4.
+3. Manage-existing-event page with a room outline (for seated venue events only) per each showing and information regarding the amount of seats left per showing
+4. Create new event page (title, description, poster, type, dates, starting hours and duration of each showing) --> 5.
+5. Pick-a-venue page with a list of all available halls (the amount of seats available between them differs. Current biggest hall is 'Hall A' with 500 seats and the smallest is 'Tiny Room' with 50 seats) for seated events (--> 6.) or no-seats venue (--> 8.)
+6. Choose which seats to remove (optional) --> 7.
+7. Choose areas and pricing per area. At least one area must be chosen --> 2.
+8. Choose the location address, dimensions of the room (XxYxZ, Z being the amount of floors of the venue), amount of tickets and price-per-ticket. No areas in this venue type, which means all tickets cost the exact same --> 2.
 
 ---
 
