@@ -44,6 +44,7 @@ The project was developed as a full-stack student assignment and has since been 
 - Mock payment flow via Stripe Checkout (no real charges)
 - Ticket order history for customers
 - Dark-mode
+- Debug randomizer buttons to quickly check proper functionality
 - Event creation mode allowing for custom venue outline (seat removal feature), event title, description, poster graphic, number of showings per event and their respective dates and starting hours (there must be at least one hour break between the end of one showing till the beggining of the next one during a day)
 - Venue-holding system (if a certain venue is occupied on at least one of the dates planned, it will be blocked in venue choosing)
 
