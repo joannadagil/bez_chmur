@@ -171,7 +171,6 @@ Seat statuses: `available` · `held` · `booked`
 | Method | Endpoint | Description |
 |---|---|---|
 | `POST` | `/api/create-checkout-session/` | Reserve seats and create a Stripe Checkout session |
-| `POST` | `/api/confirm-free-order/` | Confirm a free (£0) booking without Stripe |
 | `GET` | `/api/session-details/` | Get booking confirmation details for a session ID |
 | `GET` | `/api/user-order/` | List all orders for the authenticated user |
 | `POST` | `/api/stripe/webhook/` | Stripe webhook handler (internal) |
