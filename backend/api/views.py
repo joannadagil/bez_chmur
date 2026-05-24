@@ -1,4 +1,4 @@
-import stripe
+import stripe,os
 from datetime import timedelta
 from django.conf import settings
 from django.http import HttpResponse
@@ -12,7 +12,9 @@ from django.db import transaction
 from django.db.models import Sum
 from django.utils import timezone
 
+
 stripe.api_key = settings.STRIPE_SECRET_KEY
+frontend_url = os.environ.get("FRONTEND_URL", "http://localhost:5173")
 
 from .models import (
     Venue,
@@ -425,8 +427,8 @@ def create_checkout_session(request):
                     'quantity': quantity if is_no_seats else 1,
                 }],
                 mode='payment',
-                success_url='http://localhost:5173/checkout/success?session_id={CHECKOUT_SESSION_ID}',
-                cancel_url='http://localhost:5173/checkout/payment',
+                success_url=f'{frontend_url}/checkout/success?session_id={{CHECKOUT_SESSION_ID}}',
+                cancel_url=f'{frontend_url}/checkout/payment',
                 metadata={
                     'order_id': str(order.id),
                     'payment_id': str(payment.id),

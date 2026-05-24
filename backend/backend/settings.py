@@ -26,7 +26,13 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 
 DEBUG = os.getenv('DEBUG') == 'True'
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', '0.0.0.0', 'backend']
+ALLOWED_HOSTS = ['localhost',
+    '127.0.0.1',
+    '56.228.27.85',
+    'd2ohhsekiw1xbf.cloudfront.net',
+    'get-a-room.pl',
+    'www.get-a-room.pl',
+    'api.get-a-room.pl',]
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -63,6 +69,12 @@ INSTALLED_APPS = [
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True
+CSRF_TRUSTED_ORIGINS = [
+    "https://d2ohhsekiw1xbf.cloudfront.net",
+    "https://get-a-room.pl",
+    "https://www.get-a-room.pl",
+    "https://api.get-a-room.pl",
+]
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
