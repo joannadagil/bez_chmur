@@ -142,29 +142,39 @@ The backend exposes a REST API built with Django REST Framework.
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `POST` | `/api/auth/register` | Register a new user |
-| `POST` | `/api/auth/login` | Log in and receive an auth token |
+| `POST` | `/api/register/` | Register a new user |
+| `POST` | `/api/token/` | Log in and receive a JWT access + refresh token |
+| `POST` | `/api/token/refresh/` | Refresh an expired access token |
+| `GET` | `/api/me-role/` | Get current user's profile and account type (host/customer) |
 
 ### Events
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/api/events` | List all events (supports `?venue=` and `?date=` filters) |
-| `GET` | `/api/events/{id}` | Get details of a single event |
+| `GET` | `/api/event-instances/` | List all upcoming public events (supports `?event=` filter) |
+| `GET` | `/api/event-instances/{id}/` | Get details of a single event instance |
+| `GET` | `/api/host-events/` | List events created by the authenticated host |
+| `GET POST` | `/api/events/` | List or create event definitions |
+| `GET POST` | `/api/categories/` | List or create event categories |
 
-### Seats
+### Seats & Venues
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/api/events/{id}/seats` | Get the seating layout for an event |
+| `GET` | `/api/event-instances/{id}/seats/` | Get the seating layout for an event instance |
+| `GET POST` | `/api/venues/` | List or create venues |
 
 Seat statuses: `available` · `held` · `booked`
 
-### Reservations
+### Booking & Payments
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `POST` | `/api/reservations` | Reserve seats (temporarily holds them until payment) |
+| `POST` | `/api/create-checkout-session/` | Reserve seats and create a Stripe Checkout session |
+| `POST` | `/api/confirm-free-order/` | Confirm a free (£0) booking without Stripe |
+| `GET` | `/api/session-details/` | Get booking confirmation details for a session ID |
+| `GET` | `/api/user-order/` | List all orders for the authenticated user |
+| `POST` | `/api/stripe/webhook/` | Stripe webhook handler (internal) |
 
 ---
 
