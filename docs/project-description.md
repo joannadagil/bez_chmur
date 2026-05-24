@@ -31,7 +31,7 @@ The project was developed as a full-stack student assignment and has since been 
 | Database | PostgreSQL |
 | Payments | Stripe Checkout (test mode) |
 | Containerisation | Docker, Docker Compose |
-| Cloud | AWS (see [cloud migration description file](./cloud-migration.md)) |
+| Cloud | AWS (see [cloud migration description file](./cloud_migration.md)) |
 
 ---
 
@@ -196,4 +196,4 @@ These are enhancements and refactors the team identified during development that
 
 ## Related documentation
 
-- [Cloud Migration Guide (AWS)](./cloud-migration.md) — step-by-step instructions for deploying the application to AWS.
+- [Cloud Migration Guide (AWS)](./cloud_migration.md) — step-by-step instructions for deploying the application to AWS.
