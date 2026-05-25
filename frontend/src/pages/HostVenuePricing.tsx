@@ -216,7 +216,7 @@ const HostVenuePricing = () => {
     const assignedCategories = new Set(Object.values(seatAssignments));
     assignedCategories.forEach((category) => {
       const price = prices[category as Category];
-      if (!price || Number.isNaN(Number(price)) || Number(price) < 0) {
+      if (!price || Number.isNaN(Number(price)) || Number(price) <= 0) {
         validationErrors.push(`${CATEGORY_META[category as Category].label} has no valid price set.`);
       }
     });
