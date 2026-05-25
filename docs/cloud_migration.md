@@ -92,21 +92,29 @@ Incoming HTTPS traffic hits the ALB on port `443`. The ALB terminates TLS using 
 
 ---
 
-## 4. CDN and SPA Routing
+## 4. Database connectivity and access control
 
-### 4.1. Problem
+The PostgreSQL database is hosted on Amazon RDS and accessed by the application through standard environment-based configuration (`DATABASE_HOST`, `DATABASE_NAME`, `DATABASE_USER`, `DATABASE_PASSWORD`, `DATABASE_PORT`). This separates persistent data storage from the application runtime and allows the backend to be redeployed independently of the database layer. Network access to the database is controlled through AWS VPC Security Groups. Only explicitly authorized sources are allowed to connect to the PostgreSQL port (`5432`), which reduces unnecessary exposure of the database service.
+
+The database schema is managed through Django migrations, while application data was transferred from the local development database into the RDS instance and validated after import.
+
+---
+
+## 5. CDN and SPA Routing
+
+### 5.1. Problem
 React Router handles navigation client-side. When a user navigates directly to a URL like `https://get-a-room.pl/checkout/success` (e.g. after returning from Stripe), CloudFront tries to find a file at that path in S3. Since no such file exists, S3 returns a `403` or `404` error.
 
-### 4.2. Fix: CloudFront Error Responses
+### 5.2. Fix: CloudFront Error Responses
 CloudFront was configured to intercept `403` and `404` errors and return `/index.html` with a `200 OK` status instead. React then loads and renders the correct view based on the URL.
 
 After applying this change, a full cache invalidation was triggered (`/*`) to ensure the new rules took effect immediately.
 
 ---
 
-## 5. Stripe Integration
+## 6. Stripe Integration
 
-### 5.1. Dynamic URLs
+### 6.1. Dynamic URLs
 Checkout session URLs are built from the `FRONTEND_URL` environment variable rather than hardcoded values:
 
 ```python
@@ -126,19 +134,19 @@ session = stripe.checkout.Session.create(
 
 > The double curly braces `{{CHECKOUT_SESSION_ID}}` are required Python syntax to escape the f-string interpolation, passing the literal `{CHECKOUT_SESSION_ID}` placeholder to Stripe for substitution.
 
-### 5.2. Webhooks
+### 6.2. Webhooks
 Stripe sends `checkout.session.completed` events via POST to `https://api.get-a-room.pl/api/stripe/webhook/`. The Django handler verifies each request using an HMAC-SHA256 signature checked against the `STRIPE_WEBHOOK_SECRET` environment variable.
 
 ---
 
-## 6. Deployment Script and Secrets Management
+## 7. Deployment Script and Secrets Management
 
 Credentials are not stored in the codebase or Docker images. They are fetched at startup from **AWS SSM Parameter Store** (region: `eu-north-1`).
 
-### 6.1. API Limit Workaround
+### 7.1. API Limit Workaround
 The `aws ssm get-parameters` command supports a maximum of 10 parameters per call. Since the project uses 13 variables, the fetch is split into two calls and the results are merged.
 
-### 6.2. Deployment Script (`start.sh`)
+### 7.2. Deployment Script (`start.sh`)
 
 SSM parameters are written to a temporary file in `/tmp` using `awk` to format each line as `KEY=VALUE`. Docker reads the file directly via `--env-file`, so no secrets pass through the shell interpreter. The file is deleted immediately after the container starts.
 
@@ -189,5 +197,5 @@ fi
 rm -f "$ENV_FILE"
 ```
 
-### 6.3. IAM Permissions
+### 7.3. IAM Permissions
 The EC2 instance uses an IAM Role with the `AmazonSSMReadOnlyAccess` policy. This allows the instance to read SSM parameters without storing any credentials on disk or in environment files.
