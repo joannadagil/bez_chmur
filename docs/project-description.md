@@ -187,6 +187,7 @@ These are enhancements and refactors the team identified during development that
 - - **Promo codes** - adding promo codes, vouchers, etc. based off for example whether the customer is a student. 
 - **QR code as e-ticket** - currently, no ticket artifact is generated after booking. The current QR system is for visuals and returns info such as seat numbers (for a seated venue), event title and date. Instead, after a confirmed booking we could generate a PDF or in-app e-ticket containing a QR code encoding the reservation ID. This could be validated at the venue entrance.
 - **Cancellations** - a way for a customer to cancel their reservation.
+- **Free events** - this version of the app has gone to disallowing free events from being created, due to Stripe validation currently all tickets must have a price > 0. 
 - **Why the one hour?** - one-hour break between theatre shows is valid, but it's way too long for a 'Cinema' type event. Currently, the one-hour break is hard-coded and it could instead be changed to vary per event type.
 - **Comments / FY model** - features allowing customers to leave comments under a sepcific event or rate it. Then, a ML system to reccommend events similar to what the customer had enjoyed could be implemented.
 - **Seat selection persistence** - preserve selected seats across a page refresh (e.g. via `sessionStorage`) so users do not lose their selection by accident.
